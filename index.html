@@ -685,6 +685,20 @@
       outline-offset: 2px; /* Provides a small space between the element edge and the outline */
     }
 
+    .postit-ghost {
+      opacity: 0.7;
+      background: #f0f0f0; /* A very light grey */
+      border: 2px dashed #cccccc;
+      border-radius: 8px; /* Match postit border-radius */
+    }
+
+    .postit-drag {
+      opacity: 0.9;
+      transform: rotate(1.5deg) scale(1.02); /* Subtle lift and tilt */
+      box-shadow: 0 6px 20px rgba(0,0,0,0.25); /* Enhanced shadow */
+      cursor: grabbing !important; /* Force grabbing cursor */
+    }
+
     .postit-due-date {
       font-size: 0.65rem; color: #8b4513; background: rgba(139, 69, 19, 0.1);
       padding: 2px 4px; border-radius: 3px; font-weight: 700;
@@ -2354,15 +2368,20 @@ async function addNote() {
               const displayYear = String(dueDate.getFullYear()).slice(-2);
               dueDateDisplay = `<span class="postit-due-date"><i class="fas fa-calendar"></i> ${displayDay}/${displayMonth}/${displayYear}</span>`;
 
-              if (dueDate < today) {
-                div.classList.add('postit-overdue');
-                div.title = "Vencido";
-              } else if (dueDate.getTime() === today.getTime()) {
-                div.classList.add('postit-overdue'); // Also overdue for "due today"
-                div.title = "Vence hoje";
-              } else {
-                div.classList.add('postit-future-due');
-                div.title = "Pendente";
+              // Clear any pre-existing date classes and title
+              div.classList.remove('postit-overdue', 'postit-future-due');
+              div.title = '';
+
+              if (dueDate <= today) { // Condition includes today
+                  div.classList.add('postit-overdue');
+                  if (dueDate.getTime() === today.getTime()) {
+                      div.title = "Vence hoje";
+                  } else {
+                      div.title = "Vencido";
+                  }
+              } else { // This implies dueDate > today (strictly future)
+                  div.classList.add('postit-future-due');
+                  div.title = "Pendente";
               }
             }
             div.innerHTML = `
@@ -2370,7 +2389,6 @@ async function addNote() {
                 <span class="days">${daysAgoText}</span>
                 <div style="display: flex; align-items: center; gap: 8px;">
                   ${dueDateDisplay}
-                  {/* dateIndicatorHtml removed from here */}
                   <button class="delete-btn" onclick="deleteNote('${doc.id}')" title="Excluir nota">
                     <i class="fas fa-trash"></i>
                   </button>
@@ -2384,8 +2402,9 @@ async function addNote() {
 
           // Initialize SortableJS
           new Sortable(notesContainer, {
-            animation: 150,
-            ghostClass: 'blue-background-class', // Optional: class for styling the ghost element
+            animation: 250, // Adjusted animation duration
+            ghostClass: 'postit-ghost', // Class for the placeholder
+            dragClass: 'postit-drag',   // Class for the item being dragged
             delay: 100, // ms, delay before drag starts
             delayOnTouchOnly: true, // only delay if user is using touch
             touchStartThreshold: 10, // px, how far the touch must move before it's considered a drag
@@ -2734,15 +2753,20 @@ async function addNote() {
               const displayYear = String(dueDate.getFullYear()).slice(-2);
               dueDateDisplay = `<span class="postit-due-date"><i class="fas fa-calendar"></i> ${displayDay}/${displayMonth}/${displayYear}</span>`;
 
-              if (dueDate < today) {
-                div.classList.add('postit-overdue');
-                div.title = "Vencido";
-              } else if (dueDate.getTime() === today.getTime()) {
-                div.classList.add('postit-overdue'); // Also overdue for "due today"
-                div.title = "Vence hoje";
-              } else {
-                div.classList.add('postit-future-due');
-                div.title = "Pendente";
+              // Clear any pre-existing date classes and title
+              div.classList.remove('postit-overdue', 'postit-future-due');
+              div.title = '';
+
+              if (dueDate <= today) { // Condition includes today
+                  div.classList.add('postit-overdue');
+                  if (dueDate.getTime() === today.getTime()) {
+                      div.title = "Vence hoje";
+                  } else {
+                      div.title = "Vencido";
+                  }
+              } else { // This implies dueDate > today (strictly future)
+                  div.classList.add('postit-future-due');
+                  div.title = "Pendente";
               }
             }
             div.innerHTML = `
@@ -2750,7 +2774,6 @@ async function addNote() {
                 <span class="days">${daysAgoText}</span>
                 <div style="display: flex; align-items: center; gap: 8px;">
                   ${dueDateDisplay}
-                  {/* dateIndicatorHtml removed from here */}
                   <button class="delete-btn" onclick="deleteNote('${doc.id}')" title="Excluir nota">
                     <i class="fas fa-trash"></i>
                   </button>
@@ -2764,8 +2787,9 @@ async function addNote() {
 
           // Initialize SortableJS for theme notes
           new Sortable(notesContainer, {
-            animation: 150,
-            ghostClass: 'blue-background-class', // Optional
+            animation: 250, // Adjusted animation duration
+            ghostClass: 'postit-ghost', // Class for the placeholder
+            dragClass: 'postit-drag',   // Class for the item being dragged
             delay: 100, // ms, delay before drag starts
             delayOnTouchOnly: true, // only delay if user is using touch
             touchStartThreshold: 10, // px, how far the touch must move before it's considered a drag
