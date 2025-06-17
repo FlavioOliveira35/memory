@@ -239,6 +239,11 @@
     #appName i {
       margin-right: 8px;
     }
+    /* Ensure .logo-area handles multiple children if it wasn't before */
+    .logo-area {
+        display: flex;
+        align-items: center; /* This should already be there */
+    }
 
     .collapsible-menu { /* New container for nav and user actions */
       display: flex;
@@ -490,12 +495,17 @@
     }
 
     #memoryUsageDisplayContainer {
-        margin-top: 0; /* Adjusted */
-        background-color: #8b4513; /* Darker to match top-bar */
-        color: #f4f1e8; /* Light text */
-        border-top: 1px solid #654321; /* Consistent border */
-        padding: 8px 10px; /* Adjusted padding */
-        /* font-family and font-size are already set, display:none is in HTML */
+      font-family: 'Courier Prime', monospace;
+      font-size: 0.75rem; /* Slightly smaller to be discreet */
+      color: #f0eada; /* Slightly off-white, consistent with top-bar text */
+      background-color: transparent !important; /* Remove background */
+      border: none !important; /* Remove all borders */
+      padding: 0 !important; /* Remove all padding */
+      margin: 0; /* Reset margin */
+      margin-left: 15px; /* Space it from the appName */
+      text-align: left; /* Align text to the left */
+      /* display: none; is set by JS initially and when logged out */
+      align-self: center; /* Align well with appName in flex context */
     }
 
     .notes-container {
@@ -622,6 +632,8 @@
       width: 260px; background: #FFF59D; padding: 5px 20px 20px 20px;
       border-radius: 8px; min-height: 150px;
       box-shadow: 2px 4px 10px rgba(0,0,0,0.2); position: relative;
+      /* animation: slideInUp 0.5s ease-out; */ /* Removed animation */
+      border: 2px solid transparent; /* Added default transparent border */
     }
     .postit:hover {
       transform: rotate(0deg) scale(1.02);
@@ -671,7 +683,8 @@
     }
 
     .postit.postit-overdue {
-      animation: pulse-glow-red 1.5s infinite;
+      animation: pulse-glow-red 1.5s infinite; /* Existing pulsating glow */
+      border-color: #DC143C; /* Crimson red - makes the border visible and red */
       /* The animation itself handles the base box-shadow */
     }
 
@@ -826,6 +839,9 @@
          padding-left: 30px; /* Indent sub-items */
          border-radius: 0;
        }
+      #headerPessoaisBtn { /* Specific rule to hide Pessoais button on mobile */
+        display: none !important;
+      }
       .notes-container {
          margin-top: 125px; /* Adjusted for fixed top-bar + navbar + memory display */
       }
@@ -847,13 +863,17 @@
       .modal-content { padding: 15px; }
       .modal-content textarea { min-height: 100px; padding: 12px; }
       #categorySelectorContainer { flex-direction: column; gap: 5px; } /* This is display:none anyway */
+
+      #memoryUsageDisplayContainer { /* Hide on very small screens */
+        display: none !important;
+      }
     }
 
-    .postit { animation: slideInUp 0.5s ease-out; }
-    @keyframes slideInUp {
+    /* .postit { animation: slideInUp 0.5s ease-out; } */ /* Removed duplicate or conflicting rule */
+    /* @keyframes slideInUp { // DELETED
       from { opacity: 0; transform: translateY(30px) rotate(-1deg); }
       to { opacity: 1; transform: translateY(0) rotate(-1deg); }
-    }
+    } */
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     /* Note: slideInUp was defined twice, keeping the second one as it's more generic for modals */
     /* @keyframes slideInUp {
@@ -1040,6 +1060,9 @@
       <div class="top-bar">
         <div class="logo-area">
           <span id="appName"><i class="fas fa-brain"></i> Minhas Memorias</span>
+          <div id="memoryUsageDisplayContainer"> <!-- Moved here -->
+             Memorias Usadas: <span id="usedMemoryCount">-</span> / <span id="totalMemoryLimit">-</span>
+          </div>
         </div>
 
         <div class="collapsible-menu">
@@ -1056,6 +1079,9 @@
               </div>
             </nav>
             <div class="user-actions">
+          <button id="headerPessoaisBtn" class="user-action-btn perso-btn">
+            <i class="fas fa-sticky-note"></i> Pessoais
+          </button>
               <!-- JS will insert Premium/Admin buttons here -->
               <button onclick="logout()" class="header-logout-btn-new">
                 <i class="fas fa-sign-out-alt"></i> Sair
@@ -1074,9 +1100,7 @@
       <div id="secondaryNavbarWrapper" class="navbar-wrapper" style="display: none;">
         <nav id="secondaryNavbar" class="navbar"></nav>
       </div>
-      <div id="memoryUsageDisplayContainer" style="text-align: center; padding: 6px 10px; background-color: rgba(210, 180, 140, 0.1); color: #2c2416; font-family: 'Courier Prime', monospace; font-size: 0.8rem; border-top: 1px solid rgba(139, 69, 19, 0.2); border-bottom: 1px solid rgba(139, 69, 19, 0.2); margin-top: 0px; display: none;">
-         Memorias Usadas: <span id="usedMemoryCount">-</span> / <span id="totalMemoryLimit">-</span>
-      </div>
+      {/* memoryUsageDisplayContainer moved into .logo-area */}
 
       {/* <div id="categorySelectorContainer" style="display: none;">
         <select id="categorySelector" onchange="handleCategoryChange()"></select>
@@ -2950,6 +2974,20 @@ async function deleteThemeAndNotes(themeId, themeName, type) { // Tornar async s
                 if (!event.target.closest('.category-dropdown .dropdown-content a[data-category-type]')) {
                     collapsibleMenu.classList.remove('active');
                 }
+            }
+        });
+    }
+
+    // Event listener for the new Pessoais button in the header
+    const headerPessoaisBtn = document.getElementById('headerPessoaisBtn');
+    if (headerPessoaisBtn) {
+        headerPessoaisBtn.addEventListener('click', function() {
+            handleNewCategorySelection('pessoais');
+
+            // Safeguard: Close mobile menu if it's active (though button should be hidden on mobile)
+            const mobileMenu = document.querySelector('.collapsible-menu');
+            if (mobileMenu && mobileMenu.classList.contains('active')) {
+                mobileMenu.classList.remove('active');
             }
         });
     }
