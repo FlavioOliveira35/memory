@@ -207,70 +207,179 @@
       left: 0;
       width: 100%;
       z-index: 1001;
-      background: #dd7931; 
-      background-image: linear-gradient(45deg, #8b4513 25%, #a0522d 25%, #a0522d 50%, #8b4513 50%, #8b4513 75%, #a0522d 75%);
-      background-size: 20px 20px;
-      color: #f4f1e8;
-      padding: 15px 20px 10px 20px;
-      text-align: center;
-      font-size: 1.8rem;
-      font-weight: 700;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-      border-bottom: 3px solid #654321;
+      /* New styles */
+      padding: 0;
+      background: #8B4513; /* SaddleBrown */
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      border-bottom: none;
+      /* Removed old background, padding, text-align, font-size, font-weight, border-bottom */
     }
 
-    #categorySelectorContainer {
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px;
+      background-color: #8B4513;
+      color: #f4f1e8;
+      border-bottom: 1px solid #654321;
+    }
+
+    .logo-area {
       display: flex;
       align-items: center;
-      justify-content: center;
-      margin-top: 10px;
-      margin-bottom: 8px;
-      gap: 10px;
     }
 
-    #categorySelectorContainer label {
-      color: #f4f1e8;
-      font-size: 0.9rem;
+    #appName {
+      font-size: 1.5rem;
       font-weight: 700;
-    }
-
-    #categorySelector {
-      padding: 6px 10px;
-      border-radius: 6px;
-      border: 2px solid #654321;
-      background: #f4f1e8;
-      color: #2c2416;
-      font-size: 0.9rem;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.3s ease;
       font-family: 'Courier Prime', monospace;
+      color: #f4f1e8;
+    }
+    #appName i {
+      margin-right: 8px;
     }
 
-    #categorySelector:focus {
-      outline: none;
-      border-color: #8b4513;
-      box-shadow: 0 0 0 2px rgba(139, 69, 19, 0.3);
+    .collapsible-menu { /* New container for nav and user actions */
+      display: flex;
+      align-items: center;
+      flex-grow: 1;
     }
 
-    #categorySelector option {
-      background: #f4f1e8;
+    .main-nav {
+      display: flex;
+      align-items: center;
+      flex-grow: 1;
+      justify-content: center;
+    }
+    /* user-actions is already styled below, ensure it works within .collapsible-menu */
+
+    .hamburger-btn {
+      display: none; /* Hidden on desktop */
+      background: none;
+      border: none;
+      color: #f4f1e8;
+      font-size: 1.5rem;
+      cursor: pointer;
+      padding: 5px 10px;
+    }
+
+    .category-dropdown {
+      position: relative;
+      display: inline-block;
+    }
+
+    .category-dropdown .dropdown-btn {
+      background-color: #A0522D; /* Sienna */
+      color: white;
+      padding: 8px 15px;
+      font-size: 0.9rem;
+      font-family: 'Courier Prime', monospace;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: background-color 0.3s ease;
+    }
+    .category-dropdown .dropdown-btn:hover {
+      background-color: #654321; /* Darker Sienna */
+    }
+    .category-dropdown .dropdown-btn i {
+      margin-left: 8px;
+    }
+
+    .category-dropdown .dropdown-content {
+      display: none;
+      position: absolute;
+      background-color: #f9f6f0;
+      min-width: 220px;
+      box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+      z-index: 1005;
+      border-radius: 5px;
+      border: 1px solid #8B4513;
+      margin-top: 5px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .category-dropdown .dropdown-content a {
       color: #2c2416;
-      padding: 8px;
+      padding: 10px 15px;
+      text-decoration: none;
+      display: block;
+      font-family: 'Courier Prime', monospace;
+      font-size: 0.9rem;
+      border-bottom: 1px solid #e0d8c8;
+    }
+    .category-dropdown .dropdown-content a:last-child {
+      border-bottom: none;
+    }
+    .category-dropdown .dropdown-content a:hover {
+      background-color: #e0d8c8;
+    }
+    .category-dropdown:hover .dropdown-content {
+      display: block;
     }
 
-    .navbar-wrapper {
+    .user-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .user-actions button, .user-actions .auth-button { /* Includes .header-logout-btn-new */
+      background: #A0522D;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      font-size: 0.8rem;
+      font-family: 'Courier Prime', monospace;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      text-transform: uppercase;
+    }
+    .user-actions button:hover, .user-actions .auth-button:hover {
+      background-color: #654321;
+    }
+
+    /* Specific styles for JS-added buttons */
+    #headerPremiumButton {
+      background: #b08d57 !important;
+      border: 1px solid #9a7947 !important;
+    }
+    #headerPremiumButton:hover {
+      background: #9a7947 !important;
+    }
+    #adminPanelButton {
+      background: #6d4115 !important;
+      border: 1px solid #573310 !important;
+    }
+    #adminPanelButton:hover {
+      background: #573310 !important;
+    }
+
+    /* Removed old #categorySelectorContainer and related styles as it's now display:none */
+    /* Removed old #categorySelector styles */
+    /* Removed old .header-logout-btn styles */
+
+    .navbar-wrapper { /* Now #navbarWrapper and #secondaryNavbarWrapper */
       position: relative;
       width: 100%;
-      background: #8b4513;
-      border-bottom: 2px solid #654321;
+      /* New styles */
+      background: #a0522d; /* Lighter brown for navbar background */
+      padding-top: 5px;
+      padding-bottom: 5px;
+      border-bottom: 1px solid #654321;
     }
 
     .navbar {
       display: flex;
       overflow-x: auto; 
       background: transparent;
-      padding: 10px 15px;
+      padding: 10px 15px; /* Recheck if this padding is needed or handled by wrapper */
       gap: 8px;
       scroll-padding-left: 15px;
       scroll-snap-type: x mandatory;
@@ -283,27 +392,30 @@
     .navbar::-webkit-scrollbar-track { background: transparent; }
     .navbar::-webkit-scrollbar-thumb { background: #654321; border-radius: 3px; }
 
-    .navbar button {
+    #navbarWrapper .navbar button, #secondaryNavbarWrapper .navbar button { /* More specific selector for buttons inside new wrappers */
       position: relative;
       background: #d2b48c; 
       color: #2c2416;
       border: 2px solid #8b4513;
       border-radius: 8px;
-      padding: 8px 12px;
       white-space: nowrap;
       min-width: max-content;
-      font-size: 0.6rem;
-      font-weight: 500;
+      font-weight: 500; /* Was 700 for main buttons, now 500 for tab buttons */
       cursor: pointer;
       transition: all 0.3s ease;
       font-family: 'Courier Prime', monospace;
       text-transform: uppercase;
       letter-spacing: 0.5px;
       scroll-snap-align: start; 
+      /* New styles */
+      font-size: 0.75rem;
+      padding: 6px 10px;
     }
 
-    .navbar button:hover, 
-    .navbar button.active-tab {
+    #navbarWrapper .navbar button:hover,
+    #navbarWrapper .navbar button.active-tab,
+    #secondaryNavbarWrapper .navbar button:hover,
+    #secondaryNavbarWrapper .navbar button.active-tab {
       background: #f4f1e8;
       color: #8b4513;
       border-color: #654321;
@@ -311,7 +423,7 @@
       box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
     }
 
-    .navbar button .badge {
+    .navbar button .badge { /* Assuming this is still for navbar buttons */
       position: absolute;
       top: -6px;
       right: -6px;
@@ -348,7 +460,6 @@
       box-shadow: 0 6px 20px rgba(17, 17, 17, 0.5);
       z-index: 1000;
       font-family: 'Courier Prime', monospace;
-      /*position: relative; Needed for absolute positioning of icons */
     }
 
     .floating-add-btn .icon-plus,
@@ -357,56 +468,38 @@
       left: 50%;
       top: 50%;
       transform: translate(-50%, -50%);
-      transition: opacity 0.2s ease-in-out; /* For smooth transition */
+      transition: opacity 0.2s ease-in-out;
     }
 
     .floating-add-btn .icon-brain {
-      display: none; /* Initially hidden, can also use opacity: 0 and pointer-events: none */
-      /* opacity: 0;
-      pointer-events: none; */
+      display: none;
     }
 
     .floating-add-btn:hover {
       background: #814215;
-      transform: scale(1.1) rotate(180deg); /* Keep this */
+      transform: scale(1.1) rotate(180deg);
       box-shadow: 0 8px 25px rgba(60, 129, 75, 0.4);
     }
 
     .floating-add-btn:hover .icon-plus {
-      display: none; /* Hide plus icon on hover */
-      /* opacity: 0;
-      pointer-events: none; */
+      display: none;
     }
 
     .floating-add-btn:hover .icon-brain {
-      display: inline-block; /* Show brain icon on hover */
-      /* opacity: 1;
-      pointer-events: auto; */
+      display: inline-block;
     }
 
-    .header-logout-btn {
-      position: absolute;
-      top: 15px;
-      right: 20px;
-      background: #6d4115;
-      color: white;
-      border: 2px solid #d39960;
-      border-radius: 6px;
-      padding: 6px 12px;
-      font-size: 0.8rem;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      font-family: 'Courier Prime', monospace;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+    #memoryUsageDisplayContainer {
+        margin-top: 0; /* Adjusted */
+        background-color: #8b4513; /* Darker to match top-bar */
+        color: #f4f1e8; /* Light text */
+        border-top: 1px solid #654321; /* Consistent border */
+        padding: 8px 10px; /* Adjusted padding */
+        /* font-family and font-size are already set, display:none is in HTML */
     }
 
-    .header-logout-btn:hover {
-      background: #bb834b;
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(220, 20, 60, 0.3);
-      color: #3f270f;
+    .notes-container {
+        margin-top: 140px; /* Adjusted based on new header height; may need further tweaking */
     }
 
     .modal-overlay {
@@ -569,22 +662,29 @@
     .postit.reuniao { background: #d2f6c5; border-top-color: #a8e6a3; }
     .postit.diario { background: #ffe5b4; border-top-color: #ffd700; }
 
-    .due-date-indicator {
-      position: absolute; top: -10px; left: 5px; width: 20px;
-      height: 20px; border-radius: 50%; z-index: 5;
+    /* Removed .due-date-indicator, .due-date-indicator.overdue, .due-date-indicator.future, and @keyframes pulse */
+
+    @keyframes pulse-glow-red {
+      0% { box-shadow: 2px 4px 10px rgba(0,0,0,0.2), 0 0 0 0px rgba(220, 20, 60, 0.5); }
+      50% { box-shadow: 2px 4px 10px rgba(0,0,0,0.2), 0 0 0 5px rgba(220, 20, 60, 0.2); }
+      100% { box-shadow: 2px 4px 10px rgba(0,0,0,0.2), 0 0 0 0px rgba(220, 20, 60, 0.5); }
     }
-    .due-date-indicator.overdue {
-      background: #fd040498; box-shadow: 0 0 20px rgba(207, 81, 7, 0.4);
-      animation: pulse 1s infinite;
+
+    .postit.postit-overdue {
+      animation: pulse-glow-red 1.5s infinite;
+      /* The animation itself handles the base box-shadow */
     }
-    .due-date-indicator.future {
-      background: #228b22; box-shadow: 0 0 8px rgba(34, 139, 34, 0.5);
+
+    .postit.postit-future-due {
+      /* Combine existing shadow with a new green glow */
+      box-shadow: 2px 4px 10px rgba(0,0,0,0.2), 0 0 5px 3px rgba(34, 139, 34, 0.4);
     }
-    @keyframes pulse {
-      0% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(3.2); opacity: 0.3; }
-      100% { transform: scale(1); opacity: 0.5; } /* Corrected opacity */
+
+    .postit.postit-editing {
+      outline: 2px solid #8B4513; /* SaddleBrown color */
+      outline-offset: 2px; /* Provides a small space between the element edge and the outline */
     }
+
     .postit-due-date {
       font-size: 0.65rem; color: #8b4513; background: rgba(139, 69, 19, 0.1);
       padding: 2px 4px; border-radius: 3px; font-weight: 700;
@@ -627,24 +727,102 @@
 
     @media (max-width: 768px) {
       .auth-container { margin: 5vh 20px; padding: 30px 20px; }
-      header { font-size: 1.4rem; padding: 12px 15px 8px 15px; }
+      /* header { font-size: 1.4rem; padding: 12px 15px 8px 15px; } */ /* Old header padding */
       .navbar { padding: 8px 10px; gap: 6px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
       .navbar button { font-size: 0.7rem; padding: 6px 10px; flex-shrink: 0; }
-      .notes-container { gap: 12px; padding: 12px; margin: 12px; margin-top: 220px; justify-content: center; }
+      /* .notes-container { gap: 12px; padding: 12px; margin: 12px; margin-top: 220px; justify-content: center; } */ /* Old margin */
       .postit { width: 240px; min-height: 140px; }
       .floating-add-btn { bottom: 20px; right: 20px; width: 55px; height: 55px; font-size: 1.3rem; }
       .modal-container { width: 95%; margin: 10px; }
       .modal-content { padding: 20px; }
       .modal-button-group { flex-direction: column; gap: 8px; }
       .modal-button-group button { width: 100%; }
+
+      /* New mobile header styles from previous step */
+      .top-bar {
+        padding: 10px 15px;
+      }
+
+      #appName {
+        font-size: 1.3rem;
+      }
+
+      /* Styles for mobile .collapsible-menu */
+      .hamburger-btn {
+        display: block; /* Show on mobile */
+      }
+
+      .collapsible-menu {
+        display: none; /* Hidden by default on mobile */
+        flex-direction: column;
+        align-items: stretch;
+        position: absolute;
+        top: 100%; /* Position below the .top-bar */
+        left: 0;
+        width: 100%;
+        background-color: #8B4513;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        z-index: 1002;
+        border-top: 1px solid #654321;
+      }
+
+      .collapsible-menu.active {
+        display: flex; /* Show when active */
+      }
+
+      .collapsible-menu .main-nav,
+      .collapsible-menu .user-actions {
+        flex-direction: column;
+        width: 100%;
+        gap: 0;
+        align-items: stretch;
+      }
+
+      .collapsible-menu .category-dropdown .dropdown-btn,
+      .collapsible-menu .user-actions button, /* Targets .header-logout-btn-new */
+      .collapsible-menu .user-actions .auth-button, /* For any other general buttons if added */
+      .collapsible-menu .user-actions #headerPremiumButton, /* JS-added */
+      .collapsible-menu .user-actions #adminPanelButton { /* JS-added */
+        width: 100%;
+        text-align: left;
+        padding: 12px 15px;
+        border-radius: 0;
+        border-bottom: 1px solid #654321;
+        margin: 0; /* Reset any margins */
+      }
+
+      /* Remove bottom border from the last button in user-actions */
+      .collapsible-menu .user-actions > button:last-child,
+      .collapsible-menu .user-actions > .auth-button:last-child {
+        border-bottom: none;
+      }
+
+      .collapsible-menu .category-dropdown .dropdown-content {
+        position: static; /* No longer absolute */
+        width: 100%;
+        box-shadow: none;
+        border: none; /* Remove main border */
+        border-top: 1px dashed #A0522D; /* Separator from dropdown button */
+        transform: none;
+        margin-top: 0;
+        border-radius: 0;
+        /* display: block; /* This is the line I want to add/ensure */
+      }
+       .collapsible-menu .category-dropdown .dropdown-content a {
+         padding-left: 30px; /* Indent sub-items */
+         border-radius: 0;
+       }
+      .notes-container {
+         margin-top: 125px; /* Adjusted for fixed top-bar + navbar + memory display */
+      }
     }
 
     @media (max-width: 480px) {
       body { font-size: 14px; }
       .auth-container { margin: 5vh 15px; padding: 25px 15px; border-radius: 15px; }
       .auth-container h2 { font-size: 1.6rem; }
-      header { font-size: 0.8rem; padding: 10px 10px 6px 10px; }
-      .header-logout-btn { top: 10px; right: 10px; padding: 4px 8px; font-size: 0.5rem; }
+      /* header { font-size: 0.8rem; padding: 10px 10px 6px 10px; } */ /* Old header padding */
+      .header-logout-btn { top: 10px; right: 10px; padding: 4px 8px; font-size: 0.5rem; } /* This is the OLD logout btn, ensure it's not conflicting or remove if truly unused */
       .navbar { padding: 6px 8px; gap: 4px; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: thin; }
       .navbar button { font-size: 0.65rem; padding: 6px 8px; flex-shrink: 0; min-width: auto; }
       .notes-container { flex-direction: column; align-items: center; gap: 12px; padding: 10px; margin: 10px; margin-top: 10px; width: 260px; position: absolute; top: 230px; }
@@ -654,7 +832,7 @@
       .modal-container { width: 95%; margin: 5px; max-height: 90vh; }
       .modal-content { padding: 15px; }
       .modal-content textarea { min-height: 100px; padding: 12px; }
-      #categorySelectorContainer { flex-direction: column; gap: 5px; }
+      #categorySelectorContainer { flex-direction: column; gap: 5px; } /* This is display:none anyway */
     }
 
     .postit { animation: slideInUp 0.5s ease-out; }
@@ -844,41 +1022,51 @@
        TELA PRINCIPAL DA APLICAÇÃO
   ======================================== -->
   <div id="appScreen" class="screen">
-    <!-- Cabeçalho da aplicação -->
     <header>
-      <i class="fas fa-brain"></i> Minhas Memórias
-      
-      <!-- Botão de logout no cabeçalho -->
-      <button onclick="logout()" class="header-logout-btn">
-        <i class="fas fa-sign-out-alt"></i>
-        Sair
-      </button>
-      
-      <!-- Seletor de categoria -->
-      <div id="categorySelectorContainer">
-        <label for="categorySelector">
-          <i class="fas fa-tags"></i> Tipo:
-        </label>
-        <select id="categorySelector" onchange="handleCategoryChange()">
-          <option value="pessoais">📝 Pessoais</option>
-          <!-- Opções de tema serão adicionadas aqui por JavaScript -->
-        </select>
+      <div class="top-bar">
+        <div class="logo-area">
+          <span id="appName"><i class="fas fa-brain"></i> Minhas Memorias</span>
+        </div>
+
+        <div class="collapsible-menu">
+            <nav class="main-nav">
+              <div class="category-dropdown">
+                <button class="dropdown-btn">
+              <span class="btn-text">Categorias</span> <i class="fas fa-chevron-down"></i>
+                </button>
+                <div class="dropdown-content">
+                  <a href="#" data-category-type="pessoais">Pessoais (Visao Geral)</a>
+                  <a href="#" data-category-type="livro_overview">Livros (Visao Geral)</a>
+                  <a href="#" data-category-type="curso_overview">Cursos (Visao Geral)</a>
+                </div>
+              </div>
+            </nav>
+            <div class="user-actions">
+              <!-- JS will insert Premium/Admin buttons here -->
+              <button onclick="logout()" class="header-logout-btn-new">
+                <i class="fas fa-sign-out-alt"></i> Sair
+              </button>
+            </div>
+        </div>
+
+        <button class="hamburger-btn">
+            <i class="fas fa-bars"></i>
+        </button>
       </div>
-      
-      <!-- Navbar principal -->
-      <div class="navbar-wrapper" id="navbarWrapper">
+
+      <div id="navbarWrapper" class="navbar-wrapper">
         <nav class="navbar" id="navbar"></nav>
       </div>
-      
-      <!-- Navbar secundária para temas -->
       <div id="secondaryNavbarWrapper" class="navbar-wrapper" style="display: none;">
         <nav id="secondaryNavbar" class="navbar"></nav>
       </div>
-      
-      <!-- Elemento para Exibição de Uso de Memória -->
-      <div id="memoryUsageDisplayContainer" style="text-align: center; padding: 6px 10px; background-color: rgba(210, 180, 140, 0.1); /* Tom de papel sutil */ color: #2c2416; font-family: 'Courier Prime', monospace; font-size: 0.8rem; border-top: 1px solid rgba(139, 69, 19, 0.2); border-bottom: 1px solid rgba(139, 69, 19, 0.2); margin-top: 5px; display: none; /* Começa oculto */">
-        Memórias Usadas: <span id="usedMemoryCount">-</span> / <span id="totalMemoryLimit">-</span>
+      <div id="memoryUsageDisplayContainer" style="text-align: center; padding: 6px 10px; background-color: rgba(210, 180, 140, 0.1); color: #2c2416; font-family: 'Courier Prime', monospace; font-size: 0.8rem; border-top: 1px solid rgba(139, 69, 19, 0.2); border-bottom: 1px solid rgba(139, 69, 19, 0.2); margin-top: 0px; display: none;">
+         Memorias Usadas: <span id="usedMemoryCount">-</span> / <span id="totalMemoryLimit">-</span>
       </div>
+
+      {/* <div id="categorySelectorContainer" style="display: none;">
+        <select id="categorySelector" onchange="handleCategoryChange()"></select>
+      </div> */} {/* HTML for old category selector removed */}
     </header>
 
     <!-- Botão flutuante para abrir modal -->
@@ -1169,23 +1357,21 @@
         THEME_CONFIG_MAP[config.id] = config;
     });
 
-    function populateThemeCategorySelector() {
-        const selector = document.getElementById('categorySelector');
-        if (!selector) {
-            console.error("Elemento categorySelector não encontrado.");
-            return;
-        }
-
-        THEME_TYPES_CONFIG.forEach(themeConfig => {
-            const option = document.createElement('option');
-            option.value = themeConfig.id;
-            option.textContent = themeConfig.label; // O label já contém o emoji
-            selector.appendChild(option);
-        });
-        console.log("categorySelector populado dinamicamente com tipos de tema.");
-    }
-
-    populateThemeCategorySelector(); // Chamar a função
+    // function populateThemeCategorySelector() { // DELETED
+    //     const selector = document.getElementById('categorySelector');
+    //     if (!selector) {
+    //         console.error("Elemento categorySelector não encontrado.");
+    //         return;
+    //     }
+    //     THEME_TYPES_CONFIG.forEach(themeConfig => {
+    //         const option = document.createElement('option');
+    //         option.value = themeConfig.id;
+    //         option.textContent = themeConfig.label;
+    //         selector.appendChild(option);
+    //     });
+    //     console.log("categorySelector populado dinamicamente com tipos de tema.");
+    // }
+    // populateThemeCategorySelector(); // DELETED - Call removed
 
     // Variáveis globais
     let currentUser = null;
@@ -1714,23 +1900,31 @@
                     adminButton.innerHTML = '<i class="fas fa-user-shield"></i> Admin';
                     adminButton.onclick = openAdminModal;
                     
-                    adminButton.style.position = 'absolute';
-                    adminButton.style.top = '15px';
-                    adminButton.style.right = '110px'; 
-                    adminButton.style.background = '#8b4513'; 
-                    adminButton.style.color = '#f4f1e8';      
-                    adminButton.style.border = '2px solid #654321'; 
-                    adminButton.style.borderRadius = '6px';
-                    adminButton.style.padding = '6px 10px'; 
-                    adminButton.style.fontSize = '0.8rem';
-                    adminButton.style.fontWeight = '700';
-                    adminButton.style.cursor = 'pointer';
-                    adminButton.style.fontFamily = "'Courier Prime', monospace";
-                    adminButton.style.textTransform = 'uppercase';
-                    adminButton.style.letterSpacing = '0.5px';
-                    adminButton.style.zIndex = '1002';
-                    const headerElement = document.querySelector('header');
-                    if (headerElement) headerElement.appendChild(adminButton);
+                    // adminButton.style.position = 'absolute'; // Removed
+                    // adminButton.style.top = '15px'; // Removed
+                    // adminButton.style.right = '110px';  // Removed
+                    // adminButton.style.background = '#8b4513'; // Handled by CSS
+                    // adminButton.style.color = '#f4f1e8';      // Handled by CSS
+                    // adminButton.style.border = '2px solid #654321';  // Handled by CSS
+                    // adminButton.style.borderRadius = '6px'; // Handled by CSS
+                    // adminButton.style.padding = '6px 10px';  // Handled by CSS
+                    // adminButton.style.fontSize = '0.8rem'; // Handled by CSS
+                    // adminButton.style.fontWeight = '700'; // Handled by CSS
+                    // adminButton.style.cursor = 'pointer'; // Handled by CSS
+                    // adminButton.style.fontFamily = "'Courier Prime', monospace"; // Handled by CSS
+                    // adminButton.style.textTransform = 'uppercase'; // Handled by CSS
+                    // adminButton.style.letterSpacing = '0.5px'; // Handled by CSS
+                    // adminButton.style.zIndex = '1002'; // May not be needed or handled by .user-actions
+
+                    const userActionsContainer = document.querySelector('.top-bar .collapsible-menu .user-actions');
+                    if (userActionsContainer) {
+                        const logoutButton = userActionsContainer.querySelector('.header-logout-btn-new');
+                        if (logoutButton) {
+                            userActionsContainer.insertBefore(adminButton, logoutButton);
+                        } else {
+                            userActionsContainer.appendChild(adminButton);
+                        }
+                    }
                 }
             }
 
@@ -1747,41 +1941,32 @@
                         headerPremiumButton.innerHTML = '<i class="fas fa-star"></i> Seja Premium';
                         headerPremiumButton.onclick = openPremiumUpgradeModal;
                         
-                        headerPremiumButton.style.position = 'absolute';
-                        headerPremiumButton.style.top = '15px';
-                        const adminBtn = document.getElementById('adminPanelButton');
-                        const logoutBtn = document.querySelector('.header-logout-btn');
-                        
-                        let rightPosition = '110px'; // Default if no admin or logout button
-                        if (adminBtn) {
-                             try { rightPosition = (parseInt(getComputedStyle(adminBtn).right) + adminBtn.offsetWidth + 10) + 'px'; } catch(e){console.warn("Could not calc adminBtn right pos for premium button");}
-                        } else if (logoutBtn) {
-                             try { rightPosition = (parseInt(getComputedStyle(logoutBtn).right) + logoutBtn.offsetWidth + 10) + 'px'; } catch(e){console.warn("Could not calc logoutBtn right pos for premium button");}
-                        }
-                        headerPremiumButton.style.right = rightPosition;
+                        // Remove old styling, rely on CSS
+                        // headerPremiumButton.style.position = 'absolute'; // Removed
+                        // headerPremiumButton.style.top = '15px'; // Removed
+                        // headerPremiumButton.style.right = rightPosition; // Removed
+                        // headerPremiumButton.style.background = '#b08d57';  // Handled by CSS
+                        // headerPremiumButton.style.color = 'white'; // Handled by CSS
+                        // headerPremiumButton.style.border = '2px solid #9a7947'; // Handled by CSS
+                        // headerPremiumButton.style.borderRadius = '6px'; // Handled by CSS
+                        // headerPremiumButton.style.padding = '6px 10px'; // Handled by CSS
+                        // headerPremiumButton.style.fontSize = '0.8rem'; // Handled by CSS
+                        // headerPremiumButton.style.fontWeight = '700'; // Handled by CSS
+                        // headerPremiumButton.style.cursor = 'pointer'; // Handled by CSS
+                        // headerPremiumButton.style.fontFamily = "'Courier Prime', monospace"; // Handled by CSS
+                        // headerPremiumButton.style.textTransform = 'uppercase'; // Handled by CSS
+                        // headerPremiumButton.style.zIndex = '1002'; // May not be needed
 
-                        headerPremiumButton.style.background = '#b08d57'; 
-                        headerPremiumButton.style.color = 'white';
-                        headerPremiumButton.style.border = '2px solid #9a7947';
-                        headerPremiumButton.style.borderRadius = '6px';
-                        headerPremiumButton.style.padding = '6px 10px';
-                        headerPremiumButton.style.fontSize = '0.8rem';
-                        headerPremiumButton.style.fontWeight = '700';
-                        headerPremiumButton.style.cursor = 'pointer';
-                        headerPremiumButton.style.fontFamily = "'Courier Prime', monospace";
-                        headerPremiumButton.style.textTransform = 'uppercase';
-                        headerPremiumButton.style.zIndex = '1002';
-
-                        const headerElement = document.querySelector('header');
-                        if (headerElement) {
-                            const adminButtonForInsert = document.getElementById('adminPanelButton');
-                            const logoutButtonForInsert = document.querySelector('.header-logout-btn');
-                            if (adminButtonForInsert) { 
-                                headerElement.insertBefore(headerPremiumButton, adminButtonForInsert);
-                            } else if (logoutButtonForInsert) { 
-                                 headerElement.insertBefore(headerPremiumButton, logoutButtonForInsert);
-                            } else { 
-                                headerElement.appendChild(headerPremiumButton);
+                        const userActionsContainerForPremium = document.querySelector('.top-bar .collapsible-menu .user-actions');
+                        if (userActionsContainerForPremium) {
+                            const adminButtonRef = userActionsContainerForPremium.querySelector('#adminPanelButton');
+                            const logoutButtonRef = userActionsContainerForPremium.querySelector('.header-logout-btn-new');
+                            if (adminButtonRef) {
+                                userActionsContainerForPremium.insertBefore(headerPremiumButton, adminButtonRef);
+                            } else if (logoutButtonRef) {
+                                userActionsContainerForPremium.insertBefore(headerPremiumButton, logoutButtonRef);
+                            } else {
+                                userActionsContainerForPremium.appendChild(headerPremiumButton);
                             }
                         }
                         console.log('Usuário é free, botão Seja Premium do header exibido.');
@@ -1792,16 +1977,17 @@
             }
 
             showScreen("appScreen");
-            categorySelector.value = "pessoais"; 
-            navbarWrapper.style.display = "";
-            secondaryNavbarWrapper.style.display = "none";
-            buildNavbar();
-            const personalCategories = categorias.map(c => c[0]);
-            if (!personalCategories.includes(currentTab)) {
-                currentTab = "pessoal";
-            }
-            changeTab(currentTab);
-            themeNoteCustomizationDiv.style.display = 'none';
+            // categorySelector.value = "pessoais"; // Old selector
+            // navbarWrapper.style.display = ""; // Handled by handleNewCategorySelection
+            // secondaryNavbarWrapper.style.display = "none"; // Handled by handleNewCategorySelection
+            // buildNavbar(); // Handled by handleNewCategorySelection
+            // const personalCategories = categorias.map(c => c[0]); // Logic now in handleNewCategorySelection
+            // if (!personalCategories.includes(currentTab)) {
+            //     currentTab = "pessoal";
+            // }
+            // changeTab(currentTab); // Handled by handleNewCategorySelection
+            // themeNoteCustomizationDiv.style.display = 'none'; // Handled by handleNewCategorySelection
+            handleNewCategorySelection('pessoais'); // New way to initialize category view
             updateMemoryUsageDisplay(); // Chamar para exibir contagem no login
 
         } else { 
@@ -2058,7 +2244,7 @@ async function addNote() {
         }
     }
 
-  const selectedCategoryType = categorySelector.value;
+  // const selectedCategoryType = categorySelector.value; // Old way, using the hidden select
   const dueDateValue = document.getElementById('noteDueDate').value;
   let noteData = {
     text: text,
@@ -2068,19 +2254,29 @@ async function addNote() {
   };
   if (dueDateValue) noteData.dueDate = dueDateValue;
 
-  if (selectedCategoryType === "pessoais") {
-    noteData.category = currentTab; // Para notas pessoais, usa o currentTab da navbar principal
-  } else if (THEME_CONFIG_MAP[selectedCategoryType] && currentThemeInfo.id) {
-    // Para notas de tema, selectedCategoryType é o ID do tipo de tema (ex: 'livro', 'receita')
-    // currentThemeInfo.id é o ID do tema específico (ex: ID do doc "Bolo de Chocolate")
-    noteData.themeId = currentThemeInfo.id;       // ID do tema específico
-    noteData.themeName = currentThemeInfo.name;   // Nome do tema específico (ex: "Bolo de Chocolate")
-    noteData.noteType = selectedCategoryType;     // ID do tipo de tema (ex: 'receita', 'livro')
+  // New logic for determining category/theme for the note
+  if (currentThemeInfo && currentThemeInfo.type && !currentThemeInfo.id) {
+      // A theme type (e.g., "Livro") is selected in the main dropdown, but no specific theme instance (e.g., "Specific Book Title") has been chosen yet from the secondary navbar.
+      const themeConfig = THEME_CONFIG_MAP[currentThemeInfo.type];
+      const themeSingularName = themeConfig ? themeConfig.singularName.toLowerCase() : 'item de tema';
+      alert(`Por favor, selecione um ${themeSingularName} específico ou adicione um novo antes de criar uma nota para este tipo de tema.`);
+
+      // Re-enable add button in modal if it was disabled
+      const modalAddBtn = document.querySelector('#modalOverlay .modal-button-group .add-btn');
+      if (modalAddBtn) modalAddBtn.disabled = false; // Re-enable button
+      // closeModal(); // Do not close modal, let user correct.
+      return;
+  }
+
+  if (currentThemeInfo && currentThemeInfo.id && currentThemeInfo.type) {
+      // A specific theme instance (e.g., a particular book) is selected
+      noteData.themeId = currentThemeInfo.id;
+      noteData.themeName = currentThemeInfo.name; // Name of the specific theme instance
+      noteData.noteType = currentThemeInfo.type;  // Type of theme (e.g., 'livro', 'curso')
   } else {
-    // This case should ideally not be reached if categorySelector is correctly populated
-    // and currentThemeInfo is managed properly when a theme is selected.
-    console.error("Error: Categoria ou tema inválido selecionado.", selectedCategoryType, currentThemeInfo);
-    alert("Por favor, selecione uma categoria ou tema válido antes de adicionar uma nota."); return;
+      // "Pessoais" is selected, or no theme type is active (should default to personal)
+      // currentTab should hold the correct personal category like "pessoal", "trabalho" etc.
+      noteData.category = currentTab;
   }
 
   const addBtn = document.querySelector('#modalOverlay .modal-button-group .add-btn');
@@ -2146,7 +2342,8 @@ async function addNote() {
               else if (daysDiff === 1) daysAgoText = "Ontem";
               else if (daysDiff > 1) daysAgoText = `${daysDiff} dias atrás`;
             }
-            let dueDateDisplay = ""; let dateIndicatorHtml = "";
+            let dueDateDisplay = "";
+            // Remove dateIndicatorHtml declaration, classes will be added to div directly
             if (note.dueDate) {
               const today = new Date(); today.setHours(0,0,0,0);
               const parts = note.dueDate.split('-');
@@ -2156,23 +2353,32 @@ async function addNote() {
               const displayMonth = String(dueDate.getMonth() + 1).padStart(2, '0');
               const displayYear = String(dueDate.getFullYear()).slice(-2);
               dueDateDisplay = `<span class="postit-due-date"><i class="fas fa-calendar"></i> ${displayDay}/${displayMonth}/${displayYear}</span>`;
-              if (dueDate < today) dateIndicatorHtml = '<span class="due-date-indicator overdue" title="Vencido"></span>';
-              else if (dueDate.getTime() === today.getTime()) dateIndicatorHtml = '<span class="due-date-indicator overdue" title="Vence hoje"></span>';
-              else dateIndicatorHtml = '<span class="due-date-indicator future" title="Pendente"></span>';
+
+              if (dueDate < today) {
+                div.classList.add('postit-overdue');
+                div.title = "Vencido";
+              } else if (dueDate.getTime() === today.getTime()) {
+                div.classList.add('postit-overdue'); // Also overdue for "due today"
+                div.title = "Vence hoje";
+              } else {
+                div.classList.add('postit-future-due');
+                div.title = "Pendente";
+              }
             }
             div.innerHTML = `
               <div class="postit-header">
                 <span class="days">${daysAgoText}</span>
                 <div style="display: flex; align-items: center; gap: 8px;">
                   ${dueDateDisplay}
-                  ${dateIndicatorHtml}
+                  {/* dateIndicatorHtml removed from here */}
                   <button class="delete-btn" onclick="deleteNote('${doc.id}')" title="Excluir nota">
                     <i class="fas fa-trash"></i>
                   </button>
                 </div>
               </div>
               <div class="postit-content">${escapeHTML(note.text)}</div>`;
-            div.querySelector('.postit-content').addEventListener('dblclick', handleDoubleClickEditing);
+            // div.querySelector('.postit-content').addEventListener('dblclick', handleDoubleClickEditing); // Old: listener on content
+            div.addEventListener('dblclick', handleDoubleClickEditing); // New: listener on the entire postit
             notesContainer.appendChild(div);
           });
 
@@ -2180,6 +2386,9 @@ async function addNote() {
           new Sortable(notesContainer, {
             animation: 150,
             ghostClass: 'blue-background-class', // Optional: class for styling the ghost element
+            delay: 100, // ms, delay before drag starts
+            delayOnTouchOnly: true, // only delay if user is using touch
+            touchStartThreshold: 10, // px, how far the touch must move before it's considered a drag
             onEnd: function (evt) {
               const noteElements = notesContainer.querySelectorAll('.postit');
               const updates = [];
@@ -2229,8 +2438,35 @@ async function addNote() {
     }
 
     function handleDoubleClickEditing(event) {
-      const contentDiv = event.target;
-      const postitDiv = contentDiv.closest('.postit');
+      // event.currentTarget is the element the listener was attached to (the .postit div)
+      const postitDiv = event.currentTarget;
+      // Find the .postit-content div within this postitDiv
+      const contentDiv = postitDiv.querySelector('.postit-content');
+
+      if (!contentDiv) {
+        // If the click was on the header or delete button, contentDiv might not be found directly.
+        // Or if the structure is unexpected, prevent errors.
+        // We only want to edit if the main content area or its parent postit is dblclicked.
+        // Let's check if the original event target was part of postit-content or postit-content itself
+        if (event.target.classList.contains('postit-content') || event.target.closest('.postit-content')) {
+           // This case should be fine, but the querySelector above should ideally get it.
+           // If not, this is a safeguard or points to an issue.
+        } else if (event.target.classList.contains('delete-btn') || event.target.closest('.delete-btn')) {
+            // Do not trigger edit if delete button or its icon is clicked
+            return;
+        }
+        // If contentDiv still not found, and it wasn't delete, maybe it was header.
+        // For now, we assume dblclick on header shouldn't trigger edit.
+        // If it should, the logic to find contentDiv needs to be more robust or direct.
+        if (!postitDiv.querySelector('.postit-content')) { // Re-check specifically
+            console.log("Double click on postit, but content area not found or not intended for edit.", event.target);
+            return;
+        }
+      }
+
+      // Add the editing class
+      postitDiv.classList.add('postit-editing');
+
       const noteId = postitDiv.id;
       const originalText = contentDiv.textContent; // Use textContent for plain text
 
@@ -2282,50 +2518,91 @@ async function addNote() {
       }
 
       function revertToDiv(textToShow) {
+        postitDiv.classList.remove('postit-editing'); // Remove the class here
+
         const newContentDiv = document.createElement('div');
         newContentDiv.className = 'postit-content';
-        newContentDiv.textContent = textToShow; // Use textContent
+        newContentDiv.textContent = textToShow;
         newContentDiv.addEventListener('dblclick', handleDoubleClickEditing); // Re-attach listener
-        if (textarea.parentNode) {
+
+        if (textarea.parentNode) { // Check if textarea is still in the DOM
           textarea.parentNode.replaceChild(newContentDiv, textarea);
+        } else {
+          // This case might happen if Firestore onSnapshot updates interfere
+          // or if blur/keydown events trigger removal too quickly or multiple times.
+          console.warn("Textarea parent not found during revertToDiv. Ensuring editing class is removed if postitDiv still exists.");
+          if (postitDiv && postitDiv.classList.contains('postit-editing')) {
+               postitDiv.classList.remove('postit-editing');
+          }
         }
       }
 
-      textarea.addEventListener('blur', () => {
-        saveChanges();
-        // Note: The 'blur' event might fire before 'keydown' for Enter sometimes.
-        // The logic in saveChanges and reliance on onSnapshot should handle this.
-      });
+      // saveChanges function (as per the plan, ensuring it calls revertToDiv)
+      function saveChanges() {
+        const newText = textarea.value.trim();
+        let textToShowInDiv = originalText; // Default to original text
+
+        if (newText !== originalText.trim()) {
+          if (newText) { // If newText is not empty
+            db.collection("postits").doc(noteId).update({ text: newText })
+              .then(() => {
+                console.log("Note updated successfully:", noteId);
+                // Firestore's onSnapshot should ideally handle the UI update.
+                // If we want immediate optimistic update without waiting for snapshot:
+                // textToShowInDiv = newText;
+              })
+              .catch(err => {
+                console.error("Error updating note:", noteId, err);
+                // textToShowInDiv remains originalText on error for now
+              });
+            // For immediate UI update regardless of Firestore success (optimistic)
+            textToShowInDiv = newText;
+          } else { // If newText is empty (content was cleared)
+            db.collection("postits").doc(noteId).update({ text: "" })
+              .then(() => {
+                console.log("Note text cleared and updated:", noteId);
+              })
+              .catch(err => console.error("Error clearing note text:", noteId, err));
+            textToShowInDiv = ""; // Show empty in UI for immediate feedback
+          }
+        }
+        // Regardless of whether text changed or not, or if it was saved successfully,
+        // we revert the UI from textarea to div. Firestore listener will sync actual data.
+        revertToDiv(textToShowInDiv);
+      }
+
+      textarea.addEventListener('blur', saveChanges); // Changed to just call saveChanges
 
       textarea.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
           e.preventDefault(); // Prevent newline
           saveChanges();
         } else if (e.key === 'Escape') {
-          revertToDiv(originalText);
+          e.preventDefault(); // Prevent any other action from Escape
+          revertToDiv(originalText); // Revert to original text without saving
         }
       });
     }
 
-    function handleCategoryChange() {
-      const selectedValue = categorySelector.value;
-      console.log("Categoria alterada para:", selectedValue);
-      if (selectedValue === "pessoais") {
-        navbarWrapper.style.display = "";
-        secondaryNavbarWrapper.style.display = "none";
-        const personalCategories = categorias.map(c => c[0]);
-        if (!personalCategories.includes(currentTab)) currentTab = "pessoal";
-        buildNavbar(); changeTab(currentTab);
-        currentThemeInfo = { id: null, type: null, name: null };
-        themeNoteCustomizationDiv.style.display = 'none';
-      } else if (THEME_CONFIG_MAP[selectedValue]) { // Verifica se é um tipo de tema conhecido
-        navbarWrapper.style.display = "none";
-        secondaryNavbarWrapper.style.display = "";
-        buildSecondaryNavbar(selectedValue); // selectedValue é o 'type' ou 'id' do tema
-      } else {
-        console.error("Tipo de categoria desconhecido:", selectedValue);
-      }
-    }
+    // function handleCategoryChange() { // DELETED
+    //   const selectedValue = categorySelector.value;
+    //   console.log("Categoria alterada para:", selectedValue);
+    //   if (selectedValue === "pessoais") {
+    //     navbarWrapper.style.display = "";
+    //     secondaryNavbarWrapper.style.display = "none";
+    //     const personalCategories = categorias.map(c => c[0]);
+    //     if (!personalCategories.includes(currentTab)) currentTab = "pessoal";
+    //     buildNavbar(); changeTab(currentTab);
+    //     currentThemeInfo = { id: null, type: null, name: null };
+    //     themeNoteCustomizationDiv.style.display = 'none';
+    //   } else if (THEME_CONFIG_MAP[selectedValue]) {
+    //     navbarWrapper.style.display = "none";
+    //     secondaryNavbarWrapper.style.display = "";
+    //     buildSecondaryNavbar(selectedValue);
+    //   } else {
+    //     console.error("Tipo de categoria desconhecido:", selectedValue);
+    //   }
+    // }
 
     function buildSecondaryNavbar(type) { // type é o ID do themeConfig
       const themeConfig = THEME_CONFIG_MAP[type];
@@ -2445,7 +2722,8 @@ async function addNote() {
               else if (daysDiff === 1) daysAgoText = "Ontem";
               else if (daysDiff > 1) daysAgoText = `${daysDiff} dias atrás`;
             }
-            let dueDateDisplay = ""; let dateIndicatorHtml = "";
+            let dueDateDisplay = "";
+            // Remove dateIndicatorHtml declaration, classes will be added to div directly
             if (note.dueDate) {
               const today = new Date(); today.setHours(0,0,0,0);
               const parts = note.dueDate.split('-');
@@ -2455,23 +2733,32 @@ async function addNote() {
               const displayMonth = String(dueDate.getMonth() + 1).padStart(2, '0');
               const displayYear = String(dueDate.getFullYear()).slice(-2);
               dueDateDisplay = `<span class="postit-due-date"><i class="fas fa-calendar"></i> ${displayDay}/${displayMonth}/${displayYear}</span>`;
-              if (dueDate < today) dateIndicatorHtml = '<span class="due-date-indicator overdue" title="Vencido"></span>';
-              else if (dueDate.getTime() === today.getTime()) dateIndicatorHtml = '<span class="due-date-indicator overdue" title="Vence hoje"></span>';
-              else dateIndicatorHtml = '<span class="due-date-indicator future" title="Pendente"></span>';
+
+              if (dueDate < today) {
+                div.classList.add('postit-overdue');
+                div.title = "Vencido";
+              } else if (dueDate.getTime() === today.getTime()) {
+                div.classList.add('postit-overdue'); // Also overdue for "due today"
+                div.title = "Vence hoje";
+              } else {
+                div.classList.add('postit-future-due');
+                div.title = "Pendente";
+              }
             }
             div.innerHTML = `
               <div class="postit-header">
                 <span class="days">${daysAgoText}</span>
                 <div style="display: flex; align-items: center; gap: 8px;">
                   ${dueDateDisplay}
-                  ${dateIndicatorHtml}
+                  {/* dateIndicatorHtml removed from here */}
                   <button class="delete-btn" onclick="deleteNote('${doc.id}')" title="Excluir nota">
                     <i class="fas fa-trash"></i>
                   </button>
                 </div>
               </div>
               <div class="postit-content">${escapeHTML(note.text)}</div>`;
-            div.querySelector('.postit-content').addEventListener('dblclick', handleDoubleClickEditing);
+            // div.querySelector('.postit-content').addEventListener('dblclick', handleDoubleClickEditing); // Old: listener on content
+            div.addEventListener('dblclick', handleDoubleClickEditing); // New: listener on the entire postit
             notesContainer.appendChild(div);
           });
 
@@ -2479,6 +2766,9 @@ async function addNote() {
           new Sortable(notesContainer, {
             animation: 150,
             ghostClass: 'blue-background-class', // Optional
+            delay: 100, // ms, delay before drag starts
+            delayOnTouchOnly: true, // only delay if user is using touch
+            touchStartThreshold: 10, // px, how far the touch must move before it's considered a drag
             onEnd: function (evt) {
               const noteElements = notesContainer.querySelectorAll('.postit');
               const updates = [];
@@ -2613,6 +2903,113 @@ async function deleteThemeAndNotes(themeId, themeName, type) { // Tornar async s
 
     console.log("Aplicação inicializada com sucesso!");
   </script>
+
+  <script>
+    // Hamburger Menu Toggle
+    const hamburgerBtn = document.querySelector('.hamburger-btn');
+    const collapsibleMenu = document.querySelector('.collapsible-menu');
+
+    if (hamburgerBtn && collapsibleMenu) {
+        hamburgerBtn.addEventListener('click', function() {
+            collapsibleMenu.classList.toggle('active');
+        });
+
+        // Close menu when a link or button inside it is clicked (but not the dropdown button itself)
+        collapsibleMenu.addEventListener('click', function(event) {
+            // Check if the clicked target is an A tag or a BUTTON tag,
+            // and also ensure it's not the dropdown button or something inside it.
+            const isDropdownButton = event.target.matches('.dropdown-btn') || event.target.closest('.dropdown-btn');
+            const isLinkOrButton = event.target.tagName === 'A' || event.target.closest('button');
+
+            if (isLinkOrButton && !isDropdownButton) {
+                // For category selection from dropdown, specific handler will manage mobile menu close
+                if (!event.target.closest('.category-dropdown .dropdown-content a[data-category-type]')) {
+                    collapsibleMenu.classList.remove('active');
+                }
+            }
+        });
+    }
+
+    function populateNewCategoryDropdown() {
+        const dropdownContent = document.querySelector('.category-dropdown .dropdown-content');
+        if (!dropdownContent) {
+            console.error("New category dropdown content area not found.");
+            return;
+        }
+        dropdownContent.innerHTML = ''; // Clear any placeholders (like the initial HTML ones)
+
+        const pessoaisLink = document.createElement('a');
+        pessoaisLink.href = '#';
+        pessoaisLink.dataset.categoryType = 'pessoais';
+        pessoaisLink.innerHTML = '📝 Pessoais'; // Keeping emoji for dropdown list display
+        dropdownContent.appendChild(pessoaisLink);
+
+        THEME_TYPES_CONFIG.forEach(themeConfig => {
+            const themeLink = document.createElement('a');
+            themeLink.href = '#';
+            themeLink.dataset.categoryType = themeConfig.id;
+            themeLink.innerHTML = themeConfig.label; // Use full label with emoji for dropdown list
+            dropdownContent.appendChild(themeLink);
+        });
+        console.log("New category dropdown populated.");
+    }
+    populateNewCategoryDropdown(); // Call it once on script load
+
+    function handleNewCategorySelection(type) {
+        console.log("New category selected via new dropdown:", type);
+        const dropdownBtnTextSpan = document.querySelector('.category-dropdown .dropdown-btn .btn-text');
+
+        if (type === "pessoais") {
+            navbarWrapper.style.display = "";
+            secondaryNavbarWrapper.style.display = "none";
+
+            const personalCategories = categorias.map(c => c[0]);
+            // Ensure currentTab is valid for personal notes, default to 'pessoal' if not or if undefined
+            if (!currentTab || !personalCategories.includes(currentTab)) {
+                currentTab = "pessoal";
+            }
+            buildNavbar(); // Rebuilds the personal categories navbar
+            changeTab(currentTab); // Sets the active tab and loads notes for it
+
+            currentThemeInfo = { id: null, type: null, name: null };
+            themeNoteCustomizationDiv.style.display = 'none'; // Hide theme customization area
+            if (dropdownBtnTextSpan) dropdownBtnTextSpan.textContent = 'Pessoais';
+
+        } else if (THEME_CONFIG_MAP[type]) { // Check if it is a known theme type ID
+            navbarWrapper.style.display = "none"; // Hide personal categories navbar
+            secondaryNavbarWrapper.style.display = ""; // Show theme instances navbar (e.g., list of books)
+
+            // buildSecondaryNavbar will set currentThemeInfo.type to 'type' and currentThemeInfo.id/name to null
+            // It will also clear notesContainer or show placeholder for selecting a specific theme instance
+            buildSecondaryNavbar(type);
+
+            if (dropdownBtnTextSpan) {
+                // Use singularName for the button, fallback to full label if singularName is not defined
+                dropdownBtnTextSpan.textContent = THEME_CONFIG_MAP[type].singularName || THEME_CONFIG_MAP[type].label;
+            }
+            // Important: currentThemeInfo.id is null here. Notes should only be loaded when a specific theme instance is clicked in secondaryNavbar.
+            // buildSecondaryNavbar already handles setting notesContainer to a placeholder.
+        } else {
+            console.error("Unknown category type selected from new dropdown:", type);
+        }
+    }
+
+    const mainDropdownContent = document.querySelector('.category-dropdown .dropdown-content');
+    if (mainDropdownContent) {
+        mainDropdownContent.addEventListener('click', function(event) {
+            if (event.target.tagName === 'A' && event.target.dataset.categoryType) {
+                event.preventDefault();
+                const selectedType = event.target.dataset.categoryType;
+                handleNewCategorySelection(selectedType);
+
+                // Close mobile menu if it's active
+                const mobileMenu = document.querySelector('.collapsible-menu');
+                if (mobileMenu && mobileMenu.classList.contains('active')) {
+                    mobileMenu.classList.remove('active');
+                }
+            }
+        });
+    }
+  </script>
 </body>
 </html>
-
