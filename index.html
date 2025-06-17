@@ -1,0 +1,2090 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Post-it Retro - Minhas Memórias</title>
+  
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  
+  <!-- Font Awesome para ícones -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Google Fonts para tipografia retro -->
+  <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=Typewriter&display=swap" rel="stylesheet">
+  
+  <style>
+    /* ========================================
+       RESET E CONFIGURAÇÕES GLOBAIS
+    ======================================== */
+    * { 
+      box-sizing: border-box; 
+      margin: 0;
+      padding: 0;
+    }
+   
+    /* Configuração principal do body - Estilo Retro */
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      /*font-family: 'Courier Prime', 'Courier New', monospace;
+      background: #f4f1e8;  Cor de papel vintage */
+      background-image: 
+        radial-gradient(circle at 20% 50%, rgba(120, 119, 108, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(120, 119, 108, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 40% 80%, rgba(120, 119, 108, 0.2) 0%, transparent 50%);
+      color: #333;
+      line-height: 1.6;
+      min-height: 100vh;
+      justify-content: center;
+      align-items: center;
+      overflow-x: hidden;
+      
+    }
+
+    /* ========================================
+       SISTEMA DE TELAS (LOGIN, REGISTRO, APP)
+    ======================================== */
+    /* Container principal das telas */
+    .screen {
+      display: none;
+      width: 100%;
+      min-height: 100vh;
+      flex-direction: column;
+      align-items: center;
+     
+    }
+
+    /* Tela ativa */
+    .screen.active {
+      display: flex;
+    }
+
+    /* ========================================
+       TELAS DE AUTENTICAÇÃO (LOGIN/REGISTRO) - ESTILO RETRO
+    ======================================== */
+    .auth-container {
+      background: #f9f6f0;
+      padding: 40px 30px;
+      border-radius: 10px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+      margin-top: 10vh;
+      border: 3px solid #8b4513;
+      font-family: 'Courier Prime', 'Courier New', monospace;
+    }
+
+    .auth-container h2 {
+      margin-bottom: 30px;
+      color: #2c2416;
+      font-size: 2.2rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-family: 'Courier Prime', 'Courier New', monospace;
+    }
+
+    .auth-container input[type="email"],
+    .auth-container input[type="password"] {
+      width: 100%;
+      padding: 15px 20px;
+      margin-bottom: 20px;
+      border: 2px solid #d2b48c;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      background: #fff;
+      font-family: 'Courier Prime', 'Courier New', monospace;
+      color: #2c2416;
+    }
+
+    .auth-container input:focus {
+      outline: none;
+      border-color: #8b4513;
+      box-shadow: 0 0 0 3px rgba(139, 69, 19, 0.2);
+      transform: translateY(0);
+    }
+
+    .auth-container button {
+      width: 100%;
+      padding: 15px;
+      background: #8b4513;
+      color: #f4f1e8;
+      border: 2px solid #654321;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-family: 'Courier Prime', 'Courier New', monospace;
+      text-transform: uppercase;
+    }
+
+    .auth-container button:hover {
+      background: #654321;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+      transform: translateY(-1px);
+    }
+
+    .auth-container button.premium-cta-button {
+      background: #b08d57; /* Cor dourada/bronze para premium */
+      color: white;
+      margin-top: 15px; /* Espaçamento */
+      border: 2px solid #9a7947;
+    }
+
+    .auth-container button.premium-cta-button:hover {
+      background: #9a7947;
+      border-color: #7c6039;
+    }
+
+    .auth-container p {
+      margin-top: 25px;
+      font-size: 0.9rem;
+      color: #2c2416;
+      font-family: 'Courier Prime', 'Courier New', monospace;
+    }
+
+    .auth-container .promo-message {
+      font-family: 'Courier Prime', 'Courier New', monospace;
+      color: #2c2416;
+      background-color: #f0e6d0;
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 20px;
+      margin-bottom: 20px;
+      text-align: center;
+      font-size: 0.9rem;
+      border: 1px dashed #8b4513;
+      line-height: 1.4;
+    }
+
+    .auth-container a {
+      color: #654321;
+      text-decoration: none;
+      font-weight: 700;
+      transition: color 0.3s ease;
+      font-family: 'Courier Prime', 'Courier New', monospace;
+    }
+
+    .auth-container a:hover {
+      color: #8b4513;
+      text-decoration: underline;
+    }
+
+    /* ========================================
+       TELA PRINCIPAL DA APLICAÇÃO - ESTILO RETRO
+    ======================================== */
+    #appScreen {
+      background: #f4f1e8;
+      width: 100%;
+      margin: 0px;
+      min-height: 100vh;
+      position: absolute;
+      margin-top: 70px;
+    }
+
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 1001;
+      background: #dd7931;
+      background-image: linear-gradient(45deg, #8b4513 25%, #a0522d 25%, #a0522d 50%, #8b4513 50%, #8b4513 75%, #a0522d 75%);
+      background-size: 20px 20px;
+      color: #f4f1e8;
+      padding: 15px 20px 10px 20px;
+      text-align: center;
+      font-size: 1.8rem;
+      font-weight: 700;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      border-bottom: 3px solid #654321;
+    }
+
+    #categorySelectorContainer {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 10px;
+      margin-bottom: 8px;
+      gap: 10px;
+    }
+
+    #categorySelectorContainer label {
+      color: #f4f1e8;
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+
+    #categorySelector {
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 2px solid #654321;
+      background: #f4f1e8;
+      color: #2c2416;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: 'Courier Prime', monospace;
+    }
+
+    #categorySelector:focus {
+      outline: none;
+      border-color: #8b4513;
+      box-shadow: 0 0 0 2px rgba(139, 69, 19, 0.3);
+    }
+
+    #categorySelector option {
+      background: #f4f1e8;
+      color: #2c2416;
+      padding: 8px;
+    }
+
+    .navbar-wrapper {
+      position: relative;
+      width: 100%;
+      background: #8b4513;
+      border-bottom: 2px solid #654321;
+    }
+
+    .navbar {
+      display: flex;
+      overflow-x: auto;
+      background: transparent;
+      padding: 10px 15px;
+      gap: 8px;
+      scroll-padding-left: 15px;
+      scroll-snap-type: x mandatory;
+      justify-content: flex-start;
+      scrollbar-width: thin;
+      scrollbar-color: #654321 transparent;
+    }
+
+    .navbar::-webkit-scrollbar { height: 6px; }
+    .navbar::-webkit-scrollbar-track { background: transparent; }
+    .navbar::-webkit-scrollbar-thumb { background: #654321; border-radius: 3px; }
+
+    .navbar button {
+      position: relative;
+      background: #d2b48c;
+      color: #2c2416;
+      border: 2px solid #8b4513;
+      border-radius: 8px;
+      padding: 8px 12px;
+      white-space: nowrap;
+      min-width: max-content;
+      font-size: 0.6rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: 'Courier Prime', monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      scroll-snap-align: start;
+    }
+
+    .navbar button:hover, 
+    .navbar button.active-tab {
+      background: #f4f1e8;
+      color: #8b4513;
+      border-color: #654321;
+      transform: translateY(-1px);
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .navbar button .badge {
+      position: absolute;
+      top: -6px;
+      right: -6px;
+      z-index: 1002;
+      background: #6e3c0e;
+      color: rgb(255, 255, 255);
+      font-size: 0.6rem;
+      min-width: 18px;
+      height: 18px;
+      text-align: center;
+      line-height: 18px;
+      border-radius: 50%;      
+      display: none;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      border: 1px solid #f4f1e8;
+    }
+
+    .floating-add-btn {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 60px;
+      height: 60px;
+      background: #5e2f0d;
+      color: white;
+      border: 3px solid #bd692d;
+      border-radius: 50%;
+      font-size: 1.5rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 20px rgba(17, 17, 17, 0.5);
+      z-index: 1000;
+      font-family: 'Courier Prime', monospace;
+    }
+
+    .floating-add-btn:hover {
+      background: #814215;
+      transform: scale(1.1) rotate(180deg);
+      box-shadow: 0 8px 25px rgba(60, 129, 75, 0.4);
+    }
+
+    .header-logout-btn {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      background: #6d4115;
+      color: white;
+      border: 2px solid #d39960;
+      border-radius: 6px;
+      padding: 6px 12px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: 'Courier Prime', monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .header-logout-btn:hover {
+      background: #bb834b;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(220, 20, 60, 0.3);
+      color: #3f270f;
+    }
+
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(5px);
+      z-index: 2000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .modal-overlay.active { display: flex; }
+
+    .modal-container {
+      background: #f9f6f0;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      border: 3px solid #8b4513;
+      width: 90%;
+      max-width: 500px;
+      max-height: 80vh;
+      overflow-y: auto;
+      position: relative;
+      animation: slideInUp 0.4s ease;
+    }
+
+    .modal-header {
+      background: #8b4513;
+      background-image: linear-gradient(45deg, #8b4513 25%, #a0522d 25%, #a0522d 50%, #8b4513 50%, #8b4513 75%, #a0522d 75%);
+      background-size: 20px 20px;
+      color: #f4f1e8;
+      padding: 15px 20px;
+      border-radius: 9px 9px 0 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-weight: 700;
+      font-size: 1.2rem;
+    }
+
+    .modal-close-btn {
+      background: none; border: none; color: #f4f1e8;
+      font-size: 1.5rem; cursor: pointer; padding: 5px;
+      border-radius: 4px; transition: all 0.3s ease;
+    }
+    .modal-close-btn:hover { background: rgba(255, 255, 255, 0.2); transform: scale(1.1); }
+
+    .modal-content { padding: 25px; position: relative; }
+    .modal-content::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      background-image: 
+        linear-gradient(90deg, transparent 79px, #d2b48c 79px, #d2b48c 81px, transparent 81px),
+        linear-gradient(#f9f6f0 0px, transparent 1px);
+      background-size: 82px 20px; opacity: 0.3; pointer-events: none;
+      border-radius: 0 0 9px 9px;
+    }
+    .modal-content textarea {
+      width: 100%; padding: 15px; border: 2px solid #d2b48c;
+      border-radius: 8px; font-size: 1rem; min-height: 120px;
+      resize: vertical; margin-bottom: 15px; font-family: 'Courier Prime', monospace;
+      transition: all 0.3s ease; background: #fff; color: #2c2416;
+      position: relative; z-index: 1;
+    }
+    .modal-content textarea:focus {
+      outline: none; border-color: #8b4513;
+      box-shadow: 0 0 0 2px rgba(139, 69, 19, 0.2);
+    }
+    .modal-date-container {
+      display: flex; align-items: center; justify-content: center;
+      gap: 10px; margin-bottom: 20px; padding: 12px;
+      background: rgba(210, 180, 140, 0.2); border-radius: 8px;
+      border: 1px solid #d2b48c; position: relative; z-index: 1;
+    }
+    .modal-date-container label { color: #2c2416; font-weight: 700; font-size: 0.9rem; }
+    .modal-date-container input[type="date"] {
+      padding: 6px 10px; border: 2px solid #d2b48c; border-radius: 6px;
+      font-size: 0.9rem; color: #2c2416; background: white;
+      transition: all 0.3s ease; font-family: 'Courier Prime', monospace;
+    }
+    .modal-date-container input[type="date"]:focus {
+      outline: none; border-color: #8b4513;
+      box-shadow: 0 0 0 2px rgba(139, 69, 19, 0.2);
+    }
+    .modal-button-group {
+      display: flex; gap: 10px; justify-content: center;
+      align-items: center; position: relative; z-index: 1;
+    }
+    .modal-button-group button {
+      padding: 12px 20px; border: 2px solid #8b4513; border-radius: 8px;
+      font-size: 0.9rem; font-weight: 700; cursor: pointer;
+      transition: all 0.3s ease; display: flex; align-items: center;
+      gap: 6px; font-family: 'Courier Prime', monospace;
+      text-transform: uppercase; letter-spacing: 0.5px; flex: 1;
+      justify-content: center;
+    }
+    .modal-button-group button.add-btn { background: #633b06; color: white; }
+    .modal-button-group button.add-btn:hover {
+      background: #633b0680; color: #633b06; transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(34, 139, 34, 0.3);
+    }
+    .modal-button-group button.cancel-btn { background: #f7f2ed; color: rgb(114, 56, 17); }
+    .modal-button-group button.cancel-btn:hover {
+      background: #ad4805d5; transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(220, 20, 60, 0.3);
+    }
+
+    .notes-container {
+      display: flex; flex-wrap: wrap; gap: 15px; margin: 15px;
+      padding: 15px; justify-content: center; align-items: flex-start;
+      margin-top: 130px;
+    }
+
+    .postit {
+      width: 260px; background: #FFF59D; padding: 5px 20px 20px 20px;
+      border-radius: 8px; min-height: 150px;
+      box-shadow: 2px 4px 10px rgba(0,0,0,0.2); position: relative;
+    }
+    .postit:hover {
+      transform: rotate(0deg) scale(1.02);
+      box-shadow: 4px 8px 15px rgba(0,0,0,0.25); z-index: 10;
+    }
+    .postit .postit-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 8px; padding-bottom: 2px;
+      border-bottom: 1px dashed rgba(0,0,0,0.2);
+    }
+    .postit .days {
+      font-size: 0.7rem; font-weight: 700; color: #8b4513;
+      background: rgba(139, 69, 19, 0.1); padding: 2px 6px;
+      border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .postit .delete-btn {
+      background: rgba(220, 83, 20, 0.1); border: none; color: #8d8c8a;
+      font-size: 0.7rem; cursor: pointer; padding: 6px; /* Corrected font-size */
+      border-radius: 6px; transition: all 0.3s ease; display: flex;
+      align-items: center; justify-content: center;
+    }
+    .postit .delete-btn:hover { background: #8a4208; color: white; transform: scale(1.3); }
+    .postit .postit-content {
+      font-size: 0.95rem; line-height: 1.4; word-wrap: break-word;
+      color: #2c2416; font-weight: 400;
+    }
+    
+    .postit.pessoal { background: #FFF59D; }
+    .postit.trabalho { background: #e6e6fa; border-top-color: #dda0dd; }
+    .postit.investimentos { background: #98fb98; border-top-color: #90ee90; }
+    .postit.motivacionais { background: #ffd1dc; border-top-color: #ffb6c1; }
+    .postit.gestao { background: #87ceeb; border-top-color: #87cefa; }
+    .postit.mimos_esposa { background: #ffd6ec; border-top-color: #ffb3d9; }
+    .postit.mimos_filho { background: #add8e6; border-top-color: #87ceeb; }
+    .postit.mimos_flavio { background: #d0d0fd; border-top-color: #b8b8ff; }
+    .postit.mimos_casa { background: #fff5e1; border-top-color: #ffe4b5; }
+    .postit.sonhos { background: #ffddcc; border-top-color: #ffc8a2; }
+    .postit.reuniao { background: #d2f6c5; border-top-color: #a8e6a3; }
+    .postit.diario { background: #ffe5b4; border-top-color: #ffd700; }
+
+    .due-date-indicator {
+      position: absolute; top: -10px; left: 5px; width: 20px;
+      height: 20px; border-radius: 50%; z-index: 5;
+    }
+    .due-date-indicator.overdue {
+      background: #fd040498; box-shadow: 0 0 20px rgba(207, 81, 7, 0.4);
+      animation: pulse 1s infinite;
+    }
+    .due-date-indicator.future {
+      background: #228b22; box-shadow: 0 0 8px rgba(34, 139, 34, 0.5);
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(3.2); opacity: 0.3; }
+      100% { transform: scale(1); opacity: 0.5; } /* Corrected opacity */
+    }
+    .postit-due-date {
+      font-size: 0.65rem; color: #8b4513; background: rgba(139, 69, 19, 0.1);
+      padding: 2px 4px; border-radius: 3px; font-weight: 700;
+    }
+
+    #secondaryNavbar button {
+      background: #d2b48c; color: #2c2416; border: 2px solid #8b4513;
+      border-radius: 8px; padding: 8px 12px; white-space: nowrap;
+      min-width: max-content; font-size: 0.75rem; font-weight: 700;
+      cursor: pointer; transition: all 0.3s ease; margin-right: 8px;
+      font-family: 'Courier Prime', monospace; text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    #secondaryNavbar button:hover,
+    #secondaryNavbar button.active-tab {
+      background: #f4f1e8; color: #8b4513; border-color: #654321;
+      transform: translateY(-1px);
+    }
+    .postit.themenote { border-left: 4px solid #8b4513; }
+    .postit.livro { background: #e8f5e8; border-top-color: #d4edda; }
+    .postit.curso { background: #e3f2fd; border-top-color: #bbdefb; }
+
+    @media (max-width: 768px) {
+      .auth-container { margin: 5vh 20px; padding: 30px 20px; }
+      header { font-size: 1.4rem; padding: 12px 15px 8px 15px; }
+      .navbar { padding: 8px 10px; gap: 6px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+      .navbar button { font-size: 0.7rem; padding: 6px 10px; flex-shrink: 0; }
+      .notes-container { gap: 12px; padding: 12px; margin: 12px; margin-top: 110px; justify-content: center; }
+      .postit { width: 240px; min-height: 140px; }
+      .floating-add-btn { bottom: 20px; right: 20px; width: 55px; height: 55px; font-size: 1.3rem; }
+      .modal-container { width: 95%; margin: 10px; }
+      .modal-content { padding: 20px; }
+      .modal-button-group { flex-direction: column; gap: 8px; }
+      .modal-button-group button { width: 100%; }
+    }
+
+    @media (max-width: 480px) {
+      body { font-size: 14px; }
+      .auth-container { margin: 5vh 15px; padding: 25px 15px; border-radius: 15px; }
+      .auth-container h2 { font-size: 1.6rem; }
+      header { font-size: 0.8rem; padding: 10px 10px 6px 10px; }
+      .header-logout-btn { top: 10px; right: 10px; padding: 4px 8px; font-size: 0.5rem; }
+      .navbar { padding: 6px 8px; gap: 4px; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: thin; }
+      .navbar button { font-size: 0.65rem; padding: 6px 8px; flex-shrink: 0; min-width: auto; }
+      .notes-container { flex-direction: column; align-items: center; gap: 12px; padding: 10px; margin: 10px; margin-top: 10px; width: 260px; position: absolute; top: 100px; }
+      .postit { width: calc(100% - 20px); max-width: 300px; transform: rotate(0deg); }
+      .postit:hover { transform: scale(1.02); }
+      .floating-add-btn { bottom: 15px; right: 15px; width: 30px; height: 30px; font-size: 1.2rem; }
+      .modal-container { width: 95%; margin: 5px; max-height: 90vh; }
+      .modal-content { padding: 15px; }
+      .modal-content textarea { min-height: 100px; padding: 12px; }
+      #categorySelectorContainer { flex-direction: column; gap: 5px; }
+    }
+
+    .postit { animation: slideInUp 0.5s ease-out; }
+    @keyframes slideInUp {
+      from { opacity: 0; transform: translateY(30px) rotate(-1deg); }
+      to { opacity: 1; transform: translateY(0) rotate(-1deg); }
+    }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    /* Note: slideInUp was defined twice, keeping the second one as it's more generic for modals */
+    /* @keyframes slideInUp {
+      from { opacity: 0; transform: translateY(30px) rotate(-1deg); }
+      to { opacity: 1; transform: translateY(0) rotate(-1deg); }
+    } */
+
+    .loading {
+      display: inline-block; width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,.3); border-radius: 50%;
+      border-top-color: #fff; animation: spin 1s ease-in-out infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .hidden { display: none !important; }
+    .text-center { text-align: center; }
+    #themeNoteCustomization {
+      display: none; padding: 12px; background: rgba(210, 180, 140, 0.2);
+      border-radius: 8px; margin-bottom: 12px; border: 1px solid #d2b48c;
+      position: relative; z-index: 1;
+    }
+
+    #themeNameModalOverlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px);
+      z-index: 2000; display: none; align-items: center;
+      justify-content: center; animation: fadeIn 0.3s ease;
+    }
+    #themeNameModalOverlay.active { display: flex; }
+    #themeNameModalOverlay .modal-container {
+      background: #f9f6f0; border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3); border: 3px solid #8b4513;
+      width: 90%; max-width: 450px; max-height: 80vh; overflow-y: auto;
+      position: relative; animation: slideInUp 0.4s ease;
+    }
+    #themeNameModalOverlay .modal-header {
+      background: #8b4513;
+      background-image: linear-gradient(45deg, #8b4513 25%, #a0522d 25%, #a0522d 50%, #8b4513 50%, #8b4513 75%, #a0522d 75%);
+      background-size: 20px 20px; color: #f4f1e8; padding: 15px 20px;
+      border-radius: 9px 9px 0 0; display: flex; align-items: center;
+      justify-content: space-between; font-weight: 700; font-size: 1.1rem;
+    }
+    #themeNameModalOverlay .modal-close-btn {
+      background: none; border: none; color: #f4f1e8; font-size: 1.5rem;
+      cursor: pointer; padding: 5px; border-radius: 4px; transition: all 0.3s ease;
+    }
+    #themeNameModalOverlay .modal-close-btn:hover { background: rgba(255,255,255,0.2); transform: scale(1.1); }
+    #themeNameModalOverlay .modal-content { padding: 25px; position: relative; }
+    #themeNameInput {
+      width: 100%; padding: 15px 20px; margin-bottom: 25px;
+      border: 2px solid #d2b48c; border-radius: 8px; font-size: 1rem;
+      font-family: 'Courier Prime', monospace; transition: all 0.3s ease;
+      background: #fff; color: #2c2416; position: relative; z-index: 1;
+    }
+    #themeNameInput:focus {
+      outline: none; border-color: #8b4513;
+      box-shadow: 0 0 0 2px rgba(139, 69, 19, 0.2);
+    }
+    #themeNameModalOverlay .modal-button-group {
+      display: flex; gap: 10px; justify-content: center;
+      align-items: center; position: relative; z-index: 1;
+    }
+    #themeNameModalOverlay .modal-button-group button {
+      padding: 12px 20px; border: 2px solid #8b4513; border-radius: 8px;
+      font-size: 0.9rem; font-weight: 700; cursor: pointer;
+      transition: all 0.3s ease; display: flex; align-items: center;
+      gap: 6px; font-family: 'Courier Prime', monospace;
+      text-transform: uppercase; letter-spacing: 0.5px; flex: 1;
+      justify-content: center;
+    }
+    #themeNameModalOverlay .modal-button-group button.add-btn { background: #633b06; color: white; }
+    #themeNameModalOverlay .modal-button-group button.add-btn:hover {
+      background: #633b0680; color: #633b06; transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(34, 139, 34, 0.3);
+    }
+    #themeNameModalOverlay .modal-button-group button.cancel-btn { background: #f7f2ed; color: rgb(114, 56, 17); }
+    #themeNameModalOverlay .modal-button-group button.cancel-btn:hover {
+      background: #ad4805d5; transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(220, 20, 60, 0.3);
+    }
+
+    /* Admin Panel Modal Specific Styles */
+    .admin-modal-container { max-width: 700px; }
+    .admin-modal-content { padding: 20px; }
+    .admin-stats {
+      display: flex; justify-content: space-around; margin-bottom: 15px;
+      background-color: rgba(139, 69, 19, 0.05); padding: 10px; border-radius: 6px;
+    }
+    .admin-stats p { font-size: 1rem; font-weight: 700; color: #2c2416; }
+    .admin-stats span { font-weight: normal; color: #8b4513; }
+    .admin-divider { border: none; border-top: 1px dashed #d2b48c; margin: 15px 0; }
+    .admin-user-list-container h3 {
+      font-family: 'Courier Prime', monospace; color: #2c2416;
+      margin-bottom: 10px; font-size: 1.1rem;
+    }
+    .admin-user-list {
+      max-height: 300px; overflow-y: auto; border: 1px solid #d2b48c;
+      border-radius: 6px; padding: 10px; background: #fdfaf3;
+    }
+    .admin-user-item {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 8px 5px; border-bottom: 1px solid #e0d8c8;
+      font-family: 'Courier Prime', monospace; font-size: 0.9rem;
+    }
+    .admin-user-item:last-child { border-bottom: none; }
+    .admin-user-item .user-email { color: #2c2416; }
+    /* .admin-user-item .user-status-toggle {} */ /* Placeholder, styles in JS */
+
+    /* Premium Upgrade Modal Specific Styles */
+    .premium-upgrade-modal-container {
+      max-width: 550px;
+      border: 3px solid #8b4513;
+    }
+
+    .premium-upgrade-modal-content {
+      padding: 25px;
+      text-align: center;
+    }
+
+    .premium-upgrade-modal-content .modal-button-group .add-btn.premium-purchase-btn {
+      background-color: #633b06;
+      color: white;
+      border: 2px solid #4a2c05;
+    }
+
+    .premium-upgrade-modal-content .modal-button-group .add-btn.premium-purchase-btn:hover {
+      background-color: #4a2c05;
+      border-color: #301d03;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ========================================
+       TELA DE LOGIN
+  ======================================== -->
+  <div id="loginScreen" class="screen active">
+    <div class="auth-container">
+      <h2>
+        <i class="fas fa-sign-in-alt"></i>
+        Entrar
+      </h2>
+      <input type="email" id="loginEmail" placeholder="📧 Seu e-mail">
+      <input type="password" id="loginPassword" placeholder="🔒 Sua senha">
+      <button onclick="login()">
+        <i class="fas fa-arrow-right"></i>
+        Entrar
+      </button>
+       <button type="button" class="auth-button premium-cta-button" onclick="openPremiumUpgradeModal()">
+          <i class="fas fa-star"></i> Seja Premium
+        </button>
+      <p class="promo-message">Experimente o app com 20 memórias grátis! Após o limite, a versão premium por R$4,99/mês oferece memórias ilimitadas.</p>
+      <p>Não tem uma conta? <a href="#" onclick="showScreen('registerScreen')">Crie uma agora</a></p>
+    </div>
+  </div>
+
+  <!-- ========================================
+       TELA DE REGISTRO
+  ======================================== -->
+  <div id="registerScreen" class="screen">
+    <div class="auth-container">
+      <h2>
+        <i class="fas fa-user-plus"></i>
+        Criar Conta
+      </h2>
+      <input type="email" id="registerEmail" placeholder="📧 Seu e-mail">
+      <input type="password" id="registerPassword" placeholder="🔒 Crie uma senha">
+      <button onclick="register()">
+        <i class="fas fa-check"></i>
+        Cadastrar
+      </button>
+      <button type="button" class="auth-button premium-cta-button" onclick="openPremiumUpgradeModal()">
+        <i class="fas fa-star"></i> Seja Premium
+      </button>
+      <p>Já tem uma conta? <a href="#" onclick="showScreen('loginScreen')">Faça login</a></p>
+    </div>
+  </div>
+
+  <!-- ========================================
+       TELA PRINCIPAL DA APLICAÇÃO
+  ======================================== -->
+  <div id="appScreen" class="screen">
+    <!-- Cabeçalho da aplicação -->
+    <header>
+      <i class="fas fa-brain"></i> Minhas Memórias
+      
+      <!-- Botão de logout no cabeçalho -->
+      <button onclick="logout()" class="header-logout-btn">
+        <i class="fas fa-sign-out-alt"></i>
+        Sair
+      </button>
+      
+      <!-- Seletor de categoria -->
+      <div id="categorySelectorContainer">
+        <label for="categorySelector">
+          <i class="fas fa-tags"></i> Tipo:
+        </label>
+        <select id="categorySelector" onchange="handleCategoryChange()">
+          <option value="pessoais">📝 Pessoais</option>
+          <option value="livro">📚 Livro</option>
+          <option value="curso">🎓 Curso</option>
+        </select>
+      </div>
+      
+      <!-- Navbar principal -->
+      <div class="navbar-wrapper" id="navbarWrapper">
+        <nav class="navbar" id="navbar"></nav>
+      </div>
+      
+      <!-- Navbar secundária para temas -->
+      <div id="secondaryNavbarWrapper" class="navbar-wrapper" style="display: none;">
+        <nav id="secondaryNavbar" class="navbar"></nav>
+      </div>
+    </header>
+
+    <!-- Botão flutuante para abrir modal -->
+    <button class="floating-add-btn" onclick="openModal()" title="Adicionar nova memória">
+      <i class="fas fa-plus"></i>
+    </button>
+
+    <!-- Container dos post-its - AGORA SEM FORMULÁRIO -->
+    <div class="notes-container" id="notes"></div>
+  </div>
+
+  <!-- ========================================
+       MODAL PARA ADICIONAR NOTAS
+  ======================================== -->
+  <div id="modalOverlay" class="modal-overlay">
+    <div class="modal-container">
+      <!-- Cabeçalho do modal -->
+      <div class="modal-header">
+        <span>
+          <i class="fas fa-sticky-note"></i>
+          Nova Memória
+        </span>
+        <button class="modal-close-btn" onclick="closeModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      
+      <!-- Conteúdo do modal -->
+      <div class="modal-content">
+        <textarea id="noteText" placeholder="✍️ Escreva sua memória aqui..."></textarea>
+        
+        <!-- Customização de notas de tema (oculto por padrão) -->
+        <div id="themeNoteCustomization">
+          <!-- Conteúdo será adicionado dinamicamente pelo JavaScript -->
+        </div>
+        
+        <!-- Seletor de data de lembrete -->
+        <div class="modal-date-container">
+          <label for="noteDueDate">
+            <i class="fas fa-calendar-alt"></i> Lembrar em:
+          </label>
+          <input type="date" id="noteDueDate">
+        </div>
+        
+        <!-- Botões de ação -->
+        <div class="modal-button-group">
+          <button onclick="closeModal()" class="cancel-btn">
+            <i class="fas fa-times"></i>
+            Cancelar
+          </button>
+          <button onclick="addNote()" class="add-btn">
+            <i class="fas fa-plus"></i>
+            Add Memória
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================
+        MODAL PARA CONFIRMAÇÃO
+   ======================================== -->
+   <div id="confirmationModalOverlay" class="modal-overlay">
+     <div class="modal-container">
+       <div class="modal-header">
+         <span id="confirmationModalTitle">Confirmar Ação</span>
+         <button class="modal-close-btn" onclick="closeConfirmationModal()">
+           <i class="fas fa-times"></i>
+         </button>
+       </div>
+       <div class="modal-content">
+         <p id="confirmationModalMessage" style="margin-bottom: 20px; font-size: 1rem; color: #2c2416;"></p>
+         <div class="modal-button-group">
+           <button onclick="cancelConfirmation()" class="cancel-btn">
+             <i class="fas fa-times"></i>
+             Cancelar
+           </button>
+           <button onclick="confirmAction()" class="add-btn" id="confirmActionButton">
+             <i class="fas fa-check"></i>
+             Confirmar
+           </button>
+         </div>
+       </div>
+     </div>
+   </div>
+
+<!-- ========================================
+     MODAL PARA NOME DE TEMA (LIVRO/CURSO)
+======================================== -->
+<div id="themeNameModalOverlay" class="modal-overlay">
+  <div class="modal-container">
+    <!-- Cabeçalho do modal -->
+    <div class="modal-header">
+      <span id="themeNameModalTitle"></span>
+      <button class="modal-close-btn" onclick="closeThemeNameModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <!-- Conteúdo do modal -->
+    <div class="modal-content">
+      <input type="text" id="themeNameInput" placeholder="Digite o nome aqui..." style="width: 100%; padding: 15px; border: 2px solid #d2b48c; border-radius: 8px; font-size: 1rem; margin-bottom: 20px; font-family: 'Courier Prime', monospace; background: #fff; color: #2c2416;">
+
+      <!-- Botões de ação -->
+      <div class="modal-button-group">
+        <button onclick="closeThemeNameModal()" class="cancel-btn">
+          <i class="fas fa-times"></i>
+          Cancelar
+        </button>
+        <button onclick="saveThemeName()" class="add-btn">
+          <i class="fas fa-save"></i>
+          Salvar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========================================
+     ADMIN PANEL MODAL
+======================================== -->
+<div id="adminPanelModalOverlay" class="modal-overlay">
+  <div class="modal-container admin-modal-container">
+    <!-- Modal Header -->
+    <div class="modal-header">
+      <span>
+        <i class="fas fa-user-cog"></i> Painel Administrativo
+      </span>
+      <button class="modal-close-btn" onclick="closeAdminModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <!-- Modal Content -->
+    <div class="modal-content admin-modal-content">
+      <div class="admin-stats">
+        <p>Usuários Free: <span id="adminFreeUserCount">-</span></p>
+        <p>Usuários Premium: <span id="adminPremiumUserCount">-</span></p>
+      </div>
+
+      <hr class="admin-divider">
+
+      <div class="admin-user-list-container">
+        <h3>Lista de Usuários:</h3>
+        <div id="adminUserList" class="admin-user-list">
+          <!-- User items will be populated here by JavaScript -->
+          <p>Carregando usuários...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========================================
+     MODAL LIMITE DE NOTAS / UPGRADE PREMIUM
+======================================== -->
+<div id="premiumUpgradeModalOverlay" class="modal-overlay">
+  <div class="modal-container premium-upgrade-modal-container">
+    <div class="modal-header">
+      <span>
+        <i class="fas fa-rocket"></i> Desbloqueie Memórias Ilimitadas!
+      </span>
+      <button class="modal-close-btn" onclick="closePremiumUpgradeModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="modal-content premium-upgrade-modal-content">
+      <i class="fas fa-gem" style="font-size: 3.5em; color: #8b4513; text-align: center; display: block; margin-bottom: 20px;"></i>
+      <h3 style="text-align:center; font-family: 'Courier Prime', monospace; color: #2c2416; margin-bottom:10px;">Você atingiu o limite de 20 memórias gratuitas!</h3>
+      <p style="font-family: 'Courier Prime', monospace; color: #2c2416; margin-bottom:15px; text-align:center; line-height:1.4;">
+        Com o plano Premium, você pode registrar quantas memórias quiser, sem limites! Organize todas as suas ideias, projetos e lembranças importantes.
+      </p>
+      <p style="font-family: 'Courier Prime', monospace; color: #2c2416; margin-bottom:20px; text-align:center; font-size:1.1rem; font-weight:bold;">
+        Apenas R$4,99 por mês!
+      </p>
+      <div class="modal-button-group">
+        <button onclick="handlePremiumPurchase()" class="add-btn premium-purchase-btn">
+          <i class="fas fa-credit-card"></i> Quero ser Premium!
+        </button>
+        <button onclick="closePremiumUpgradeModal()" class="cancel-btn">
+          Fechar
+        </button>
+      </div>
+       <p id="premiumPurchaseInfo" style="font-family: 'Courier Prime', monospace; color: #8b4513; margin-top:15px; text-align:center; font-size:0.8rem; display:none;">
+        A integração com o sistema de pagamento estará disponível em breve!
+      </p>
+    </div>
+  </div>
+</div>
+
+  <!-- ========================================
+       JAVASCRIPT DA APLICAÇÃO
+  ======================================== -->
+  <script>
+    // Configuração do Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyCMvMLlcxThYIquvAXjsuKtvznQyeGo0d4",
+      authDomain: "postit-6b2f0.firebaseapp.com",
+      projectId: "postit-6b2f0",
+      storageBucket: "postit-6b2f0.firebasestorage.app",
+      messagingSenderId: "419645960721",
+      appId: "1:419645960721:web:e07c4d3a559e4b36d0b7b0"
+    };
+
+    // Inicialização do Firebase
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // Enable Firestore offline persistence
+    db.enablePersistence()
+      .then(() => {
+        console.log("Persistência offline do Firestore habilitada.");
+      })
+      .catch((error) => {
+        if (error.code == 'failed-precondition') {
+          // Multiple tabs open, persistence can only be enabled in one tab at a time.
+          console.warn("Falha ao habilitar persistência offline: várias abas abertas.");
+        } else if (error.code == 'unimplemented') {
+          // The current browser does not support all of the
+          // features required to enable persistence
+          console.warn("Falha ao habilitar persistência offline: navegador não suportado.");
+        } else {
+          console.error("Falha ao habilitar persistência offline:", error);
+        }
+      });
+    console.log("Firebase inicializado com sucesso (auth, db).");
+
+    // Variáveis globais
+    let currentUser = null;
+    let currentTab = "pessoal"; // Aba inicial padrão
+    let currentThemeInfo = { id: null, type: null, name: null }; // Informações do tema atual
+    let currentThemeType = null; // To store 'livro' ou 'curso' for the new modal
+
+    // Categorias com ícones
+    const categorias = [
+      ["pessoal", "🚨 Problemas"],
+      ["diario", "📝 Anotações"],
+      ["trabalho", "💼 Profissional"],
+      ["investimentos", "💰 Finanças"],
+      ["motivacionais", "✨ Inspiração"],
+      ["gestao", "📊 Conhecimento"],
+      ["mimos_esposa", "💕 Saúde"],
+      ["mimos_filho", "👨‍👩‍👦 Família"],
+      ["mimos_flavio", "🎁 Pessoal"],
+      ["mimos_casa", "🏠 Casa"],
+      ["sonhos", "🎯 Metas"],
+      ["reuniao", "📅 Reunião"]
+    ];
+
+    // Elementos da interface
+    const loginScreen = document.getElementById('loginScreen');
+    const registerScreen = document.getElementById('registerScreen');
+    const appScreen = document.getElementById('appScreen');
+    const loginEmailInput = document.getElementById('loginEmail');
+    const loginPasswordInput = document.getElementById('loginPassword');
+    const registerEmailInput = document.getElementById('registerEmail'); 
+    const registerPasswordInput = document.getElementById("registerPassword");
+    const navbarContainer = document.getElementById("navbar");
+    const notesContainer = document.getElementById("notes");
+    const noteTextInput = document.getElementById("noteText");
+    const navbarWrapper = document.getElementById("navbarWrapper");
+    const secondaryNavbarWrapper = document.getElementById('secondaryNavbarWrapper');
+    const categorySelector = document.getElementById('categorySelector');
+    const secondaryNavbarContainer = document.getElementById('secondaryNavbar');
+    const themeNoteCustomizationDiv = document.getElementById('themeNoteCustomization');
+    const modalOverlay = document.getElementById('modalOverlay');
+    const themeNameModalOverlay = document.getElementById('themeNameModalOverlay');
+    const themeNameModalTitle = document.getElementById('themeNameModalTitle');
+    const themeNameInput = document.getElementById('themeNameInput');
+
+   // Elementos do Modal de Confirmação
+   const confirmationModalOverlay = document.getElementById('confirmationModalOverlay');
+   const confirmationModalTitle = document.getElementById('confirmationModalTitle');
+   const confirmationModalMessage = document.getElementById('confirmationModalMessage');
+   let confirmCallback = null;
+
+   /**
+    * Abre o modal de confirmação
+    * @param {string} title - Título do modal
+    * @param {string} message - Mensagem de confirmação
+    * @param {function} callback - Função a ser executada ao confirmar
+    */
+   function openConfirmationModal(title, message, callback) {
+     confirmationModalTitle.textContent = title;
+     confirmationModalMessage.textContent = message;
+     confirmCallback = callback;
+     confirmationModalOverlay.classList.add('active');
+   }
+
+   /**
+    * Fecha o modal de confirmação
+    */
+   function closeConfirmationModal() {
+     confirmationModalOverlay.classList.remove('active');
+     confirmCallback = null;
+   }
+
+   /**
+    * Executa a ação de confirmação e fecha o modal
+    */
+   function confirmAction() {
+     if (typeof confirmCallback === 'function') {
+       confirmCallback();
+     }
+     closeConfirmationModal();
+   }
+
+   /**
+    * Cancela a ação e fecha o modal
+    */
+   function cancelConfirmation() {
+     closeConfirmationModal();
+   }
+
+   // Fecha modal de confirmação ao clicar no overlay
+    confirmationModalOverlay.addEventListener('click', function(event) {
+      if (event.target === confirmationModalOverlay) {
+        closeConfirmationModal();
+      }
+    });
+
+    /**
+     * Função para mostrar a tela correta
+     * @param {string} id - ID da tela a ser mostrada
+     */
+    function showScreen(id) {
+      console.log(`Mostrando tela: ${id}`);
+      
+      // Remove a classe 'active' de todas as telas
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      
+      // Adiciona a classe 'active' à tela selecionada
+      const screenToShow = document.getElementById(id);
+      if (screenToShow) {
+        screenToShow.classList.add('active');
+      } else {
+        console.error("Tela não encontrada: ", id);
+        // Fallback para tela de login
+        loginScreen.classList.add('active');
+      }
+    }
+
+    /**
+     * Abre o modal para adicionar nota
+     */
+    function openModal() {
+      modalOverlay.classList.add('active');
+      noteTextInput.focus();
+    }
+
+    /**
+     * Fecha o modal e limpa os campos
+     */
+    function closeModal() {
+      modalOverlay.classList.remove('active');
+      noteTextInput.value = '';
+      document.getElementById('noteDueDate').value = '';
+    }
+
+    // --- Admin Panel Modal Functions ---
+    const adminPanelModalOverlay = document.getElementById('adminPanelModalOverlay');
+
+    async function loadAdminPanelData() {
+        const freeUserCountSpan = document.getElementById('adminFreeUserCount');
+        const premiumUserCountSpan = document.getElementById('adminPremiumUserCount');
+        const userListDiv = document.getElementById('adminUserList');
+
+        if (!freeUserCountSpan || !premiumUserCountSpan || !userListDiv) {
+            console.error('Admin panel elements not found.');
+            return;
+        }
+
+        userListDiv.innerHTML = '<p>Carregando usuários...</p>'; // Show loading state
+
+        try {
+            const usersSnapshot = await db.collection('users').orderBy('email', 'asc').get();
+            let freeCount = 0;
+            let premiumCount = 0;
+
+            userListDiv.innerHTML = ''; // Clear loading message
+
+            if (usersSnapshot.empty) {
+                userListDiv.innerHTML = '<p>Nenhum usuário encontrado.</p>';
+            }
+
+            usersSnapshot.forEach(doc => {
+                const userData = doc.data();
+
+                if (userData.status === 'premium') {
+                    premiumCount++;
+                } else {
+                    freeCount++; // Default to free if status is missing or different
+                }
+
+                const userItem = document.createElement('div');
+                userItem.className = 'admin-user-item';
+
+                const userEmailSpan = document.createElement('span');
+                userEmailSpan.className = 'user-email';
+                userEmailSpan.textContent = userData.email || userData.uid; // Display email or UID
+
+                const statusToggleButton = document.createElement('button');
+                statusToggleButton.className = 'user-status-toggle-btn';
+                statusToggleButton.textContent = userData.status === 'premium' ? 'Rebaixar para Free' : 'Promover para Premium';
+                statusToggleButton.style.padding = '5px 10px';
+                statusToggleButton.style.fontFamily = "'Courier Prime', monospace";
+                statusToggleButton.style.fontSize = '0.8rem';
+                statusToggleButton.style.cursor = 'pointer';
+                statusToggleButton.style.border = '1px solid #8b4513';
+                statusToggleButton.style.borderRadius = '4px';
+                if (userData.status === 'premium') {
+                    statusToggleButton.style.backgroundColor = '#d2b48c'; // Beige for "Rebaixar"
+                    statusToggleButton.style.color = '#2c2416';
+                } else {
+                    statusToggleButton.style.backgroundColor = '#633b06'; // Green for "Promover"
+                    statusToggleButton.style.color = 'white';
+                }
+
+                // Prevent changing admin's own status via this button for safety
+                if (userData.uid === currentUser.uid) { // currentUser should be admin here
+                    statusToggleButton.disabled = true;
+                    statusToggleButton.textContent = 'Admin (Você)';
+                    statusToggleButton.style.opacity = '0.7';
+                    statusToggleButton.style.cursor = 'not-allowed';
+                } else {
+                    statusToggleButton.onclick = () => toggleUserStatus(doc.id, userData.status);
+                }
+
+                userItem.appendChild(userEmailSpan);
+                userItem.appendChild(statusToggleButton);
+                userListDiv.appendChild(userItem);
+            });
+
+            freeUserCountSpan.textContent = freeCount;
+            premiumUserCountSpan.textContent = premiumCount;
+
+        } catch (error) {
+            console.error('Error loading admin panel data:', error);
+            userListDiv.innerHTML = '<p>Erro ao carregar usuários.</p>';
+            freeUserCountSpan.textContent = 'Erro';
+            premiumUserCountSpan.textContent = 'Erro';
+        }
+    }
+
+    async function toggleUserStatus(userId, currentStatus) {
+        const newStatus = currentStatus === 'premium' ? 'free' : 'premium';
+        try {
+            await db.collection('users').doc(userId).update({ status: newStatus });
+            console.log(`User ${userId} status updated to ${newStatus}`);
+            loadAdminPanelData(); // Refresh the list and counts
+        } catch (error) {
+            console.error(`Error updating user ${userId} status:`, error);
+            alert('Falha ao atualizar status do usuário.');
+        }
+    }
+
+    function openAdminModal() {
+      if (adminPanelModalOverlay) {
+        adminPanelModalOverlay.classList.add('active');
+        loadAdminPanelData();
+        console.log("Admin modal opened and data loading initiated.");
+      }
+    }
+
+    function closeAdminModal() {
+      if (adminPanelModalOverlay) {
+        adminPanelModalOverlay.classList.remove('active');
+        console.log("Admin modal closed.");
+      }
+    }
+
+    if (adminPanelModalOverlay) {
+      adminPanelModalOverlay.addEventListener('click', function(event) {
+        if (event.target === adminPanelModalOverlay) {
+          closeAdminModal();
+        }
+      });
+    }
+
+    // --- Premium Upgrade Modal Functions ---
+    const premiumUpgradeModalOverlay = document.getElementById('premiumUpgradeModalOverlay');
+    const premiumPurchaseInfo = document.getElementById('premiumPurchaseInfo');
+
+    function openPremiumUpgradeModal() {
+      if (premiumUpgradeModalOverlay) {
+        premiumUpgradeModalOverlay.classList.add('active');
+        if (premiumPurchaseInfo) premiumPurchaseInfo.style.display = 'none';
+      }
+    }
+
+    function closePremiumUpgradeModal() {
+      if (premiumUpgradeModalOverlay) {
+        premiumUpgradeModalOverlay.classList.remove('active');
+      }
+    }
+
+    if (premiumUpgradeModalOverlay) {
+      premiumUpgradeModalOverlay.addEventListener('click', function(event) {
+        if (event.target === premiumUpgradeModalOverlay) {
+          closePremiumUpgradeModal();
+        }
+      });
+    }
+
+    function handlePremiumPurchase() {
+      console.log('Botão "Quero ser Premium!" clicado.');
+      if (premiumPurchaseInfo) {
+        premiumPurchaseInfo.textContent = 'Agradecemos o seu interesse! A funcionalidade de pagamento será implementada em breve.';
+        premiumPurchaseInfo.style.display = 'block';
+      }
+    }
+
+    /**
+     * Abre o modal para adicionar nome de tema (livro/curso)
+     * @param {string} type - 'livro' ou 'curso'
+     */
+    function openThemeNameModal(type) {
+      currentThemeType = type;
+      themeNameModalTitle.textContent = type === 'livro' ? 'Adicionar Novo Livro' : 'Adicionar Novo Curso';
+      themeNameInput.value = '';
+      themeNameModalOverlay.classList.add('active');
+      themeNameInput.focus();
+    }
+
+    /**
+     * Fecha o modal de nome de tema
+     */
+    function closeThemeNameModal() {
+      themeNameModalOverlay.classList.remove('active');
+      themeNameInput.value = '';
+      currentThemeType = null;
+    }
+
+    /**
+     * Salva o nome do tema (livro/curso)
+     */
+    function saveThemeName() {
+      const themeName = themeNameInput.value.trim();
+      if (themeName && currentThemeType) {
+        addNewTheme(currentThemeType, themeName);
+        closeThemeNameModal();
+      } else {
+        if (!themeName) {
+          alert('Por favor, digite um nome para o ' + (currentThemeType || 'tema') + '.');
+          themeNameInput.focus();
+        } else {
+           alert('Erro: Tipo de tema não definido.');
+        }
+      }
+    }
+
+    /**
+     * Observador de estado de autenticação do Firebase
+     */
+    auth.onAuthStateChanged(user => {
+      console.log("Estado de autenticação alterado");
+      
+      if (user) {
+        console.log("Usuário autenticado:", user.uid);
+        currentUser = user;
+
+        // Admin Panel Button Logic
+        let existingAdminButton = document.getElementById('adminPanelButton');
+        if (user.email === 'flavio_cesar_oliveira@hotmail.com') {
+            if (!existingAdminButton) {
+                let adminButton = document.createElement('button');
+                adminButton.id = 'adminPanelButton';
+                adminButton.innerHTML = '<i class="fas fa-user-shield"></i> Admin';
+                adminButton.onclick = openAdminModal;
+
+                adminButton.style.position = 'absolute';
+                adminButton.style.top = '15px';
+                adminButton.style.right = '110px';
+                adminButton.style.background = '#8b4513';
+                adminButton.style.color = '#f4f1e8';
+                adminButton.style.border = '2px solid #654321';
+                adminButton.style.borderRadius = '6px';
+                adminButton.style.padding = '6px 10px';
+                adminButton.style.fontSize = '0.8rem';
+                adminButton.style.fontWeight = '700';
+                adminButton.style.cursor = 'pointer';
+                adminButton.style.fontFamily = "'Courier Prime', monospace";
+                adminButton.style.textTransform = 'uppercase';
+                adminButton.style.letterSpacing = '0.5px';
+                adminButton.style.zIndex = '1002';
+
+                const headerElement = document.querySelector('header');
+                if (headerElement) {
+                    headerElement.appendChild(adminButton);
+                }
+            }
+        } else {
+            if (existingAdminButton) {
+                existingAdminButton.remove();
+            }
+        }
+        
+        // Botão "Seja Premium" no Header
+        let existingHeaderPremiumBtn = document.getElementById('headerPremiumButton');
+        if (existingHeaderPremiumBtn) existingHeaderPremiumBtn.remove();
+
+        db.collection('users').doc(user.uid).get().then(userDoc => {
+            if (userDoc.exists && userDoc.data().status === 'premium') {
+                let btnToRemove = document.getElementById('headerPremiumButton');
+                if (btnToRemove) btnToRemove.remove();
+                console.log('Usuário é premium, botão Seja Premium do header não será exibido/removido.');
+            } else {
+                let headerPremiumButton = document.createElement('button');
+                headerPremiumButton.id = 'headerPremiumButton';
+                headerPremiumButton.innerHTML = '<i class="fas fa-star"></i> Seja Premium';
+                headerPremiumButton.onclick = openPremiumUpgradeModal;
+
+                headerPremiumButton.style.position = 'absolute';
+                headerPremiumButton.style.top = '15px';
+                // Ajuste de posicionamento dinâmico
+                const adminBtn = document.getElementById('adminPanelButton');
+                if (adminBtn) {
+                    headerPremiumButton.style.right = (parseInt(adminBtn.style.right) + adminBtn.offsetWidth + 10) + 'px';
+                } else {
+                     const logoutBtn = document.querySelector('.header-logout-btn');
+                     if(logoutBtn) {
+                        headerPremiumButton.style.right = (parseInt(getComputedStyle(logoutBtn).right) + logoutBtn.offsetWidth + 10) + 'px';
+                     } else {
+                        headerPremiumButton.style.right = '110px'; // Fallback
+                     }
+                }
+
+                headerPremiumButton.style.background = '#b08d57';
+                headerPremiumButton.style.color = 'white';
+                headerPremiumButton.style.border = '2px solid #9a7947';
+                headerPremiumButton.style.borderRadius = '6px';
+                headerPremiumButton.style.padding = '6px 10px';
+                headerPremiumButton.style.fontSize = '0.8rem';
+                headerPremiumButton.style.fontWeight = '700';
+                headerPremiumButton.style.cursor = 'pointer';
+                headerPremiumButton.style.fontFamily = "'Courier Prime', monospace";
+                headerPremiumButton.style.textTransform = 'uppercase';
+                headerPremiumButton.style.zIndex = '1002';
+
+                const headerElement = document.querySelector('header');
+                if (headerElement) {
+                    const logoutButton = document.querySelector('.header-logout-btn');
+                    const adminButton = document.getElementById('adminPanelButton');
+                    if (adminButton) { // If admin button exists, insert before it
+                        headerElement.insertBefore(headerPremiumButton, adminButton);
+                    } else if (logoutButton) { // Else, if logout button exists, insert before it
+                         headerElement.insertBefore(headerPremiumButton, logoutButton);
+                    } else { // Fallback
+                        headerElement.appendChild(headerPremiumButton);
+                    }
+                }
+                console.log('Usuário é free, botão Seja Premium do header exibido.');
+            }
+        }).catch(error => {
+            console.error("Erro ao buscar status do usuário para botão Seja Premium:", error);
+            let btnToRemove = document.getElementById('headerPremiumButton');
+            if (btnToRemove) btnToRemove.remove();
+        });
+        
+        showScreen("appScreen");
+        categorySelector.value = "pessoais";
+        navbarWrapper.style.display = "";
+        secondaryNavbarWrapper.style.display = "none";
+        buildNavbar();
+        const personalCategories = categorias.map(c => c[0]);
+        if (!personalCategories.includes(currentTab)) {
+          currentTab = "pessoal";
+        }
+        changeTab(currentTab);
+        themeNoteCustomizationDiv.style.display = 'none';
+        
+      } else {
+        console.log("Usuário não autenticado");
+        currentUser = null;
+        showScreen("loginScreen");
+        navbarContainer.innerHTML = '';
+        notesContainer.innerHTML = '';
+        noteTextInput.value = '';
+
+        let adminButtonToRemoveOnLogout = document.getElementById('adminPanelButton');
+        if (adminButtonToRemoveOnLogout) {
+            adminButtonToRemoveOnLogout.remove();
+        }
+        let headerPremiumBtnToRemove = document.getElementById('headerPremiumButton');
+        if (headerPremiumBtnToRemove) {
+            headerPremiumBtnToRemove.remove();
+        }
+      }
+    });
+
+    /**
+     * Função de login
+     */
+    function login() {
+      console.log("Iniciando processo de login");
+      
+      const email = loginEmailInput.value.trim();
+      const password = loginPasswordInput.value;
+      
+      if (!email || !password) {
+        alert("Por favor, preencha e-mail e senha.");
+        return;
+      }
+      
+      const loginBtn = document.querySelector('#loginScreen button');
+      const originalText = loginBtn.innerHTML;
+      loginBtn.innerHTML = '<div class="loading"></div> Entrando...';
+      loginBtn.disabled = true;
+      
+      auth.signInWithEmailAndPassword(email, password)
+        .then(userCredential => {
+          console.log("Login realizado com sucesso");
+        })
+        .catch(error => {
+          console.error("Erro no login:", error);
+          alert("Erro ao fazer login: " + mapFirebaseAuthError(error.code));
+        })
+        .finally(() => {
+          loginBtn.innerHTML = originalText;
+          loginBtn.disabled = false;
+        });
+    }
+
+    /**
+     * Função de registro
+     */
+    function register() {
+      console.log("Iniciando processo de registro");
+      
+      const email = registerEmailInput.value.trim();
+      const password = registerPasswordInput.value;
+      
+      if (!email || !password) {
+        alert("Por favor, preencha e-mail e senha para registrar.");
+        return;
+      }
+      if (password.length < 6) {
+        alert("A senha deve ter pelo menos 6 caracteres.");
+        return;
+      }
+      
+      const registerBtn = document.querySelector('#registerScreen button');
+      const originalText = registerBtn.innerHTML;
+      registerBtn.innerHTML = '<div class="loading"></div> Cadastrando...';
+      registerBtn.disabled = true;
+      
+      auth.createUserWithEmailAndPassword(email, password)
+        .then(userCredential => {
+          console.log("Registro realizado com sucesso:", userCredential.user);
+          currentTab = "pessoal";
+          const user = userCredential.user;
+          if (user) {
+              db.collection('users').doc(user.uid).set({
+                  uid: user.uid,
+                  email: user.email,
+                  status: 'free',
+                  createdAt: firebase.firestore.FieldValue.serverTimestamp()
+              }).then(() => {
+                  console.log('User document created in Firestore with free status.');
+              }).catch(error => {
+                  console.error('Error creating user document in Firestore:', error);
+              });
+          }
+        })
+        .catch(error => {
+          console.error("Erro no registro:", error);
+          alert("Erro ao registrar: " + mapFirebaseAuthError(error.code));
+        })
+        .finally(() => {
+          registerBtn.innerHTML = originalText;
+          registerBtn.disabled = false;
+        });
+    }
+
+    /**
+     * Função de logout
+     */
+    function logout() {
+      openConfirmationModal("Confirmar Logout", "Tem certeza que deseja sair?", () => {
+        auth.signOut().then(() => {
+          console.log("Logout realizado com sucesso");
+        }).catch(error => {
+          console.error("Erro ao fazer logout:", error);
+          alert("Ocorreu um erro ao sair.");
+        });
+      });
+    }
+
+    function buildNavbar() {
+      navbarContainer.innerHTML = "";
+      categorias.forEach(([id, label]) => {
+        const btn = document.createElement("button");
+        btn.id = "btn_" + id;
+        btn.innerHTML = `${label}<span class="badge" id="badge_${id}">0</span>`;
+        btn.onclick = () => { changeTab(id); };
+        if (id === currentTab) {
+          btn.classList.add('active-tab');
+        }
+        navbarContainer.appendChild(btn);
+        updateBadgeCount(id);
+      });
+    }
+
+    function updateBadgeCount(cat) {
+      if (!currentUser) return;
+      const badge = document.getElementById("badge_" + cat);
+      if (!badge) {
+        console.warn("Badge não encontrado para categoria:", cat);
+        return;
+      }
+      db.collection("postits")
+        .where("uid", "==", currentUser.uid)
+        .where("category", "==", cat)
+        .onSnapshot(snapshot => {
+          const count = snapshot.size;
+          if (count > 0) {
+            badge.textContent = count;
+            badge.style.display = "inline-block";
+          } else {
+            badge.style.display = "none";
+          }
+          let hasOverdue = false;
+          let hasPending = false;
+          snapshot.docs.forEach(doc => {
+            const note = doc.data();
+            if (note.dueDate) {
+              const today = new Date(); today.setHours(0,0,0,0);
+              const parts = note.dueDate.split('-');
+              const dueDate = new Date(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
+              dueDate.setHours(0,0,0,0);
+              if (dueDate <= today) hasOverdue = true;
+              else hasPending = true;
+            }
+            if(hasOverdue) return;
+          });
+          if (hasOverdue) {
+            badge.style.backgroundColor = '#dc143c';
+            badge.title = 'Contém itens vencidos ou para hoje';
+          } else if (hasPending) {
+            badge.style.backgroundColor = '#1d7e14';
+            badge.title = 'Contém itens com data futura';
+          } else {
+            badge.style.backgroundColor = '#6e3c0e'; // Default badge color
+            badge.title = count > 0 ? `${count} nota(s)` : '';
+          }
+        }, error => {
+          console.error("Erro ao obter contagem da categoria", cat, error);
+          badge.title = 'Erro ao carregar contagem';
+          badge.style.display = 'none';
+        });
+    }
+
+    function changeTab(tabId) {
+      console.log("Mudando para aba:", tabId);
+      currentTab = tabId;
+      document.querySelectorAll('.navbar button').forEach(btn => {
+        btn.classList.remove('active-tab');
+        if (btn.id === "btn_" + tabId) {
+          btn.classList.add('active-tab');
+        }
+      });
+      loadNotes();
+    }
+
+async function addNote() {
+  const text = noteTextInput.value.trim();
+  if (!text) {
+    alert("Por favor, escreva algo na nota.");
+    noteTextInput.focus(); return;
+  }
+  if (!currentUser) {
+    alert("Erro: Usuário não está logado."); return;
+  }
+
+    let isPremiumUser = false;
+    if (currentUser) {
+        try {
+            const userDocRef = db.collection('users').doc(currentUser.uid);
+            const userDoc = await userDocRef.get();
+            if (userDoc.exists && userDoc.data().status === 'premium') {
+                isPremiumUser = true;
+                console.log('User is premium. Note limit check skipped.');
+            }
+        } catch (error) {
+            console.error("Error fetching user status for note limit check:", error);
+        }
+    }
+
+    if (!isPremiumUser) {
+        console.log('User is not premium or status unknown, checking note limit.');
+        if (currentUser) {
+            try {
+                const notesSnapshot = await db.collection('postits')
+                                              .where('uid', '==', currentUser.uid)
+                                              .get();
+                const noteCount = notesSnapshot.size;
+                console.log('Current note count for user:', noteCount);
+                if (noteCount >= 20) {
+                    openPremiumUpgradeModal(); // Calls the new modal
+                    return;
+                }
+            } catch (error) {
+                console.error("Error fetching note count for limit check:", error);
+                alert("Erro ao verificar seu limite de notas. Tente novamente.");
+                return;
+            }
+        } else {
+            alert("Erro: Usuário não identificado para verificar limite de notas.");
+            return;
+        }
+    }
+
+  const selectedCategoryType = categorySelector.value;
+  const dueDateValue = document.getElementById('noteDueDate').value;
+  let noteData = {
+    text: text,
+    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+    uid: currentUser.uid
+  };
+  if (dueDateValue) noteData.dueDate = dueDateValue;
+
+  if ((selectedCategoryType === "livro" || selectedCategoryType === "curso") && currentThemeInfo.id) {
+    noteData.themeId = currentThemeInfo.id;
+    noteData.themeName = currentThemeInfo.name;
+    noteData.noteType = selectedCategoryType;
+  } else if (selectedCategoryType === "pessoais") {
+    noteData.category = currentTab;
+  } else {
+    alert("Por favor, selecione uma categoria ou tema válido."); return;
+  }
+
+  const addBtn = document.querySelector('#modalOverlay .modal-button-group .add-btn');
+  const originalText = addBtn.innerHTML;
+  addBtn.innerHTML = '<div class="loading"></div> Salvando...';
+  addBtn.disabled = true;
+  closeModal();
+
+  db.collection("postits").add(noteData)
+    .then((docRef) => { console.log("Nota adicionada com ID:", docRef.id); })
+    .catch((error) => {
+      console.error("Erro ao adicionar nota:", error);
+      alert("Erro ao salvar a nota. Sua nota poderá ser salva localmente e será sincronizada quando houver conexão.");
+    })
+    .finally(() => {
+      addBtn.innerHTML = originalText;
+      addBtn.disabled = false;
+    });
+}
+
+    function deleteNote(noteId) {
+      openConfirmationModal("Confirmar Exclusão", "Tem certeza que deseja excluir esta nota?", () => {
+        db.collection("postits").doc(noteId).delete()
+          .then(() => { console.log("Nota deletada com sucesso"); })
+          .catch((error) => {
+            console.error("Erro ao deletar nota:", error);
+            alert("Erro ao excluir a nota. Tente novamente.");
+          });
+      });
+    }
+
+    function loadNotes() {
+      if (!currentUser) return;
+      console.log("Carregando notas para a categoria:", currentTab);
+      notesContainer.innerHTML = "<p class='text-center' style='width:100%; color: #8b4513; margin-top: 50px; font-family: Courier Prime, monospace;'><i class='fas fa-spinner fa-spin'></i> Carregando notas...</p>";
+      db.collection("postits")
+        .where("category", "==", currentTab)
+        .where("uid", "==", currentUser.uid)
+        .orderBy("createdAt", "desc")
+        .onSnapshot(snapshot => {
+          notesContainer.innerHTML = "";
+          if (snapshot.empty) {
+            const categoryName = categorias.find(c=>c[0]===currentTab)?.[1] || currentTab;
+            notesContainer.innerHTML = `<p class='text-center' style='width:100%; color: #8b4513; margin-top: 50px; font-family: Courier Prime, monospace;'><i class='fas fa-sticky-note' style='font-size: 3rem; margin-bottom: 20px; display: block; opacity: 0.3;'></i>Nenhuma nota encontrada em '${categoryName}'.</p>`;
+            return;
+          }
+          snapshot.forEach(doc => {
+            const note = doc.data();
+            const div = document.createElement("div");
+            div.className = `postit ${note.category}`;
+            div.id = doc.id;
+            const createdDate = note.createdAt?.toDate();
+            let daysAgoText = "Recente";
+            if (createdDate) {
+              const daysDiff = Math.floor((Date.now() - createdDate.getTime()) / (1000 * 60 * 60 * 24));
+              if (daysDiff === 0) daysAgoText = "Hoje";
+              else if (daysDiff === 1) daysAgoText = "Ontem";
+              else if (daysDiff > 1) daysAgoText = `${daysDiff} dias atrás`;
+            }
+            let dueDateDisplay = ""; let dateIndicatorHtml = "";
+            if (note.dueDate) {
+              const today = new Date(); today.setHours(0,0,0,0);
+              const parts = note.dueDate.split('-');
+              const dueDate = new Date(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
+              dueDate.setHours(0,0,0,0);
+              const displayDay = String(dueDate.getDate()).padStart(2, '0');
+              const displayMonth = String(dueDate.getMonth() + 1).padStart(2, '0');
+              const displayYear = String(dueDate.getFullYear()).slice(-2);
+              dueDateDisplay = `<span class="postit-due-date"><i class="fas fa-calendar"></i> ${displayDay}/${displayMonth}/${displayYear}</span>`;
+              if (dueDate < today) dateIndicatorHtml = '<span class="due-date-indicator overdue" title="Vencido"></span>';
+              else if (dueDate.getTime() === today.getTime()) dateIndicatorHtml = '<span class="due-date-indicator overdue" title="Vence hoje"></span>';
+              else dateIndicatorHtml = '<span class="due-date-indicator future" title="Pendente"></span>';
+            }
+            div.innerHTML = `
+              <div class="postit-header">
+                <span class="days">${daysAgoText}</span>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  ${dueDateDisplay}
+                  ${dateIndicatorHtml}
+                  <button class="delete-btn" onclick="deleteNote('${doc.id}')" title="Excluir nota">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="postit-content">${escapeHTML(note.text)}</div>`;
+            notesContainer.appendChild(div);
+          });
+        }, error => {
+          console.error("Erro ao carregar notas:", error);
+          notesContainer.innerHTML = `<p class='text-center' style='width:100%; color: #dc143c; margin-top: 50px; font-family: Courier Prime, monospace;'><i class='fas fa-exclamation-triangle' style='font-size: 3rem; margin-bottom: 20px; display: block;'></i>Erro ao carregar notas.</p>`;
+        });
+    }
+
+    function mapFirebaseAuthError(errorCode) {
+      const errorMessages = {
+        'auth/invalid-email': 'Formato de e-mail inválido.',
+        'auth/user-disabled': 'Este usuário foi desabilitado.',
+        'auth/user-not-found': 'Usuário não encontrado.',
+        'auth/wrong-password': 'Senha incorreta.',
+        'auth/email-already-in-use': 'Este e-mail já está em uso.',
+        'auth/weak-password': 'Senha muito fraca. Use pelo menos 6 caracteres.',
+        'auth/operation-not-allowed': 'Operação não permitida. Verifique as configurações do Firebase.',
+        'auth/invalid-credential': 'Credenciais inválidas. Verifique e-mail e senha.',
+        'auth/too-many-requests': 'Muitas tentativas. Tente novamente mais tarde.'
+      };
+      return errorMessages[errorCode] || 'Ocorreu um erro desconhecido. Tente novamente.';
+    }
+
+    function escapeHTML(str) {
+      const div = document.createElement("div");
+      div.appendChild(document.createTextNode(str));
+      return div.innerHTML;
+    }
+
+    function handleCategoryChange() {
+      const selectedValue = categorySelector.value;
+      console.log("Categoria alterada para:", selectedValue);
+      if (selectedValue === "pessoais") {
+        navbarWrapper.style.display = "";
+        secondaryNavbarWrapper.style.display = "none";
+        const personalCategories = categorias.map(c => c[0]);
+        if (!personalCategories.includes(currentTab)) currentTab = "pessoal";
+        buildNavbar(); changeTab(currentTab);
+        currentThemeInfo = { id: null, type: null, name: null };
+        themeNoteCustomizationDiv.style.display = 'none';
+      } else if (selectedValue === "livro" || selectedValue === "curso") {
+        navbarWrapper.style.display = "none";
+        secondaryNavbarWrapper.style.display = "";
+        buildSecondaryNavbar(selectedValue);
+      }
+    }
+
+    function buildSecondaryNavbar(type) {
+      secondaryNavbarContainer.innerHTML = "";
+      currentThemeInfo = { id: null, type: type, name: null };
+      notesContainer.innerHTML = `<p class='text-center' style='width:100%; color: #8b4513; margin-top: 50px; font-family: Courier Prime, monospace;'><i class='fas fa-${type === 'livro' ? 'book' : 'graduation-cap'}' style='font-size: 3rem; margin-bottom: 20px; display: block; opacity: 0.3;'></i>Selecione ou adicione um tema de ${type}.</p>`;
+      themeNoteCustomizationDiv.style.display = 'none';
+      const addThemeBtn = document.createElement("button");
+      addThemeBtn.innerHTML = `<i class="fas fa-plus"></i> Novo ${type === 'livro' ? 'Livro' : 'Curso'}`;
+      addThemeBtn.onclick = () => promptAndAddNewTheme(type);
+      addThemeBtn.style.cssText = "background: #228b22; color: white; border: 2px solid #8b4513; border-radius: 8px; padding: 8px 12px; cursor: pointer; margin-right: 10px; font-weight: 700; transition: all 0.3s ease; font-family: 'Courier Prime', monospace; text-transform: uppercase; letter-spacing: 0.5px;";
+      secondaryNavbarContainer.appendChild(addThemeBtn);
+      if (currentUser) {
+        db.collection("userThemes").where("uid", "==", currentUser.uid).where("type", "==", type).orderBy("themeName", "asc")
+          .onSnapshot(snapshot => {
+            const existingButtons = secondaryNavbarContainer.querySelectorAll('button:not(:first-child)');
+            existingButtons.forEach(btn => btn.remove());
+            if (snapshot.empty) console.log(`Nenhum tema encontrado para ${type}`);
+            snapshot.forEach(doc => {
+              const theme = doc.data();
+              const themeBtn = document.createElement("button");
+              themeBtn.id = `themebtn_${doc.id}`;
+              const themeBtnContent = document.createElement('span');
+              themeBtnContent.style.cssText = 'display: flex; align-items: center; gap: 6px;';
+              const themeNameSpan = document.createElement('span');
+              themeNameSpan.innerHTML = `<i class="fas fa-${type === 'livro' ? 'book' : 'graduation-cap'}"></i> ${theme.themeName}`;
+              const badgeSpan = document.createElement('span');
+              badgeSpan.className = 'badge'; badgeSpan.id = `themebadge_${doc.id}`; badgeSpan.textContent = '0';
+              const deleteIcon = document.createElement("span");
+              deleteIcon.innerHTML = '<i class="fas fa-times"></i>';
+              deleteIcon.style.cssText = 'position: absolute; top: -6px; right: -6px; background: #dc143c; color: white; border-radius: 50%; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; font-size: 0.6rem; cursor: pointer; z-index: 10; transition: all 0.3s ease;';
+              deleteIcon.onclick = (event) => { event.stopPropagation(); deleteThemeAndNotes(doc.id, theme.themeName, type); };
+              themeBtnContent.appendChild(themeNameSpan); themeBtnContent.appendChild(badgeSpan);
+              themeBtn.style.position = 'relative'; themeBtn.appendChild(deleteIcon); themeBtn.appendChild(themeBtnContent);
+              themeBtn.onclick = () => selectTheme(doc.id, type, theme.themeName, theme.themeEmoji, theme.themeColor);
+              secondaryNavbarContainer.appendChild(themeBtn); updateThemeBadge(doc.id);
+            });
+            if (currentThemeInfo.id) {
+              const activeBtn = document.getElementById(`themebtn_${currentThemeInfo.id}`);
+              if (activeBtn) activeBtn.classList.add('active-tab');
+            }
+          }, error => { console.error(`Erro ao buscar temas para ${type}:`, error); });
+      }
+    }
+
+    function promptAndAddNewTheme(type) { openThemeNameModal(type); }
+
+    function addNewTheme(type, themeName) {
+      if (!currentUser) { alert("Erro: Usuário não está logado."); return; }
+      const themeData = {
+        uid: currentUser.uid, type: type, themeName: themeName,
+        themeEmoji: type === 'livro' ? '📚' : '🎓',
+        themeColor: type === 'livro' ? '#e8f5e8' : '#e3f2fd',
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      };
+      db.collection("userThemes").add(themeData)
+        .then((docRef) => {
+          console.log("Tema adicionado com ID:", docRef.id);
+          selectTheme(docRef.id, type, themeName, themeData.themeEmoji, themeData.themeColor);
+        })
+        .catch((error) => { console.error("Erro ao adicionar tema:", error); alert("Erro ao criar tema. Tente novamente."); });
+    }
+
+    function selectTheme(themeId, type, themeName, themeEmoji, themeColor) {
+      console.log(`Tema selecionado: ${themeName} (${themeId})`);
+      currentThemeInfo = { id: themeId, type: type, name: themeName };
+      document.querySelectorAll('#secondaryNavbar button').forEach(btn => btn.classList.remove('active-tab'));
+      const activeBtn = document.getElementById(`themebtn_${themeId}`);
+      if (activeBtn) activeBtn.classList.add('active-tab');
+      loadThemeNotes(themeId);
+    }
+
+    function loadThemeNotes(themeId) {
+      if (!currentUser) return;
+      console.log("Carregando notas para o tema:", themeId);
+      notesContainer.innerHTML = "<p class='text-center' style='width:100%; color: #8b4513; margin-top: 50px; font-family: Courier Prime, monospace;'><i class='fas fa-spinner fa-spin'></i> Carregando notas do tema...</p>";
+      db.collection("postits").where("themeId", "==", themeId).where("uid", "==", currentUser.uid).orderBy("createdAt", "desc")
+        .onSnapshot(snapshot => {
+          notesContainer.innerHTML = "";
+          if (snapshot.empty) {
+            notesContainer.innerHTML = `<p class='text-center' style='width:100%; color: #8b4513; margin-top: 50px; font-family: Courier Prime, monospace;'><i class='fas fa-sticky-note' style='font-size: 3rem; margin-bottom: 20px; display: block; opacity: 0.3;'></i>Nenhuma nota encontrada para este tema.</p>`;
+            return;
+          }
+          snapshot.forEach(doc => { /* ... (code for displaying theme notes, identical to previous version) ... */
+            const note = doc.data();
+            const div = document.createElement("div");
+            div.className = `postit ${note.noteType || 'themenote'}`;
+            div.id = doc.id;
+            const createdDate = note.createdAt?.toDate();
+            let daysAgoText = "Recente";
+            if (createdDate) {
+              const daysDiff = Math.floor((Date.now() - createdDate.getTime()) / (1000 * 60 * 60 * 24));
+              if (daysDiff === 0) daysAgoText = "Hoje";
+              else if (daysDiff === 1) daysAgoText = "Ontem";
+              else if (daysDiff > 1) daysAgoText = `${daysDiff} dias atrás`;
+            }
+            let dueDateDisplay = ""; let dateIndicatorHtml = "";
+            if (note.dueDate) {
+              const today = new Date(); today.setHours(0,0,0,0);
+              const parts = note.dueDate.split('-');
+              const dueDate = new Date(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
+              dueDate.setHours(0,0,0,0);
+              const displayDay = String(dueDate.getDate()).padStart(2, '0');
+              const displayMonth = String(dueDate.getMonth() + 1).padStart(2, '0');
+              const displayYear = String(dueDate.getFullYear()).slice(-2);
+              dueDateDisplay = `<span class="postit-due-date"><i class="fas fa-calendar"></i> ${displayDay}/${displayMonth}/${displayYear}</span>`;
+              if (dueDate < today) dateIndicatorHtml = '<span class="due-date-indicator overdue" title="Vencido"></span>';
+              else if (dueDate.getTime() === today.getTime()) dateIndicatorHtml = '<span class="due-date-indicator overdue" title="Vence hoje"></span>';
+              else dateIndicatorHtml = '<span class="due-date-indicator future" title="Pendente"></span>';
+            }
+            div.innerHTML = `
+              <div class="postit-header">
+                <span class="days">${daysAgoText}</span>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  ${dueDateDisplay}
+                  ${dateIndicatorHtml}
+                  <button class="delete-btn" onclick="deleteNote('${doc.id}')" title="Excluir nota">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="postit-content">${escapeHTML(note.text)}</div>`;
+            notesContainer.appendChild(div);
+          });
+        }, error => {
+          console.error("Erro ao carregar notas do tema:", error);
+          notesContainer.innerHTML = `<p class='text-center' style='width:100%; color: #dc143c; margin-top: 50px; font-family: Courier Prime, monospace;'><i class='fas fa-exclamation-triangle' style='font-size: 3rem; margin-bottom: 20px; display: block;'></i>Erro ao carregar notas do tema.</p>`;
+        });
+    }
+
+    function updateThemeBadge(themeId) {
+      if (!currentUser) return;
+      const badge = document.getElementById("themebadge_" + themeId);
+      if (!badge) return;
+      db.collection("postits").where("uid", "==", currentUser.uid).where("themeId", "==", themeId)
+        .onSnapshot(snapshot => {
+          const count = snapshot.size;
+          let hasOverdue = false; let hasPending = false;
+          snapshot.docs.forEach(doc => {
+            const note = doc.data();
+            if (note.dueDate) {
+              const today = new Date(); today.setHours(0,0,0,0);
+              const parts = note.dueDate.split('-');
+              const dueDate = new Date(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
+              dueDate.setHours(0,0,0,0);
+              if (dueDate < today) hasOverdue = true;
+              else hasPending = true;
+            }
+            if(hasOverdue) return;
+          });
+          if (hasOverdue) { badge.style.backgroundColor = '#dc143c'; badge.title = 'Contém itens vencidos ou para hoje'; }
+          else if (hasPending) { badge.style.backgroundColor = ''; badge.title = 'Contém itens com data futura'; }
+          else { badge.style.backgroundColor = '#dc143c'; badge.title = count > 0 ? `${count} nota(s)` : ''; }
+        }, error => { console.error("Erro ao obter contagem do tema", themeId, error); });
+    }
+
+    function deleteThemeAndNotes(themeId, themeName, type) {
+      openConfirmationModal(
+        `Confirmar Exclusão de Tema`,
+        `Tem certeza que deseja excluir o ${type} "${themeName}" e todas as suas notas? Esta ação não pode ser desfeita.`,
+        () => {
+          db.collection("postits").where("themeId", "==", themeId).where("uid", "==", currentUser.uid).get()
+            .then(snapshot => {
+              const batch = db.batch();
+              snapshot.docs.forEach(doc => batch.delete(doc.ref));
+              batch.delete(db.collection("userThemes").doc(themeId));
+              return batch.commit();
+            })
+            .then(() => {
+              console.log("Tema e notas deletados com sucesso");
+              if (currentThemeInfo.id === themeId) {
+                currentThemeInfo = { id: null, type: type, name: null };
+                notesContainer.innerHTML = `<p class='text-center' style='width:100%; color: #8b4513; margin-top: 50px; font-family: Courier Prime, monospace;'><i class='fas fa-${type === 'livro' ? 'book' : 'graduation-cap'}' style='font-size: 3rem; margin-bottom: 20px; display: block; opacity: 0.3;'></i>Selecione ou adicione um tema de ${type}.</p>`;
+              }
+            })
+            .catch(error => { console.error("Erro ao deletar tema:", error); alert("Erro ao excluir tema. Tente novamente."); });
+        }
+      );
+    }
+
+    document.addEventListener('keydown', function(event) {
+      if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
+        if (modalOverlay.classList.contains('active') && noteTextInput.value.trim()) addNote();
+      }
+      if (event.key === 'Escape') {
+        if (modalOverlay.classList.contains('active')) closeModal();
+      }
+    });
+
+    noteTextInput.addEventListener('input', function() {
+      this.style.height = 'auto';
+      this.style.height = Math.max(120, this.scrollHeight) + 'px';
+    });
+
+    modalOverlay.addEventListener('click', function(event) {
+      if (event.target === modalOverlay) closeModal();
+    });
+    themeNameModalOverlay.addEventListener('click', function(event) {
+      if (event.target === themeNameModalOverlay) closeThemeNameModal();
+    });
+
+    console.log("Aplicação inicializada com sucesso!");
+  </script>
+</body>
+</html>
