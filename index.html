@@ -250,7 +250,7 @@
     #categorySelector:focus {
       outline: none;
       border-color: #8b4513;
-      box-shadow: 0 0 0 2px rgba(139, 69, 19, 0.2);
+      box-shadow: 0 0 0 2px rgba(139, 69, 19, 0.3);
     }
 
     #categorySelector option {
@@ -614,20 +614,15 @@
       resize: none;
       width: 100%;
       height: auto; /* Will be adjusted by JS if needed, or use min-height */
-      font-family: inherit; /* Should correctly inherit from .postit -> body */
-      font-size: 0.95rem;   /* Explicitly match .postit-content */
-      line-height: 1.4;     /* Explicitly match .postit-content */
-      color: #2c2416;       /* Explicitly match .postit-content */
-      font-weight: 400;     /* Match .postit-content */
-      overflow-wrap: break-word; /* Match word-wrap: break-word on .postit-content */
+      font-family: inherit;
+      font-size: inherit;
+      line-height: inherit;
+      color: inherit;
       padding: 0;
       margin: 0;
       box-sizing: border-box;
       outline: none; /* Remove focus outline */
       overflow-y: hidden; /* Hide scrollbar initially, adjust with JS if content overflows */
-      /* Ensure other properties like text-align are inherited or match if necessary.
-         .postit-content does not have specific text-align, so default (left) is used.
-         Textareas also default to left-align. */
     }
 
     @media (max-width: 768px) {
@@ -1113,19 +1108,6 @@
       });
     console.log("Firebase inicializado com sucesso (auth, db).");
 
-    /**
-     * Verifica se o dispositivo é um celular ou tablet com base na largura da tela.
-     * @returns {boolean} True se for um dispositivo móvel (largura <= 768px), false caso contrário.
-     */
-    function isMobileDevice() {
-      if (typeof window.matchMedia === 'function') {
-        return window.matchMedia("only screen and (max-width: 768px)").matches;
-      }
-      // Fallback ou alternativa se matchMedia não estiver disponível (raro em navegadores modernos)
-      // Poderia verificar userAgent aqui, mas matchMedia é preferível.
-      return false; // Padrão para não móvel se matchMedia não for suportado
-    }
-
     // ========================================
     // CONFIGURAÇÃO DE TIPOS DE TEMA
     // ========================================
@@ -1382,7 +1364,7 @@
             if (isPremium) {
                 totalLimitSpan.textContent = 'Ilimitado';
             } else {
-                const baseLimit = 30; // NOTE: This was 20 in addNote, ensuring consistency or using a global const would be better.
+                const baseLimit = 30;
                 const totalLimit = baseLimit + bonusNotes;
                 totalLimitSpan.textContent = totalLimit;
             }
@@ -1453,12 +1435,12 @@
                 }
 
                 const userItem = document.createElement('div');
-                userItem.className = 'admin-user-item'; 
+                userItem.className = 'admin-user-item'; // display: flex, justify-content: space-between
 
-                const userInfoDiv = document.createElement('div'); 
+                const userInfoDiv = document.createElement('div'); // Agrupar email e bônus
                 userInfoDiv.style.display = 'flex';
-                userInfoDiv.style.flexDirection = 'column'; 
-                userInfoDiv.style.alignItems = 'flex-start'; 
+                userInfoDiv.style.flexDirection = 'column'; // E-mail acima, bônus abaixo
+                userInfoDiv.style.alignItems = 'flex-start'; // Alinhar à esquerda
 
                 const userEmailSpan = document.createElement('span');
                 userEmailSpan.className = 'user-email';
@@ -1473,12 +1455,12 @@
                 userBonusSpan.style.color = '#333';
                 userInfoDiv.appendChild(userBonusSpan);
                 
-                userItem.appendChild(userInfoDiv); 
+                userItem.appendChild(userInfoDiv); // Adiciona o grupo de info
 
-                const userActionsDiv = document.createElement('div'); 
+                const userActionsDiv = document.createElement('div'); // Agrupar doação e toggle status
                 userActionsDiv.style.display = 'flex';
                 userActionsDiv.style.alignItems = 'center';
-                userActionsDiv.style.gap = '15px'; 
+                userActionsDiv.style.gap = '15px'; // Espaço entre doação e toggle status
 
                 const donationContainer = document.createElement('div');
                 donationContainer.style.display = 'flex';
@@ -1507,13 +1489,13 @@
                 grantBonusButton.style.cursor = 'pointer';
 
                 grantBonusButton.onclick = () => {
-                    const amountToDonate = parseInt(bonusAmountInput.value); 
+                    const amountToDonate = parseInt(bonusAmountInput.value); // Renomeada para clareza
                     if (Number.isInteger(amountToDonate) && amountToDonate > 0) {
-                        grantBonusNotes(doc.id, amountToDonate); 
-                        bonusAmountInput.value = ''; 
+                        grantBonusNotes(doc.id, amountToDonate); // Chamar a função real implementada
+                        bonusAmountInput.value = ''; // Limpar input após a chamada
                     } else {
                         alert('Por favor, insira uma quantidade numérica positiva para doar.');
-                        bonusAmountInput.value = ''; 
+                        bonusAmountInput.value = ''; // Limpar input também em caso de erro de validação
                     }
                 };
                 donationContainer.appendChild(bonusAmountInput);
@@ -1530,14 +1512,15 @@
                 statusToggleButton.style.border = '1px solid #8b4513';
                 statusToggleButton.style.borderRadius = '4px';
                 if (userData.status === 'premium') {
-                    statusToggleButton.style.backgroundColor = '#d2b48c'; 
+                    statusToggleButton.style.backgroundColor = '#d2b48c'; // Beige for "Rebaixar"
                     statusToggleButton.style.color = '#2c2416';
                 } else {
-                    statusToggleButton.style.backgroundColor = '#633b06'; 
+                    statusToggleButton.style.backgroundColor = '#633b06'; // Green for "Promover"
                     statusToggleButton.style.color = 'white';
                 }
 
-                if (userData.uid === currentUser.uid) { 
+                // Prevent changing admin's own status via this button for safety
+                if (userData.uid === currentUser.uid) { // currentUser should be admin here
                     statusToggleButton.disabled = true;
                     statusToggleButton.textContent = 'Admin (Você)';
                     statusToggleButton.style.opacity = '0.7';
@@ -1548,6 +1531,7 @@
                     grantBonusButton.style.cursor = 'not-allowed';
                 } else {
                     statusToggleButton.onclick = () => toggleUserStatus(doc.id, userData.status);
+                    // grantBonusButton.onclick is already defined above
                 }
                 
                 userActionsDiv.appendChild(statusToggleButton);
@@ -1571,7 +1555,7 @@
         try {
             await db.collection('users').doc(userId).update({ status: newStatus });
             console.log(`User ${userId} status updated to ${newStatus}`);
-            loadAdminPanelData(); 
+            loadAdminPanelData(); // Refresh the list and counts
         } catch (error) {
             console.error(`Error updating user ${userId} status:`, error);
             alert('Falha ao atualizar status do usuário.');
@@ -1638,14 +1622,14 @@
      * Abre o modal para adicionar nome de tema (livro/curso)
      * @param {string} type - ID do tipo de tema (ex: 'livro', 'receita')
      */
-    function openThemeNameModal(type) { 
+    function openThemeNameModal(type) { // type é o ID do themeConfig
       const themeConfig = THEME_CONFIG_MAP[type];
       if (!themeConfig) {
           console.error(`Configuração de tema não encontrada para o tipo: ${type} em openThemeNameModal`);
           alert("Erro: Tipo de tema desconhecido.");
           return;
       }
-      currentThemeType = type; 
+      currentThemeType = type; // Armazena o 'id' do tipo de tema
       themeNameModalTitle.textContent = `Adicionar Novo ${themeConfig.singularName}`;
       themeNameInput.value = ''; 
       themeNameModalOverlay.classList.add('active');
@@ -1671,7 +1655,7 @@
         closeThemeNameModal();
       } else {
         if (!themeName) {
-          alert('Por favor, digite um nome para o ' + (THEME_CONFIG_MAP[currentThemeType]?.singularName || 'tema') + '.');
+          alert('Por favor, digite um nome para o ' + (currentThemeType || 'tema') + '.');
           themeNameInput.focus();
         } else {
            alert('Erro: Tipo de tema não definido.');
@@ -1682,8 +1666,10 @@
     /**
      * Observador de estado de autenticação do Firebase
      */
-    auth.onAuthStateChanged(async user => { 
+    auth.onAuthStateChanged(async user => { // Tornar async
         console.log("Estado de autenticação alterado");
+
+        // Limpa botões de admin e premium header antes de qualquer lógica
         let existingAdminButton = document.getElementById('adminPanelButton');
         if (existingAdminButton) existingAdminButton.remove();
         let existingHeaderPremiumBtn = document.getElementById('headerPremiumButton');
@@ -1692,34 +1678,63 @@
         if (user) {
             console.log("Usuário autenticado:", user.uid);
             currentUser = user;
+
+            // --- Verificação e Criação de Perfil de Usuário ---
             const userDocRef = db.collection('users').doc(user.uid);
             try {
-                const docSnapshot = await userDocRef.get(); 
+                const docSnapshot = await userDocRef.get(); // Usar await
                 if (!docSnapshot.exists) {
                     let initialStatus = 'free';
-                    if (user.email === 'flavio_cesar_oliveira@hotmail.com') { // Admin email
+                    if (user.email === 'flavio_cesar_oliveira@hotmail.com') {
                         initialStatus = 'premium';
                         console.log(`Usuário ${user.email} é administrador, definindo status inicial como premium.`);
                     }
-                    await userDocRef.set({ 
-                        uid: user.uid, email: user.email, status: initialStatus, bonusNotes: 0, 
+                    await userDocRef.set({ // Usar await
+                        uid: user.uid,
+                        email: user.email,
+                        status: initialStatus,
+                        bonusNotes: 0, // Adicionar esta linha
                         createdAt: firebase.firestore.FieldValue.serverTimestamp()
                     });
-                    console.log(`Documento criado para ${user.uid} com status ${initialStatus} e bonusNotes 0.`);
-                } else { console.log(`Documento para ${user.uid} já existe. Status: ${docSnapshot.data().status}`); }
-            } catch (error) { console.error("Erro ao verificar/criar documento do usuário:", error); }
+                    console.log(`Documento criado para ${user.uid} na coleção 'users' com status ${initialStatus} e bonusNotes 0.`);
+                } else {
+                    console.log(`Documento para ${user.uid} já existe. Status: ${docSnapshot.data().status}`);
+                }
+            } catch (error) {
+                console.error("Erro ao verificar/criar documento do usuário:", error);
+            }
+            // --- Fim da Verificação e Criação de Perfil ---
 
-            if (user.email === 'flavio_cesar_oliveira@hotmail.com') { // Admin email
+            // Lógica do Botão Admin (verificar e-mail)
+            if (user.email === 'flavio_cesar_oliveira@hotmail.com') {
                 let adminButton = document.getElementById('adminPanelButton'); 
                 if (!adminButton) {
-                    adminButton = document.createElement('button'); adminButton.id = 'adminPanelButton';
-                    adminButton.innerHTML = '<i class="fas fa-user-shield"></i> Admin'; adminButton.onclick = openAdminModal;
-                    Object.assign(adminButton.style, { position: 'absolute', top: '15px', right: '110px', background: '#8b4513', color: '#f4f1e8', border: '2px solid #654321', borderRadius: '6px', padding: '6px 10px', fontSize: '0.8rem', fontWeight: '700', cursor: 'pointer', fontFamily: "'Courier Prime', monospace", textTransform: 'uppercase', letterSpacing: '0.5px', zIndex: '1002' });
+                    adminButton = document.createElement('button');
+                    adminButton.id = 'adminPanelButton';
+                    adminButton.innerHTML = '<i class="fas fa-user-shield"></i> Admin';
+                    adminButton.onclick = openAdminModal;
+                    
+                    adminButton.style.position = 'absolute';
+                    adminButton.style.top = '15px';
+                    adminButton.style.right = '110px'; 
+                    adminButton.style.background = '#8b4513'; 
+                    adminButton.style.color = '#f4f1e8';      
+                    adminButton.style.border = '2px solid #654321'; 
+                    adminButton.style.borderRadius = '6px';
+                    adminButton.style.padding = '6px 10px'; 
+                    adminButton.style.fontSize = '0.8rem';
+                    adminButton.style.fontWeight = '700';
+                    adminButton.style.cursor = 'pointer';
+                    adminButton.style.fontFamily = "'Courier Prime', monospace";
+                    adminButton.style.textTransform = 'uppercase';
+                    adminButton.style.letterSpacing = '0.5px';
+                    adminButton.style.zIndex = '1002';
                     const headerElement = document.querySelector('header');
                     if (headerElement) headerElement.appendChild(adminButton);
                 }
             }
 
+            // Lógica do Botão "Seja Premium" no Header
             try {
                 const userStatusDoc = await db.collection('users').doc(user.uid).get(); 
                 if (userStatusDoc.exists && userStatusDoc.data().status === 'premium') {
@@ -1727,299 +1742,380 @@
                 } else {
                     let headerPremiumButton = document.getElementById('headerPremiumButton');
                     if (!headerPremiumButton) {
-                        headerPremiumButton = document.createElement('button'); headerPremiumButton.id = 'headerPremiumButton';
-                        headerPremiumButton.innerHTML = '<i class="fas fa-star"></i> Seja Premium'; headerPremiumButton.onclick = openPremiumUpgradeModal;
-                        Object.assign(headerPremiumButton.style, { position: 'absolute', top: '15px', background: '#b08d57', color: 'white', border: '2px solid #9a7947', borderRadius: '6px', padding: '6px 10px', fontSize: '0.8rem', fontWeight: '700', cursor: 'pointer', fontFamily: "'Courier Prime', monospace", textTransform: 'uppercase', zIndex: '1002' });
+                        headerPremiumButton = document.createElement('button');
+                        headerPremiumButton.id = 'headerPremiumButton';
+                        headerPremiumButton.innerHTML = '<i class="fas fa-star"></i> Seja Premium';
+                        headerPremiumButton.onclick = openPremiumUpgradeModal;
+                        
+                        headerPremiumButton.style.position = 'absolute';
+                        headerPremiumButton.style.top = '15px';
                         const adminBtn = document.getElementById('adminPanelButton');
                         const logoutBtn = document.querySelector('.header-logout-btn');
-                        let rightPosition = logoutBtn ? (parseInt(getComputedStyle(logoutBtn).right) + logoutBtn.offsetWidth + 10) + 'px' : '110px';
-                        if (adminBtn) { rightPosition = (parseInt(getComputedStyle(adminBtn).right) + adminBtn.offsetWidth + 10) + 'px';}
+                        
+                        let rightPosition = '110px'; // Default if no admin or logout button
+                        if (adminBtn) {
+                             try { rightPosition = (parseInt(getComputedStyle(adminBtn).right) + adminBtn.offsetWidth + 10) + 'px'; } catch(e){console.warn("Could not calc adminBtn right pos for premium button");}
+                        } else if (logoutBtn) {
+                             try { rightPosition = (parseInt(getComputedStyle(logoutBtn).right) + logoutBtn.offsetWidth + 10) + 'px'; } catch(e){console.warn("Could not calc logoutBtn right pos for premium button");}
+                        }
                         headerPremiumButton.style.right = rightPosition;
+
+                        headerPremiumButton.style.background = '#b08d57'; 
+                        headerPremiumButton.style.color = 'white';
+                        headerPremiumButton.style.border = '2px solid #9a7947';
+                        headerPremiumButton.style.borderRadius = '6px';
+                        headerPremiumButton.style.padding = '6px 10px';
+                        headerPremiumButton.style.fontSize = '0.8rem';
+                        headerPremiumButton.style.fontWeight = '700';
+                        headerPremiumButton.style.cursor = 'pointer';
+                        headerPremiumButton.style.fontFamily = "'Courier Prime', monospace";
+                        headerPremiumButton.style.textTransform = 'uppercase';
+                        headerPremiumButton.style.zIndex = '1002';
+
                         const headerElement = document.querySelector('header');
                         if (headerElement) {
-                            const referenceNode = adminBtn || logoutBtn;
-                            if (referenceNode) headerElement.insertBefore(headerPremiumButton, referenceNode);
-                            else headerElement.appendChild(headerPremiumButton);
+                            const adminButtonForInsert = document.getElementById('adminPanelButton');
+                            const logoutButtonForInsert = document.querySelector('.header-logout-btn');
+                            if (adminButtonForInsert) { 
+                                headerElement.insertBefore(headerPremiumButton, adminButtonForInsert);
+                            } else if (logoutButtonForInsert) { 
+                                 headerElement.insertBefore(headerPremiumButton, logoutButtonForInsert);
+                            } else { 
+                                headerElement.appendChild(headerPremiumButton);
+                            }
                         }
                         console.log('Usuário é free, botão Seja Premium do header exibido.');
                     }
                 }
-            } catch (error) { console.error("Erro ao buscar status do usuário para botão Seja Premium:", error); }
+            } catch (error) {
+                console.error("Erro ao buscar status do usuário para botão Seja Premium:", error);
+            }
 
-            showScreen("appScreen"); categorySelector.value = "pessoais"; 
-            navbarWrapper.style.display = ""; secondaryNavbarWrapper.style.display = "none";
+            showScreen("appScreen");
+            categorySelector.value = "pessoais"; 
+            navbarWrapper.style.display = "";
+            secondaryNavbarWrapper.style.display = "none";
             buildNavbar();
             const personalCategories = categorias.map(c => c[0]);
-            if (!personalCategories.includes(currentTab)) { currentTab = "pessoal"; }
+            if (!personalCategories.includes(currentTab)) {
+                currentTab = "pessoal";
+            }
             changeTab(currentTab);
             themeNoteCustomizationDiv.style.display = 'none';
-            updateMemoryUsageDisplay(); 
+            updateMemoryUsageDisplay(); // Chamar para exibir contagem no login
+
         } else { 
-            console.log("Usuário não autenticado"); currentUser = null;
-            updateMemoryUsageDisplay(); showScreen("loginScreen");
-            navbarContainer.innerHTML = ''; notesContainer.innerHTML = ''; noteTextInput.value = '';
+            console.log("Usuário não autenticado");
+            currentUser = null;
+            updateMemoryUsageDisplay(); // Chamará e ocultará o display pois currentUser é null
+            showScreen("loginScreen");
+            navbarContainer.innerHTML = '';
+            notesContainer.innerHTML = '';
+            noteTextInput.value = '';
+            // Os botões de admin e premium do header já foram removidos no início.
         }
     });
 
+    /**
+     * Função de login
+     */
     function login() {
       console.log("Iniciando processo de login");
-      const email = loginEmailInput.value.trim(); const password = loginPasswordInput.value;
-      if (!email || !password) { alert("Por favor, preencha e-mail e senha."); return; }
+      
+      const email = loginEmailInput.value.trim();
+      const password = loginPasswordInput.value;
+      
+      if (!email || !password) {
+        alert("Por favor, preencha e-mail e senha.");
+        return;
+      }
+      
       const loginBtn = document.querySelector('#loginScreen button');
       const originalText = loginBtn.innerHTML;
-      loginBtn.innerHTML = '<div class="loading"></div> Entrando...'; loginBtn.disabled = true;
+      loginBtn.innerHTML = '<div class="loading"></div> Entrando...';
+      loginBtn.disabled = true;
+      
       auth.signInWithEmailAndPassword(email, password)
-        .then(userCredential => { console.log("Login realizado com sucesso"); })
-        .catch(error => { console.error("Erro no login:", error); alert("Erro ao fazer login: " + mapFirebaseAuthError(error.code)); })
-        .finally(() => { loginBtn.innerHTML = originalText; loginBtn.disabled = false; });
+        .then(userCredential => {
+          console.log("Login realizado com sucesso");
+        })
+        .catch(error => {
+          console.error("Erro no login:", error);
+          alert("Erro ao fazer login: " + mapFirebaseAuthError(error.code));
+        })
+        .finally(() => {
+          loginBtn.innerHTML = originalText;
+          loginBtn.disabled = false;
+        });
     }
 
+    /**
+     * Função de registro
+     */
     function register() {
       console.log("Iniciando processo de registro");
-      const email = registerEmailInput.value.trim(); const password = registerPasswordInput.value;
-      if (!email || !password) { alert("Por favor, preencha e-mail e senha para registrar."); return; }
-      if (password.length < 6) { alert("A senha deve ter pelo menos 6 caracteres."); return; }
+      
+      const email = registerEmailInput.value.trim();
+      const password = registerPasswordInput.value;
+      
+      if (!email || !password) {
+        alert("Por favor, preencha e-mail e senha para registrar.");
+        return;
+      }
+      if (password.length < 6) {
+        alert("A senha deve ter pelo menos 6 caracteres.");
+        return;
+      }
+      
       const registerBtn = document.querySelector('#registerScreen button');
       const originalText = registerBtn.innerHTML;
-      registerBtn.innerHTML = '<div class="loading"></div> Cadastrando...'; registerBtn.disabled = true;
+      registerBtn.innerHTML = '<div class="loading"></div> Cadastrando...';
+      registerBtn.disabled = true;
+      
       auth.createUserWithEmailAndPassword(email, password)
         .then(userCredential => {
-          console.log("Registro realizado com sucesso:", userCredential.user); currentTab = "pessoal"; 
+          console.log("Registro realizado com sucesso:", userCredential.user);
+          currentTab = "pessoal"; 
           const user = userCredential.user;
           if (user) {
               db.collection('users').doc(user.uid).set({
-                  uid: user.uid, email: user.email, status: 'free', bonusNotes: 0,
+                  uid: user.uid,
+                  email: user.email,
+                  status: 'free', 
+                    bonusNotes: 0, // Adicionar esta linha
                   createdAt: firebase.firestore.FieldValue.serverTimestamp()
-              }).then(() => { console.log('User document created with free status and bonusNotes.'); })
-              .catch(error => { console.error('Error creating user document:', error); });
+              }).then(() => {
+                    console.log('User document created in Firestore with free status and bonusNotes.');
+              }).catch(error => {
+                  console.error('Error creating user document in Firestore:', error);
+              });
           }
         })
-        .catch(error => { console.error("Erro no registro:", error); alert("Erro ao registrar: " + mapFirebaseAuthError(error.code)); })
-        .finally(() => { registerBtn.innerHTML = originalText; registerBtn.disabled = false; });
+        .catch(error => {
+          console.error("Erro no registro:", error);
+          alert("Erro ao registrar: " + mapFirebaseAuthError(error.code));
+        })
+        .finally(() => {
+          registerBtn.innerHTML = originalText;
+          registerBtn.disabled = false;
+        });
     }
 
+    /**
+     * Função de logout
+     */
     function logout() {
       openConfirmationModal("Confirmar Logout", "Tem certeza que deseja sair?", () => {
-        auth.signOut().then(() => { console.log("Logout realizado com sucesso"); })
-        .catch(error => { console.error("Erro ao fazer logout:", error); alert("Ocorreu um erro ao sair."); });
+        auth.signOut().then(() => {
+          console.log("Logout realizado com sucesso");
+        }).catch(error => {
+          console.error("Erro ao fazer logout:", error);
+          alert("Ocorreu um erro ao sair.");
+        });
       });
     }
 
     function buildNavbar() {
       navbarContainer.innerHTML = "";
       categorias.forEach(([id, label]) => {
-        const btn = document.createElement("button"); btn.id = "btn_" + id;
+        const btn = document.createElement("button");
+        btn.id = "btn_" + id;
         btn.innerHTML = `${label}<span class="badge" id="badge_${id}">0</span>`;
         btn.onclick = () => { changeTab(id); };
-        if (id === currentTab) { btn.classList.add('active-tab'); }
-        navbarContainer.appendChild(btn); updateBadgeCount(id);
+        if (id === currentTab) {
+          btn.classList.add('active-tab');
+        }
+        navbarContainer.appendChild(btn);
+        updateBadgeCount(id);
       });
     }
 
     function updateBadgeCount(cat) {
       if (!currentUser) return;
       const badge = document.getElementById("badge_" + cat);
-      if (!badge) { console.warn("Badge não encontrado para categoria:", cat); return; }
-      db.collection("postits").where("uid", "==", currentUser.uid).where("category", "==", cat)
+      if (!badge) {
+        console.warn("Badge não encontrado para categoria:", cat);
+        return;
+      }
+      db.collection("postits")
+        .where("uid", "==", currentUser.uid)
+        .where("category", "==", cat)
         .onSnapshot(snapshot => {
           const count = snapshot.size;
-          if (count > 0) { badge.textContent = count; badge.style.display = "inline-block"; } 
-          else { badge.style.display = "none"; }
-          let hasOverdue = false; let hasPending = false;
-          snapshot.docs.forEach(doc => { /* ... (badge color logic as it was) ... */ });
-          // This badge color logic was complex and can be kept as is or simplified if needed
-        }, error => { console.error("Erro ao obter contagem da categoria", cat, error); badge.title = 'Erro'; badge.style.display = 'none'; });
+          if (count > 0) {
+            badge.textContent = count;
+            badge.style.display = "inline-block";
+          } else {
+            badge.style.display = "none";
+          }
+          let hasOverdue = false;
+          let hasPending = false;
+          snapshot.docs.forEach(doc => {
+            const note = doc.data();
+            if (note.dueDate) {
+              const today = new Date(); today.setHours(0,0,0,0);
+              const parts = note.dueDate.split('-');
+              const dueDate = new Date(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
+              dueDate.setHours(0,0,0,0);
+              if (dueDate <= today) hasOverdue = true;
+              else hasPending = true;
+            }
+            if(hasOverdue) return;
+          });
+          if (hasOverdue) {
+            badge.style.backgroundColor = '#dc143c';
+            badge.title = 'Contém itens vencidos ou para hoje';
+          } else if (hasPending) {
+            badge.style.backgroundColor = '#1d7e14';
+            badge.title = 'Contém itens com data futura';
+          } else {
+            badge.style.backgroundColor = '#6e3c0e'; // Default badge color
+            badge.title = count > 0 ? `${count} nota(s)` : '';
+          }
+        }, error => {
+          console.error("Erro ao obter contagem da categoria", cat, error);
+          badge.title = 'Erro ao carregar contagem';
+          badge.style.display = 'none';
+        });
     }
 
     function changeTab(tabId) {
-      console.log("Mudando para aba:", tabId); currentTab = tabId;
+      console.log("Mudando para aba:", tabId);
+      currentTab = tabId;
       document.querySelectorAll('.navbar button').forEach(btn => {
         btn.classList.remove('active-tab');
-        if (btn.id === "btn_" + tabId) { btn.classList.add('active-tab'); }
+        if (btn.id === "btn_" + tabId) {
+          btn.classList.add('active-tab');
+        }
       });
       loadNotes();
     }
 
-    async function addNote() {
-      const text = noteTextInput.value.trim();
-      if (!text) { alert("Por favor, escreva algo na nota."); noteTextInput.focus(); return; }
-      if (!currentUser) { alert("Erro: Usuário não está logado."); return; }
-      let isPremiumUser = false; let userBonusNotes = 0;
-      if (currentUser) {
-          try { /* ... (user status and bonus notes check as it was) ... */ } 
-          catch (error) { /* ... */ }
-      }
-      if (!isPremiumUser) {
-          try { /* ... (note limit check as it was, using baseLimit = 20) ... */ } 
-          catch (error) { /* ... */ }
-      }
-      const selectedCategoryType = categorySelector.value;
-      const dueDateValue = document.getElementById('noteDueDate').value;
-      let noteData = { text: text, createdAt: firebase.firestore.FieldValue.serverTimestamp(), uid: currentUser.uid, order: Date.now() };
-      if (dueDateValue) noteData.dueDate = dueDateValue;
-      if (selectedCategoryType === "pessoais") { noteData.category = currentTab; } 
-      else if (THEME_CONFIG_MAP[selectedCategoryType] && currentThemeInfo.id) {
-        noteData.themeId = currentThemeInfo.id; noteData.themeName = currentThemeInfo.name; 
-        noteData.noteType = selectedCategoryType;
-      } else { console.error("Error: Categoria ou tema inválido.", selectedCategoryType, currentThemeInfo); alert("Selecione categoria/tema."); return; }
-      const addBtn = document.querySelector('#modalOverlay .modal-button-group .add-btn');
-      const originalBtnText = addBtn.innerHTML;
-      addBtn.innerHTML = '<div class="loading"></div> Salvando...'; addBtn.disabled = true;
-      closeModal();
-      db.collection("postits").add(noteData)
-        .then((docRef) => { console.log("Nota adicionada com ID:", docRef.id); updateMemoryUsageDisplay(); })
-        .catch((error) => { console.error("Erro ao adicionar nota:", error); alert("Erro ao salvar. Nota pode ser salva localmente e sincronizada depois."); })
-        .finally(() => { addBtn.innerHTML = originalBtnText; addBtn.disabled = false; });
+async function addNote() {
+  const text = noteTextInput.value.trim();
+  if (!text) {
+    alert("Por favor, escreva algo na nota.");
+    noteTextInput.focus(); return;
+  }
+  if (!currentUser) {
+    alert("Erro: Usuário não está logado."); return;
+  }
+
+    let isPremiumUser = false;
+    let userBonusNotes = 0; // Initialize bonusNotes
+
+    if (currentUser) {
+        try {
+            const userDocRef = db.collection('users').doc(currentUser.uid);
+            const userDoc = await userDocRef.get();
+            if (userDoc.exists) {
+                const userData = userDoc.data();
+                if (userData.status === 'premium') {
+                    isPremiumUser = true;
+                    console.log('User is premium. Note limit check skipped.');
+                }
+                // Get bonusNotes regardless of premium status
+                userBonusNotes = userData.bonusNotes !== undefined ? userData.bonusNotes : 0;
+            } else {
+                // User profile not found in Firestore (should ideally not happen)
+                console.warn(`Usuário ${currentUser.uid} não encontrado na coleção 'users'. Tratando como free sem bônus.`);
+            }
+        } catch (error) {
+            console.error("Error fetching user status/bonus for note limit check:", error);
+            // Fallback to free without bonus for safety, maybe alert user.
+            // alert("Erro ao verificar seu status de usuário. Tente novamente.");
+            // return; // Could be too disruptive here.
+        }
     }
+
+    if (!isPremiumUser) {
+        console.log('User is not premium, checking note limit including bonus.');
+        if (currentUser) {
+            try {
+                const notesSnapshot = await db.collection('postits')
+                                              .where('uid', '==', currentUser.uid)
+                                              .get();
+                const noteCount = notesSnapshot.size;
+                console.log('Current note count for user:', noteCount);
+                console.log('User bonus notes:', userBonusNotes);
+
+                const baseLimit = 20;
+                const totalLimit = baseLimit + userBonusNotes;
+                console.log('Total limit for user (base + bonus):', totalLimit);
+
+                if (noteCount >= totalLimit) { // Modified condition
+                    openPremiumUpgradeModal(); 
+                    return;
+                }
+            } catch (error) {
+                console.error("Error fetching note count for limit check:", error);
+                alert("Erro ao verificar seu limite de notas. Tente novamente.");
+                return; 
+            }
+        } else {
+            alert("Erro: Usuário não identificado para verificar limite de notas.");
+            return;
+        }
+    }
+
+  const selectedCategoryType = categorySelector.value;
+  const dueDateValue = document.getElementById('noteDueDate').value;
+  let noteData = {
+    text: text,
+    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+    uid: currentUser.uid,
+    order: Date.now() // Add initial order timestamp
+  };
+  if (dueDateValue) noteData.dueDate = dueDateValue;
+
+  if (selectedCategoryType === "pessoais") {
+    noteData.category = currentTab; // Para notas pessoais, usa o currentTab da navbar principal
+  } else if (THEME_CONFIG_MAP[selectedCategoryType] && currentThemeInfo.id) {
+    // Para notas de tema, selectedCategoryType é o ID do tipo de tema (ex: 'livro', 'receita')
+    // currentThemeInfo.id é o ID do tema específico (ex: ID do doc "Bolo de Chocolate")
+    noteData.themeId = currentThemeInfo.id;       // ID do tema específico
+    noteData.themeName = currentThemeInfo.name;   // Nome do tema específico (ex: "Bolo de Chocolate")
+    noteData.noteType = selectedCategoryType;     // ID do tipo de tema (ex: 'receita', 'livro')
+  } else {
+    // This case should ideally not be reached if categorySelector is correctly populated
+    // and currentThemeInfo is managed properly when a theme is selected.
+    console.error("Error: Categoria ou tema inválido selecionado.", selectedCategoryType, currentThemeInfo);
+    alert("Por favor, selecione uma categoria ou tema válido antes de adicionar uma nota."); return;
+  }
+
+  const addBtn = document.querySelector('#modalOverlay .modal-button-group .add-btn');
+  const originalText = addBtn.innerHTML;
+  addBtn.innerHTML = '<div class="loading"></div> Salvando...';
+  addBtn.disabled = true;
+  closeModal();
+
+  db.collection("postits").add(noteData)
+    .then((docRef) => { 
+      console.log("Nota adicionada com ID:", docRef.id);
+      updateMemoryUsageDisplay(); // Atualizar contagem
+    })
+    .catch((error) => {
+      console.error("Erro ao adicionar nota:", error);
+      alert("Erro ao salvar a nota. Sua nota poderá ser salva localmente e será sincronizada quando houver conexão.");
+    })
+    .finally(() => {
+      addBtn.innerHTML = originalText;
+      addBtn.disabled = false;
+    });
+}
 
     function deleteNote(noteId) {
       openConfirmationModal("Confirmar Exclusão", "Tem certeza que deseja excluir esta nota?", () => {
         db.collection("postits").doc(noteId).delete()
-          .then(() => { console.log("Nota deletada com sucesso"); updateMemoryUsageDisplay(); })
-          .catch((error) => { console.error("Erro ao deletar nota:", error); alert("Erro ao excluir a nota."); });
+          .then(() => { // Adicionar .then()
+              console.log("Nota deletada com sucesso");
+              updateMemoryUsageDisplay(); // Atualizar contagem
+          })
+          .catch((error) => {
+            console.error("Erro ao deletar nota:", error);
+            alert("Erro ao excluir a nota. Tente novamente.");
+          });
       });
-    }
-    
-    function mapFirebaseAuthError(errorCode) {
-      const errorMessages = {
-        'auth/invalid-email': 'Formato de e-mail inválido.', 'auth/user-disabled': 'Este usuário foi desabilitado.',
-        'auth/user-not-found': 'Usuário não encontrado.', 'auth/wrong-password': 'Senha incorreta.',
-        'auth/email-already-in-use': 'Este e-mail já está em uso.', 'auth/weak-password': 'Senha muito fraca. Use pelo menos 6 caracteres.',
-        'auth/operation-not-allowed': 'Operação não permitida.', 'auth/invalid-credential': 'Credenciais inválidas.',
-        'auth/too-many-requests': 'Muitas tentativas. Tente novamente mais tarde.'
-      };
-      return errorMessages[errorCode] || 'Ocorreu um erro desconhecido. Tente novamente.';
-    }
-
-    function escapeHTML(str) {
-      const div = document.createElement("div");
-      div.appendChild(document.createTextNode(str));
-      return div.innerHTML;
-    }
-
-    function attachPostitEventListeners(contentElement) {
-      if (!isMobileDevice()) {
-        contentElement.addEventListener('dblclick', handleDoubleClickEditing);
-      } else {
-        let touchStartX, touchStartY;
-        const LONG_PRESS_DURATION = 500; 
-        const MAX_TOUCH_MOVE_THRESHOLD = 10; 
-
-        contentElement.addEventListener('touchstart', (e) => {
-          if (e.target.tagName === 'TEXTAREA' || contentElement.querySelector('textarea.postit-content-editing')) {
-            return;
-          }
-          touchStartX = e.touches[0].clientX;
-          touchStartY = e.touches[0].clientY;
-          
-          if (contentElement.longPressTimerId) { 
-              clearTimeout(contentElement.longPressTimerId);
-          }
-
-          contentElement.longPressTimerId = setTimeout(() => {
-            if (document.body.contains(contentElement) && !contentElement.querySelector('textarea.postit-content-editing')) { 
-              enablePostitEditing(contentElement);
-            }
-          }, LONG_PRESS_DURATION);
-        });
-
-        contentElement.addEventListener('touchend', (e) => {
-          clearTimeout(contentElement.longPressTimerId);
-        });
-
-        contentElement.addEventListener('touchmove', (e) => {
-          if (!e.touches || e.touches.length === 0) return;
-          const touchX = e.touches[0].clientX;
-          const touchY = e.touches[0].clientY;
-          if (touchStartX === undefined || touchStartY === undefined) return; 
-          if ( Math.abs(touchX - touchStartX) > MAX_TOUCH_MOVE_THRESHOLD ||
-               Math.abs(touchY - touchStartY) > MAX_TOUCH_MOVE_THRESHOLD ) {
-            clearTimeout(contentElement.longPressTimerId);
-          }
-        });
-      }
-    }
-
-    function enablePostitEditing(contentDiv) {
-      if (!contentDiv || contentDiv.tagName === 'TEXTAREA' || contentDiv.isEditing === true ) { return; }
-      if (contentDiv.querySelector('textarea.postit-content-editing')) { return; }
-      contentDiv.isEditing = true; 
-
-      const postitDiv = contentDiv.closest('.postit');
-      if (!postitDiv) { contentDiv.isEditing = false; return; }
-      const noteId = postitDiv.id;
-      const originalText = contentDiv.textContent; 
-
-      const textarea = document.createElement('textarea');
-      textarea.value = originalText;
-      textarea.className = 'postit-content-editing'; 
-      
-      function autoResizeTextarea() {
-        textarea.style.height = 'auto';
-        textarea.style.height = textarea.scrollHeight + 'px';
-      }
-      textarea.addEventListener('input', autoResizeTextarea);
-      
-      contentDiv.parentNode.replaceChild(textarea, contentDiv);
-      textarea.focus();
-      textarea.select();
-      autoResizeTextarea(); 
-
-      let blurTimeout = null; 
-
-      function finishEditing(saveChangesFlag) {
-        clearTimeout(blurTimeout);
-        if (!textarea.parentNode) { 
-            // If contentDiv was the original, mark its flag as false if it's still somehow relevant
-            // However, contentDiv is replaced, so this flag's relevance on the original div is diminished.
-            // The newContentDiv created in revertToDiv won't have this flag unless explicitly set.
-            if(contentDiv) contentDiv.isEditing = false; 
-            return; 
-        }
-        const newText = textarea.value.trim();
-        
-        // Always revert the DOM structure
-        const textToShow = (saveChangesFlag && newText) ? newText : originalText;
-        revertToDivDOM(textToShow); // DOM revert helper
-
-        if (saveChangesFlag && newText && newText !== originalText.trim()) {
-          db.collection("postits").doc(noteId).update({ text: newText })
-            .then(() => console.log("Note updated successfully:", noteId))
-            .catch(err => console.error("Error updating note:", noteId, err));
-        }
-      }
-      
-      function revertToDivDOM(textToShow) {
-        if (!textarea.parentNode) { return; } // Should be redundant due to check in finishEditing
-        const newContentDiv = document.createElement('div');
-        newContentDiv.className = 'postit-content';
-        newContentDiv.textContent = textToShow; 
-        textarea.parentNode.replaceChild(newContentDiv, textarea);
-        attachPostitEventListeners(newContentDiv); 
-        // The original contentDiv's .isEditing flag is implicitly handled by it being removed from DOM.
-        // newContentDiv does not have .isEditing = true.
-      }
-
-      textarea.addEventListener('blur', () => {
-        blurTimeout = setTimeout(() => {
-            if (document.body.contains(textarea)) { finishEditing(true); }
-            else if(contentDiv) { contentDiv.isEditing = false; }
-        }, 50); 
-      });
-
-      textarea.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-          e.preventDefault(); 
-          finishEditing(true);
-        } else if (e.key === 'Escape') {
-          finishEditing(false); // False means don't save, revert to originalText
-        }
-      });
-    }
-
-    function handleDoubleClickEditing(event) {
-      if (isMobileDevice()) return;
-      enablePostitEditing(event.target); 
     }
 
     function loadNotes() {
@@ -2029,7 +2125,7 @@
       db.collection("postits")
         .where("category", "==", currentTab)
         .where("uid", "==", currentUser.uid)
-        .orderBy("order", "asc") 
+        .orderBy("order", "asc") // Order by the new 'order' field
         .onSnapshot(snapshot => {
           notesContainer.innerHTML = "";
           if (snapshot.empty) {
@@ -2076,22 +2172,33 @@
                 </div>
               </div>
               <div class="postit-content">${escapeHTML(note.text)}</div>`;
-            
-            const contentElement = div.querySelector('.postit-content');
-            attachPostitEventListeners(contentElement);
+            div.querySelector('.postit-content').addEventListener('dblclick', handleDoubleClickEditing);
             notesContainer.appendChild(div);
           });
 
+          // Initialize SortableJS
           new Sortable(notesContainer, {
             animation: 150,
-            ghostClass: 'blue-background-class', 
+            ghostClass: 'blue-background-class', // Optional: class for styling the ghost element
             onEnd: function (evt) {
               const noteElements = notesContainer.querySelectorAll('.postit');
               const updates = [];
-              noteElements.forEach((el, index) => { updates.push({ docId: el.id, newOrder: index }); });
+              noteElements.forEach((el, index) => {
+                updates.push({
+                  docId: el.id,
+                  newOrder: index // Could also use Date.now() or a more complex logic if needed
+                });
+              });
+
               const batch = db.batch();
-              updates.forEach(update => { batch.update(db.collection("postits").doc(update.docId), { order: update.newOrder }); });
-              batch.commit().then(() => console.log("Note order updated.")).catch(err => console.error("Error updating order:", err));
+              updates.forEach(update => {
+                const docRef = db.collection("postits").doc(update.docId);
+                batch.update(docRef, { order: update.newOrder });
+              });
+
+              batch.commit()
+                .then(() => console.log("Note order updated successfully."))
+                .catch(err => console.error("Error updating note order:", err));
             }
           });
         }, error => {
@@ -2100,21 +2207,235 @@
         });
     }
 
+    function mapFirebaseAuthError(errorCode) {
+      const errorMessages = {
+        'auth/invalid-email': 'Formato de e-mail inválido.',
+        'auth/user-disabled': 'Este usuário foi desabilitado.',
+        'auth/user-not-found': 'Usuário não encontrado.',
+        'auth/wrong-password': 'Senha incorreta.',
+        'auth/email-already-in-use': 'Este e-mail já está em uso.',
+        'auth/weak-password': 'Senha muito fraca. Use pelo menos 6 caracteres.',
+        'auth/operation-not-allowed': 'Operação não permitida. Verifique as configurações do Firebase.',
+        'auth/invalid-credential': 'Credenciais inválidas. Verifique e-mail e senha.',
+        'auth/too-many-requests': 'Muitas tentativas. Tente novamente mais tarde.'
+      };
+      return errorMessages[errorCode] || 'Ocorreu um erro desconhecido. Tente novamente.';
+    }
+
+    function escapeHTML(str) {
+      const div = document.createElement("div");
+      div.appendChild(document.createTextNode(str));
+      return div.innerHTML;
+    }
+
+    function handleDoubleClickEditing(event) {
+      const contentDiv = event.target;
+      const postitDiv = contentDiv.closest('.postit');
+      const noteId = postitDiv.id;
+      const originalText = contentDiv.textContent; // Use textContent for plain text
+
+      const textarea = document.createElement('textarea');
+      textarea.value = originalText;
+      textarea.className = 'postit-content-editing'; // Apply styling
+      
+      // Auto-resize textarea height
+      function autoResizeTextarea() {
+        textarea.style.height = 'auto';
+        textarea.style.height = textarea.scrollHeight + 'px';
+      }
+      textarea.addEventListener('input', autoResizeTextarea);
+      
+      // Replace div with textarea
+      contentDiv.parentNode.replaceChild(textarea, contentDiv);
+      textarea.focus();
+      textarea.select();
+      autoResizeTextarea(); // Initial resize
+
+      function saveChanges() {
+        const newText = textarea.value.trim();
+        if (newText !== originalText.trim()) {
+          if (newText) { // Only update if newText is not empty
+            db.collection("postits").doc(noteId).update({ text: newText })
+              .then(() => console.log("Note updated successfully:", noteId))
+              .catch(err => console.error("Error updating note:", noteId, err));
+            // The onSnapshot listener in loadNotes/loadThemeNotes will automatically update the UI
+          } else {
+            // If newText is empty, effectively delete the content or handle as an error
+            // For now, let's revert to original or consider deleting the note
+            console.log("Note content was cleared, reverting to original or consider deletion logic.");
+            revertToDiv(originalText); // Revert to original if cleared
+          }
+        } else {
+          revertToDiv(originalText); // No change, just revert
+        }
+        // No need to manually replace textarea here if onSnapshot updates it.
+        // However, if onSnapshot is too slow or for immediate feedback:
+        if (newText && newText === originalText.trim()) { // if text is same, snapshot might not re-render, so force revert.
+             revertToDiv(originalText);
+        } else if (!newText && originalText) { // if text was cleared, revert to original
+             revertToDiv(originalText);
+        }
+        // If the text actually changed, Firestore's onSnapshot should handle the update.
+        // If it doesn't (e.g. due to local latency or if the change is too fast for snapshot)
+        // we might need to manually call revertToDiv(newText) here.
+        // For simplicity now, relying on onSnapshot.
+      }
+
+      function revertToDiv(textToShow) {
+        const newContentDiv = document.createElement('div');
+        newContentDiv.className = 'postit-content';
+        newContentDiv.textContent = textToShow; // Use textContent
+        newContentDiv.addEventListener('dblclick', handleDoubleClickEditing); // Re-attach listener
+        if (textarea.parentNode) {
+          textarea.parentNode.replaceChild(newContentDiv, textarea);
+        }
+      }
+
+      textarea.addEventListener('blur', () => {
+        saveChanges();
+        // Note: The 'blur' event might fire before 'keydown' for Enter sometimes.
+        // The logic in saveChanges and reliance on onSnapshot should handle this.
+      });
+
+      textarea.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault(); // Prevent newline
+          saveChanges();
+        } else if (e.key === 'Escape') {
+          revertToDiv(originalText);
+        }
+      });
+    }
+
+    function handleCategoryChange() {
+      const selectedValue = categorySelector.value;
+      console.log("Categoria alterada para:", selectedValue);
+      if (selectedValue === "pessoais") {
+        navbarWrapper.style.display = "";
+        secondaryNavbarWrapper.style.display = "none";
+        const personalCategories = categorias.map(c => c[0]);
+        if (!personalCategories.includes(currentTab)) currentTab = "pessoal";
+        buildNavbar(); changeTab(currentTab);
+        currentThemeInfo = { id: null, type: null, name: null };
+        themeNoteCustomizationDiv.style.display = 'none';
+      } else if (THEME_CONFIG_MAP[selectedValue]) { // Verifica se é um tipo de tema conhecido
+        navbarWrapper.style.display = "none";
+        secondaryNavbarWrapper.style.display = "";
+        buildSecondaryNavbar(selectedValue); // selectedValue é o 'type' ou 'id' do tema
+      } else {
+        console.error("Tipo de categoria desconhecido:", selectedValue);
+      }
+    }
+
+    function buildSecondaryNavbar(type) { // type é o ID do themeConfig
+      const themeConfig = THEME_CONFIG_MAP[type];
+      if (!themeConfig) {
+          console.error(`Configuração de tema não encontrada para o tipo: ${type}`);
+          return;
+      }
+
+      secondaryNavbarContainer.innerHTML = "";
+      currentThemeInfo = { id: null, type: type, name: null }; // type aqui é o 'id' do tema
+      notesContainer.innerHTML = `<p class='text-center' style='width:100%; color: #8b4513; margin-top: 50px; font-family: Courier Prime, monospace;'><i class='fas ${themeConfig.iconClass}' style='font-size: 3rem; margin-bottom: 20px; display: block; opacity: 0.3;'></i>Selecione ou adicione um ${themeConfig.singularName}.</p>`;
+      themeNoteCustomizationDiv.style.display = 'none';
+      
+      const addThemeBtn = document.createElement("button");
+      addThemeBtn.innerHTML = `<i class="fas ${themeConfig.iconClass}"></i> Novo ${themeConfig.singularName}`; // Usa iconClass e singularName da config
+      addThemeBtn.onclick = () => openThemeNameModal(type); // Passa o 'type' (id do themeConfig)
+      addThemeBtn.style.cssText = "background: #228b22; color: white; border: 2px solid #8b4513; border-radius: 8px; padding: 8px 12px; cursor: pointer; margin-right: 10px; font-weight: 700; transition: all 0.3s ease; font-family: 'Courier Prime', monospace; text-transform: uppercase; letter-spacing: 0.5px;";
+      secondaryNavbarContainer.appendChild(addThemeBtn);
+
+      if (currentUser) {
+        db.collection("userThemes").where("uid", "==", currentUser.uid).where("type", "==", type).orderBy("themeName", "asc")
+          .onSnapshot(snapshot => {
+            const existingButtons = secondaryNavbarContainer.querySelectorAll('button:not(:first-child)');
+            existingButtons.forEach(btn => btn.remove());
+            if (snapshot.empty) console.log(`Nenhum tema encontrado para ${type}`);
+            
+            snapshot.forEach(doc => {
+              const theme = doc.data(); // theme.type é o ID do themeConfig (ex: 'livro')
+              const currentThemeTypeConfig = THEME_CONFIG_MAP[theme.type]; // Busca a config do TIPO de tema
+              
+              if (!currentThemeTypeConfig) {
+                  console.warn(`Configuração não encontrada para o tipo de tema ${theme.type} do tema específico ${theme.themeName}`);
+                  return; 
+              }
+
+              const themeBtn = document.createElement("button");
+              themeBtn.id = `themebtn_${doc.id}`;
+              const themeBtnContent = document.createElement('span');
+              themeBtnContent.style.cssText = 'display: flex; align-items: center; gap: 6px;';
+              const themeNameSpan = document.createElement('span');
+              // Usa o iconClass da config do TIPO de tema
+              themeNameSpan.innerHTML = `<i class="fas ${currentThemeTypeConfig.iconClass}"></i> ${theme.themeName}`;
+              const badgeSpan = document.createElement('span');
+              badgeSpan.className = 'badge'; badgeSpan.id = `themebadge_${doc.id}`; badgeSpan.textContent = '0';
+              const deleteIcon = document.createElement("span");
+              deleteIcon.innerHTML = '<i class="fas fa-times"></i>';
+              deleteIcon.style.cssText = 'position: absolute; top: -6px; right: -6px; background: #dc143c; color: white; border-radius: 50%; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; font-size: 0.6rem; cursor: pointer; z-index: 10; transition: all 0.3s ease;';
+              deleteIcon.onclick = (event) => { event.stopPropagation(); deleteThemeAndNotes(doc.id, theme.themeName, theme.type); };
+              themeBtnContent.appendChild(themeNameSpan); themeBtnContent.appendChild(badgeSpan);
+              themeBtn.style.position = 'relative'; themeBtn.appendChild(deleteIcon); themeBtn.appendChild(themeBtnContent);
+              themeBtn.onclick = () => selectTheme(doc.id, theme.type, theme.themeName); // Adjusted call
+              secondaryNavbarContainer.appendChild(themeBtn); updateThemeBadge(doc.id);
+            });
+            if (currentThemeInfo.id) {
+              const activeBtn = document.getElementById(`themebtn_${currentThemeInfo.id}`);
+              if (activeBtn) activeBtn.classList.add('active-tab');
+            }
+          }, error => { console.error(`Erro ao buscar temas para ${type}:`, error); });
+      }
+    }
+
+    function promptAndAddNewTheme(type) { openThemeNameModal(type); }
+
+    function addNewTheme(type, themeName) { // type é o ID do themeConfig
+      if (!currentUser) { alert("Erro: Usuário não está logado."); return; }
+      const themeConfig = THEME_CONFIG_MAP[type];
+      if (!themeConfig) {
+          console.error(`Configuração de tema não encontrada para o tipo: ${type} em addNewTheme`);
+          alert("Erro: Não foi possível adicionar o tema. Tipo desconhecido.");
+          return;
+      }
+
+      const themeData = {
+          uid: currentUser.uid,
+          type: type, // Este é o 'id' do themeConfig, ex: 'receita'
+          themeName: themeName, // ex: "Bolo de Chocolate"
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      };
+      db.collection("userThemes").add(themeData)
+        .then((docRef) => {
+          console.log("Tema adicionado com ID:", docRef.id, "do tipo:", type);
+          selectTheme(docRef.id, type, themeName); // Passa o 'type' (id) e o nome específico do tema
+        })
+        .catch((error) => { console.error("Erro ao adicionar tema:", error); alert("Erro ao criar tema. Tente novamente."); });
+    }
+
+    function selectTheme(themeId, type, themeName) { // type é o ID do themeConfig, themeName é o nome específico
+      console.log(`Tema selecionado: ${themeName} (ID: ${themeId}, Tipo: ${type})`);
+      currentThemeInfo = { id: themeId, type: type, name: themeName }; // Armazena o tipo (ID do config) e o nome específico
+      document.querySelectorAll('#secondaryNavbar button').forEach(btn => btn.classList.remove('active-tab'));
+      const activeBtn = document.getElementById(`themebtn_${themeId}`);
+      if (activeBtn) activeBtn.classList.add('active-tab');
+      loadThemeNotes(themeId);
+    }
+
     function loadThemeNotes(themeId) {
       if (!currentUser) return;
       console.log("Carregando notas para o tema:", themeId);
       notesContainer.innerHTML = "<p class='text-center' style='width:100%; color: #8b4513; margin-top: 50px; font-family: Courier Prime, monospace;'><i class='fas fa-spinner fa-spin'></i> Carregando notas do tema...</p>";
-      db.collection("postits").where("themeId", "==", themeId).where("uid", "==", currentUser.uid).orderBy("order", "asc")
+      db.collection("postits").where("themeId", "==", themeId).where("uid", "==", currentUser.uid).orderBy("order", "asc") // Order by the new 'order' field
         .onSnapshot(snapshot => {
           notesContainer.innerHTML = "";
           if (snapshot.empty) {
             notesContainer.innerHTML = `<p class='text-center' style='width:100%; color: #8b4513; margin-top: 50px; font-family: Courier Prime, monospace;'><i class='fas fa-sticky-note' style='font-size: 3rem; margin-bottom: 20px; display: block; opacity: 0.3;'></i>Nenhuma nota encontrada para este tema.</p>`;
             return;
           }
-          snapshot.forEach(doc => { 
+          snapshot.forEach(doc => { /* ... (code for displaying theme notes, identical to previous version) ... */ 
             const note = doc.data();
             const div = document.createElement("div");
-            div.className = `postit ${note.noteType || 'themenote'}`; 
+            div.className = `postit ${note.noteType || 'themenote'}`; // note.noteType should hold the theme id like 'livro', 'receita'
             div.id = doc.id;
             const createdDate = note.createdAt?.toDate();
             let daysAgoText = "Recente";
@@ -2150,22 +2471,33 @@
                 </div>
               </div>
               <div class="postit-content">${escapeHTML(note.text)}</div>`;
-            
-            const contentElement = div.querySelector('.postit-content');
-            attachPostitEventListeners(contentElement);
+            div.querySelector('.postit-content').addEventListener('dblclick', handleDoubleClickEditing);
             notesContainer.appendChild(div);
           });
 
+          // Initialize SortableJS for theme notes
           new Sortable(notesContainer, {
             animation: 150,
-            ghostClass: 'blue-background-class', 
+            ghostClass: 'blue-background-class', // Optional
             onEnd: function (evt) {
               const noteElements = notesContainer.querySelectorAll('.postit');
               const updates = [];
-              noteElements.forEach((el, index) => { updates.push({ docId: el.id, newOrder: index }); });
+              noteElements.forEach((el, index) => {
+                updates.push({
+                  docId: el.id,
+                  newOrder: index 
+                });
+              });
+
               const batch = db.batch();
-              updates.forEach(update => { batch.update(db.collection("postits").doc(update.docId), { order: update.newOrder }); });
-              batch.commit().then(() => console.log("Theme note order updated.")).catch(err => console.error("Error updating order:", err));
+              updates.forEach(update => {
+                const docRef = db.collection("postits").doc(update.docId);
+                batch.update(docRef, { order: update.newOrder });
+              });
+
+              batch.commit()
+                .then(() => console.log("Theme note order updated successfully."))
+                .catch(err => console.error("Error updating theme note order:", err));
             }
           });
         }, error => {
@@ -2182,116 +2514,88 @@
         .onSnapshot(snapshot => {
           const count = snapshot.size;
           let hasOverdue = false; let hasPending = false;
-          snapshot.docs.forEach(doc => { /* ... (badge color logic as it was) ... */ });
+          snapshot.docs.forEach(doc => {
+            const note = doc.data();
+            if (note.dueDate) {
+              const today = new Date(); today.setHours(0,0,0,0);
+              const parts = note.dueDate.split('-');
+              const dueDate = new Date(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
+              dueDate.setHours(0,0,0,0);
+              if (dueDate < today) hasOverdue = true;
+              else hasPending = true;
+            }
+            if(hasOverdue) return;
+          });
+          if (hasOverdue) { badge.style.backgroundColor = '#dc143c'; badge.title = 'Contém itens vencidos ou para hoje'; }
+          else if (hasPending) { badge.style.backgroundColor = ''; badge.title = 'Contém itens com data futura'; }
+          else { badge.style.backgroundColor = '#dc143c'; badge.title = count > 0 ? `${count} nota(s)` : ''; }
         }, error => { console.error("Erro ao obter contagem do tema", themeId, error); });
     }
 
-    async function deleteThemeAndNotes(themeId, themeName, type) { 
-        openConfirmationModal(
-            `Confirmar Exclusão de Tema`,
-            `Tem certeza que deseja excluir o tema "${themeName}" e todas as suas notas? Esta ação não pode ser desfeita.`,
-            async () => { 
-                console.log(`Iniciando exclusão do tema ${themeId} ('${themeName}') e suas notas.`);
-                if (!currentUser) { console.error("Usuário não logado."); alert("Erro: Usuário não logado."); return; }
-                try {
-                    const postitsQuery = db.collection("postits").where("themeId", "==", themeId).where("uid", "==", currentUser.uid);
-                    const postitsSnapshot = await postitsQuery.get();
-                    const batch = db.batch();
-                    let notesDeletedCount = 0;
-                    postitsSnapshot.forEach(doc => { batch.delete(doc.ref); notesDeletedCount++; });
-                    console.log(`${notesDeletedCount} notas para exclusão para o tema ${themeId}.`);
-                    batch.delete(db.collection("userThemes").doc(themeId));
-                    await batch.commit();
-                    console.log(`Tema ${themeId} ('${themeName}') e ${notesDeletedCount} notas associadas excluídos.`);
-                    alert(`Tema "${themeName}" e suas notas foram excluídos.`);
-                    updateMemoryUsageDisplay();
-                    if (currentThemeInfo && currentThemeInfo.id === themeId) {
-                        currentThemeInfo = { id: null, type: type, name: null }; 
-                    }
-                    buildSecondaryNavbar(type); 
-                } catch (error) {
-                    console.error(`Erro ao excluir tema ${themeId} ('${themeName}') e/ou suas notas:`, error);
-                    alert("Erro ao excluir o tema e/ou suas notas.");
-                }
+async function deleteThemeAndNotes(themeId, themeName, type) { // Tornar async se for usar await
+    openConfirmationModal(
+        `Confirmar Exclusão de Tema`,
+        `Tem certeza que deseja excluir o tema "${themeName}" e todas as suas notas? Esta ação não pode ser desfeita.`,
+        async () => { // Callback de confirmação também async
+            console.log(`Iniciando exclusão do tema ${themeId} ('${themeName}') e suas notas.`);
+            if (!currentUser) {
+                console.error("Usuário não logado, não é possível excluir tema.");
+                alert("Erro: Usuário não está logado.");
+                return;
             }
-        );
-    }
-    
-    function handleCategoryChange() {
-      const selectedValue = categorySelector.value;
-      console.log("Categoria alterada para:", selectedValue);
-      if (selectedValue === "pessoais") {
-        navbarWrapper.style.display = "";
-        secondaryNavbarWrapper.style.display = "none";
-        const personalCategories = categorias.map(c => c[0]);
-        if (!personalCategories.includes(currentTab)) currentTab = "pessoal";
-        buildNavbar(); changeTab(currentTab);
-        currentThemeInfo = { id: null, type: null, name: null };
-        themeNoteCustomizationDiv.style.display = 'none';
-      } else if (THEME_CONFIG_MAP[selectedValue]) { 
-        navbarWrapper.style.display = "none";
-        secondaryNavbarWrapper.style.display = "";
-        buildSecondaryNavbar(selectedValue); 
-      } else {
-        console.error("Tipo de categoria desconhecido:", selectedValue);
-      }
-    }
 
-    function buildSecondaryNavbar(type) { 
-      const themeConfig = THEME_CONFIG_MAP[type];
-      if (!themeConfig) { console.error(`Configuração de tema não encontrada para: ${type}`); return; }
-      secondaryNavbarContainer.innerHTML = "";
-      currentThemeInfo = { id: null, type: type, name: null }; 
-      notesContainer.innerHTML = `<p class='text-center' style='width:100%; color: #8b4513; margin-top: 50px; font-family: Courier Prime, monospace;'><i class='fas ${themeConfig.iconClass}' style='font-size: 3rem; margin-bottom: 20px; display: block; opacity: 0.3;'></i>Selecione ou adicione um ${themeConfig.singularName}.</p>`;
-      themeNoteCustomizationDiv.style.display = 'none';
-      const addThemeBtn = document.createElement("button");
-      addThemeBtn.innerHTML = `<i class="fas ${themeConfig.iconClass}"></i> Novo ${themeConfig.singularName}`; 
-      addThemeBtn.onclick = () => openThemeNameModal(type); 
-      addThemeBtn.style.cssText = "background: #228b22; color: white; border: 2px solid #8b4513; border-radius: 8px; padding: 8px 12px; cursor: pointer; margin-right: 10px; font-weight: 700; transition: all 0.3s ease; font-family: 'Courier Prime', monospace; text-transform: uppercase; letter-spacing: 0.5px;";
-      secondaryNavbarContainer.appendChild(addThemeBtn);
-      if (currentUser) {
-        db.collection("userThemes").where("uid", "==", currentUser.uid).where("type", "==", type).orderBy("themeName", "asc")
-          .onSnapshot(snapshot => {
-            const existingButtons = secondaryNavbarContainer.querySelectorAll('button:not(:first-child)');
-            existingButtons.forEach(btn => btn.remove());
-            if (snapshot.empty) console.log(`Nenhum tema encontrado para ${type}`);
-            snapshot.forEach(doc => { /* ... (rest of theme button creation as it was) ... */ });
-            if (currentThemeInfo.id) { /* ... (active tab logic as it was) ... */ }
-          }, error => { console.error(`Erro ao buscar temas para ${type}:`, error); });
-      }
-    }
+            try {
+                const postitsQuery = db.collection("postits")
+                    .where("themeId", "==", themeId)
+                    .where("uid", "==", currentUser.uid);
+                
+                const postitsSnapshot = await postitsQuery.get();
+                
+                const batch = db.batch();
+                let notesDeletedCount = 0;
+                postitsSnapshot.forEach(doc => {
+                    batch.delete(doc.ref);
+                    notesDeletedCount++;
+                });
+                console.log(`${notesDeletedCount} notas encontradas para exclusão para o tema ${themeId}.`);
 
-    function promptAndAddNewTheme(type) { openThemeNameModal(type); }
+                // Deletar o documento do tema
+                const themeDocRef = db.collection("userThemes").doc(themeId);
+                batch.delete(themeDocRef);
 
-    function addNewTheme(type, themeName) { 
-      if (!currentUser) { alert("Erro: Usuário não logado."); return; }
-      const themeConfig = THEME_CONFIG_MAP[type];
-      if (!themeConfig) { console.error(`Config tema não encontrada: ${type}`); alert("Erro: Tipo de tema desconhecido."); return; }
-      const themeData = { uid: currentUser.uid, type: type, themeName: themeName, createdAt: firebase.firestore.FieldValue.serverTimestamp() };
-      db.collection("userThemes").add(themeData)
-        .then((docRef) => { console.log("Tema adicionado:", docRef.id, type); selectTheme(docRef.id, type, themeName); })
-        .catch((error) => { console.error("Erro ao adicionar tema:", error); alert("Erro ao criar tema."); });
-    }
+                await batch.commit();
+                console.log(`Tema ${themeId} ('${themeName}') e ${notesDeletedCount} notas associadas foram excluídos com sucesso.`);
+                alert(`Tema "${themeName}" e suas notas foram excluídos.`);
 
-    function selectTheme(themeId, type, themeName) { 
-      console.log(`Tema selecionado: ${themeName} (ID: ${themeId}, Tipo: ${type})`);
-      currentThemeInfo = { id: themeId, type: type, name: themeName }; 
-      document.querySelectorAll('#secondaryNavbar button').forEach(btn => btn.classList.remove('active-tab'));
-      const activeBtn = document.getElementById(`themebtn_${themeId}`);
-      if (activeBtn) activeBtn.classList.add('active-tab');
-      loadThemeNotes(themeId);
-    }
-    
+                // Atualizar a UI
+                updateMemoryUsageDisplay();
+
+                // Se o tema excluído era o tema atualmente ativo, precisamos limpar currentThemeInfo
+                // e reconstruir a navbar secundária para selecionar o próximo tema (ou nenhum).
+                if (currentThemeInfo && currentThemeInfo.id === themeId) {
+                    currentThemeInfo = { id: null, type: type, name: null }; 
+                    // notesContainer.innerHTML = ''; // Limpar notas imediatamente
+                    // A chamada abaixo para buildSecondaryNavbar cuidará de limpar/atualizar notesContainer
+                }
+                // Reconstrói a navbar secundária para o tipo de tema atual.
+                // buildSecondaryNavbar agora seleciona o primeiro tema se nenhum estiver ativo,
+                // ou limpa se não houver mais temas desse tipo.
+                buildSecondaryNavbar(type); 
+
+            } catch (error) {
+                console.error(`Erro ao excluir tema ${themeId} ('${themeName}') e/ou suas notas:`, error);
+                alert("Erro ao excluir o tema e/ou suas notas. Verifique o console para detalhes.");
+            }
+        }
+    );
+}
+
     document.addEventListener('keydown', function(event) {
       if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
         if (modalOverlay.classList.contains('active') && noteTextInput.value.trim()) addNote();
       }
       if (event.key === 'Escape') {
         if (modalOverlay.classList.contains('active')) closeModal();
-        if (themeNameModalOverlay.classList.contains('active')) closeThemeNameModal();
-        if (confirmationModalOverlay.classList.contains('active')) closeConfirmationModal();
-        if (adminPanelModalOverlay.classList.contains('active')) closeAdminModal();
-        if (premiumUpgradeModalOverlay.classList.contains('active')) closePremiumUpgradeModal();
       }
     });
 
@@ -2311,3 +2615,4 @@
   </script>
 </body>
 </html>
+
