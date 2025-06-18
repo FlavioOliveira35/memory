@@ -278,19 +278,27 @@
     .category-dropdown .dropdown-btn {
       background-color: #A0522D; /* Sienna */
       color: white;
-      padding: 8px 15px;
-      font-size: 0.9rem;
+      /* padding: 8px 15px; */ /* Original */
+      padding: 8px 12px; /* AJUSTADO para consistência */
+      /* font-size: 0.9rem; */ /* Original */
+      font-size: 0.8rem; /* AJUSTADO para consistência */
       font-family: 'Courier Prime', monospace;
       border: none;
       cursor: pointer;
       border-radius: 5px;
       transition: background-color 0.3s ease;
+      display: flex; /* Adicionado */
+      align-items: center; /* Adicionado */
+    }
+    .category-dropdown .dropdown-btn .btn-text { /* Alvo para o texto */
+      text-transform: uppercase; /* Adicionado */
     }
     .category-dropdown .dropdown-btn:hover {
       background-color: #654321; /* Darker Sienna */
     }
     .category-dropdown .dropdown-btn i {
-      margin-left: 8px;
+      /* margin-left: 8px; */ /* Original */
+      margin-left: 6px; /* AJUSTADO para consistência com gap */
     }
 
     .category-dropdown .dropdown-content {
@@ -970,60 +978,7 @@
       .notes-container {
          margin-top: 125px;
       }
-
-      /* Ajustes para o menu hambúrguer achatado */
-      .collapsible-menu.active .main-nav .category-dropdown .dropdown-btn {
-          display: none !important;
-      }
-      .collapsible-menu.active .main-nav {
-          display: flex;
-          flex-direction: column;
-          width: 100%;
-      }
-      /* Estilo unificado para todos os links/botões que servem como itens de menu diretamente dentro do .main-nav */
-      .collapsible-menu.active .main-nav > a { /* Aplica a todos os links 'a' diretos */
-        padding: 15px 20px;
-        border-bottom: 1px solid #e0d8c8;
-        font-family: 'Courier Prime', monospace;
-        color: #2c2416;
-        text-decoration: none;
-        display: block;
-        background-color: transparent;
-        text-align: left;
-        margin:0;
-        border-radius: 0;
-        width: 100%;
-        border-left: none;
-        border-right: none;
-        border-top: none;
-      }
-      /* Remove a borda inferior do último link 'a' direto no .main-nav (que seria o settings-link-mobile) */
-      .collapsible-menu.active .main-nav > a:last-child {
-          border-bottom: none;
-      }
-
-      /* Se a estrutura .category-dropdown > .dropdown-content ainda existir DENTRO do .main-nav
-         (a lógica JS atual em populateNewCategoryDropdown para mobile limpa o mainNav,
-         então esta estrutura .category-dropdown não deveria estar lá no mobile.
-         Estas regras são mais um fallback ou para o caso da lógica JS mudar) */
-      .collapsible-menu.active .main-nav .category-dropdown {
-          width: 100%;
-          margin:0;
-          padding:0;
-          border:0;
-      }
-      .collapsible-menu.active .main-nav .category-dropdown .dropdown-content {
-          display: block; /* Se os links estiverem aqui, eles precisam ser mostrados */
-          position: static;
-          box-shadow: none;
-          border: none;
-          margin-top: 0;
-          background-color: transparent;
-          width: 100%;
-          padding: 0;
-      }
-      /* Os botões em .user-actions já são estilizados pelas regras existentes para .collapsible-menu .user-actions button */
-
+      /* Os estilos para o menu achatado já foram adicionados na rodada anterior, esta é uma limpeza de bloco de busca. */
       /* Ajustes para o menu hambúrguer achatado */
       .collapsible-menu.active .main-nav .category-dropdown .dropdown-btn {
           display: none !important;
