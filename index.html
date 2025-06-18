@@ -18,6 +18,9 @@
   
   <!-- Google Fonts para tipografia retro -->
   <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=Typewriter&display=swap" rel="stylesheet">
+
+  <!-- Chart.js via CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   
   <style>
     /* ========================================
@@ -828,33 +831,29 @@
       }
 
       .collapsible-menu {
-        /* display: none; Hidden by default on mobile - changed for transform */
-        visibility: hidden;
-        opacity: 0;
-        transform: translateX(-100%);
-        transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out, visibility 0s linear 0.3s;
+        visibility: hidden; /* Alterado para hidden por padrão para a animação */
+        opacity: 0; /* Começa invisível para fade-in */
+        transform: translateX(-100%); /* Começa fora da tela à esquerda */
+        transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out, visibility 0s linear 0.3s; /* Adicionada transição de opacidade e visibilidade */
         flex-direction: column;
         align-items: stretch;
-        position: fixed; /* Changed from absolute */
-        top: 56px; /* Altura estimada do .top-bar. Ajustar se necessário. */
+        position: fixed;
+        top: 56px; /* Altura do .top-bar. Ajustar se o top-bar mudar */
         left: 0;
-        right: 0; /* Added for full width */
-        bottom: 0; /* Added for full height below top-bar */
-        /* width: 100%; */ /* Replaced by left:0, right:0 */
-        background-color: #f9f6f0; /* Changed to vintage paper */
-        box-shadow: 0 8px 16px rgba(0,0,0,0.2); /* Enhanced shadow */
-        z-index: 1005; /* Increased z-index */
-        /* border-top: 1px solid #654321; Removed, covered by shadow or new design */
-        overflow-y: auto; /* Added for scrollable content */
+        right: 0;
+        bottom: 0;
+        background-color: #f9f6f0; /* Cor de papel vintage */
+        box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+        z-index: 1005;
+        overflow-y: auto;
       }
 
       .collapsible-menu.active {
-        /* display: flex; Show when active - flex is now default */
-        display: flex; /* Ensure display is flex when active */
-        visibility: visible;
-        opacity: 1;
-        transform: translateX(0);
-        transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+        display: flex;
+        visibility: visible; /* Torna visível quando ativo */
+        opacity: 1; /* Fade-in completo */
+        transform: translateX(0); /* Desliza para a posição */
+        transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out; /* Transição suave */
       }
 
       .collapsible-menu .main-nav,
@@ -865,78 +864,72 @@
         align-items: stretch;
       }
 
-      .collapsible-menu .category-dropdown .dropdown-btn,
+      /* Estilo unificado para links diretos <a> no .main-nav (novo local dos itens de categoria no mobile) */
+      /* e botões em .user-actions no mobile */
+      .collapsible-menu .main-nav > a,
       .collapsible-menu .user-actions button,
-      .collapsible-menu .user-actions .auth-button,
-      .collapsible-menu .user-actions #headerPremiumButton,
-      .collapsible-menu .user-actions #adminPanelButton {
+      .collapsible-menu .user-actions .auth-button {
         width: 100%;
         text-align: left;
-        padding: 15px 20px; /* Increased padding */
+        padding: 15px 20px; /* Aumentado para toque mais suave */
         border-radius: 0;
-        border-bottom: 1px solid #e0d8c8; /* Subtle border */
+        border-bottom: 1px solid #e0d8c8; /* Borda inferior sutil */
         margin: 0;
-        font-family: 'Courier Prime', monospace; /* Retro font */
-        color: #2c2416; /* Retro text color */
-        background-color: transparent; /* Ensure no conflicting background */
+        font-family: 'Courier Prime', monospace; /* Fonte retro */
+        color: #2c2416; /* Cor de texto retro */
+        background-color: transparent;
+        text-decoration: none; /* Para os links <a> */
+        display: flex; /* Para alinhar ícones e texto nos botões */
+        align-items: center; /* Para alinhar ícones e texto nos botões */
+        gap: 10px; /* Espaço entre ícone e texto */
       }
-      /* Styling for category items specifically, if different from buttons */
+      /* Remover borda lateral (se houver, por padrão não há em botões ou links) */
+      .collapsible-menu .main-nav > a,
+      .collapsible-menu .user-actions button,
+      .collapsible-menu .user-actions .auth-button {
+          border-left: none;
+          border-right: none;
+          border-top: none; /* Apenas borda inferior ou superior para separação */
+      }
+
+
+      /* Estilo para os itens de categoria que vêm do .dropdown-content (se ainda usados no mobile, o que não é o plano) */
+      /* Idealmente, .main-nav > a cobrirá isso quando a JS for atualizada */
       .collapsible-menu .category-dropdown .dropdown-content a {
-        padding: 15px 20px; /* Increased padding */
-        font-family: 'Courier Prime', monospace; /* Retro font */
-        color: #2c2416; /* Retro text color */
-        border-bottom: 1px solid #e0d8c8; /* Subtle border */
-        /* border-radius, width, text-align, margin are inherited or covered by general rule */
-      }
-
-      /* Remove bottom border from the very last item in the collapsible menu */
-      .collapsible-menu > div > *:last-child, /* For direct children like main-nav, user-actions */
-      .collapsible-menu .user-actions > button:last-of-type, /* For last button in user-actions */
-      .collapsible-menu .user-actions > .auth-button:last-of-type,
-      .collapsible-menu .category-dropdown .dropdown-content > a:last-of-type { /* For last category link */
-        border-bottom: none;
-      }
-
-      /* New styles for contact and settings links */
-      .collapsible-menu .contact-link-mobile,
-      .collapsible-menu .settings-link-mobile {
         padding: 15px 20px;
         font-family: 'Courier Prime', monospace;
         color: #2c2416;
+        border-bottom: 1px solid #e0d8c8;
         text-decoration: none;
         display: block;
-        border-bottom: 1px solid #e0d8c8;
-      }
-      .collapsible-menu .contact-link-mobile {
-        margin-top: 20px; /* Separation from categories */
-        border-top: 1px solid #d2b48c; /* Stronger separator */
-      }
-      .collapsible-menu .settings-link-mobile:last-child { /* If settings is the absolute last, no border */
-          border-bottom: none;
-      }
-      /* Ensure icons in links are spaced correctly */
-      .collapsible-menu .contact-link-mobile i,
-      .collapsible-menu .settings-link-mobile i {
-        margin-right: 10px;
       }
 
-      /* Ensure dropdown content itself doesn't have conflicting styles */
-      .collapsible-menu .category-dropdown .dropdown-content {
-        position: static;
-        width: 100%;
-        box-shadow: none;
-        border: none;
-        /* border-top: 1px dashed #A0522D; /* Removed, items have their own top/bottom borders now */
-        transform: none;
-        margin-top: 0;
-        border-radius: 0;
-        background-color: transparent; /* Make sure it's transparent */
+      /* Remove bottom border from the very last item in the collapsible menu */
+      /* Isso precisa ser mais específico para a nova estrutura onde main-nav tem links diretos */
+      .collapsible-menu .main-nav > a:last-of-type,
+      .collapsible-menu .user-actions > button:last-of-type,
+      .collapsible-menu .user-actions > .auth-button:last-of-type {
+        border-bottom: none;
       }
-      /* Original indentation for sub-items, adjust if needed with new padding */
-       /* .collapsible-menu .category-dropdown .dropdown-content a {
-         padding-left: 30px;
-         border-radius: 0;
-       } */
+
+      /* Estilos para os novos links de contato e configurações (já cobertos por .main-nav > a) */
+      /* Apenas a estilização específica de margem e borda superior para o primeiro deles */
+      .collapsible-menu .contact-link-mobile { /* Será um <a> dentro de .main-nav */
+        margin-top: 20px;
+        border-top: 1px solid #d2b48c; /* Borda superior para separar dos temas */
+      }
+      /* Ícones já são tratados pelo gap em .main-nav > a e .user-actions button */
+
+
+      /* Ocultar o dropdown de categorias desktop no mobile, pois a lista é plana */
+      .collapsible-menu .category-dropdown {
+        display: none; /* Esconder completamente o container do dropdown no mobile */
+      }
+      /* Se .category-dropdown não for display:none, mas sim seu conteúdo for gerenciado, então: */
+      /* .collapsible-menu .category-dropdown .dropdown-btn { display: none; } */
+      /* .collapsible-menu .category-dropdown .dropdown-content { display: block; position: static; ... } */
+
+
       #mobilePessoaisBtn {
         display: block; /* Exibir o botão em telas mobile */
       }
@@ -945,18 +938,14 @@
         display: none !important; /* Reafirmar ou garantir esta regra */
       }
 
-      /* A classe .mobile-premium-icon-source-hidden e sua regra CSS foram removidas,
-         pois mover o nó #headerPremiumButton é suficiente. */
-
       #mobileRightActionColumn {
-          display: flex !important; /* Torna visível no mobile, usa !important para garantir prioridade se necessário */
-          bottom: 90px; /* Espaço acima do .floating-add-btn (ex: 60px btn + 30px margem) */
-          right: 25px;  /* Alinhar com o centro do .floating-add-btn */
-          /* Outros estilos como position, z-index, flex-direction já estão inline no HTML */
+          display: flex !important;
+          bottom: 90px;
+          right: 25px;
       }
 
       #headerPremiumButton.mobile-premium-icon {
-          display: flex !important; /* Garantir visibilidade e comportamento flex */
+          display: flex !important;
           background: #b08d57 !important;
           color: white !important;
           width: 40px;
@@ -968,9 +957,8 @@
           margin-bottom: 10px;
           align-items: center;
           justify-content: center;
-          /* Ocultar texto - JS cuidará do innerHTML para remover o texto */
       }
-       #headerPremiumButton.mobile-premium-icon .fa-star { /* Se o ícone já tem margens */
+       #headerPremiumButton.mobile-premium-icon .fa-star {
           margin: 0;
       }
 
@@ -978,50 +966,23 @@
       .notes-container {
          margin-top: 125px;
       }
-      /* Os estilos para o menu achatado já foram adicionados na rodada anterior, esta é uma limpeza de bloco de busca. */
-      /* Ajustes para o menu hambúrguer achatado (garantindo que estão aqui) */
+
+      /* Ajustes para o menu hambúrguer achatado (já feito acima com .main-nav > a) */
+      /* Garantir que o botão de dropdown interno não apareça */
       .collapsible-menu.active .main-nav .category-dropdown .dropdown-btn {
           display: none !important;
       }
+      /* Garantir que o container .main-nav se comporte como coluna */
       .collapsible-menu.active .main-nav {
           display: flex;
           flex-direction: column;
           width: 100%;
       }
-      /* Estilo unificado para todos os links <a> diretos no .main-nav */
-      .collapsible-menu.active .main-nav > a {
-        padding: 15px 20px;
-        border-bottom: 1px solid #e0d8c8;
-        font-family: 'Courier Prime', monospace;
-        color: #2c2416;
-        text-decoration: none;
-        display: block;
-        background-color: transparent;
-        text-align: left;
-        margin:0;
-        border-radius: 0;
-        width: 100%;
-        border-left: none;
-        border-right: none;
-        border-top: none;
-      }
-      /* Remove a borda inferior do último link <a> direto no .main-nav */
-      .collapsible-menu.active .main-nav > a:last-of-type {
-          border-bottom: none;
-      }
+      /* Estilo para os links <a> diretos no .main-nav já definido acima */
 
-      /* Estrutura de fallback/limpeza se .category-dropdown e .dropdown-content ainda estiverem no DOM dentro de .main-nav
-         (A lógica JS atual limpa o .main-nav no mobile, então estas podem não ser estritamente necessárias, mas são boas como fallback) */
-      .collapsible-menu.active .main-nav .category-dropdown {
-          width: 100%;
-          margin:0;
-          padding:0;
-          border:0;
-          box-shadow: none; /* Adicionado para garantir limpeza */
-          background: transparent; /* Adicionado para garantir limpeza */
-      }
+      /* Limpeza do .dropdown-content se ainda estiver no DOM no mobile (idealmente não estará) */
       .collapsible-menu.active .main-nav .category-dropdown .dropdown-content {
-          display: block;
+          display: block; /* Ou none se for completamente substituído */
           position: static;
           box-shadow: none;
           border: none;
@@ -1031,20 +992,10 @@
           padding: 0;
       }
     }
-    /* Ensure the main category dropdown button (.dropdown-btn) within .collapsible-menu also gets vintage styling */
-    .collapsible-menu .category-dropdown .dropdown-btn {
-        background-color: transparent; /* Or a specific vintage background if desired */
-        color: #2c2416; /* Dark retro text color */
-        border-bottom: 1px solid #e0d8c8; /* Consistent separator */
-    }
-    .collapsible-menu .category-dropdown .dropdown-btn:hover {
-        background-color: #e0d8c8; /* Subtle hover for the button itself */
-    }
-    /* Ensure the .btn-text and icon inside .dropdown-btn are styled correctly */
-    .collapsible-menu .category-dropdown .dropdown-btn .btn-text,
-    .collapsible-menu .category-dropdown .dropdown-btn i {
-        color: #2c2416; /* Ensure text and icon match the desired retro color */
-    }
+    /* Os estilos abaixo de .collapsible-menu .category-dropdown .dropdown-btn foram removidos */
+    /* pois no mobile o .category-dropdown inteiro deve ser display:none */
+    /* Se ele não for display:none, então os estilos para .dropdown-btn e seu texto/ícone seriam relevantes */
+    /* mas o plano é ter uma lista plana de links <a> diretamente no .main-nav */
 
 
     @media (max-width: 480px) {
@@ -1203,6 +1154,310 @@
       background-color: #4a2c05;
       border-color: #301d03;
     }
+
+    /* ========================================
+       ADMIN SCREEN STYLES
+    ======================================== */
+    #adminScreen {
+      background-color: #f4f1e8;
+      color: #333;
+      font-family: 'Courier Prime', 'Courier New', monospace;
+    }
+
+    #adminHeader {
+      background: #654321;
+      color: #f4f1e8;
+      padding: 15px 25px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      display: flex; /* Adicionado para align-items funcionar */
+      justify-content: space-between; /* Adicionado para espaçar título e botão */
+      align-items: center;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 1010;
+    }
+
+    #adminHeader h2 {
+      font-size: 1.6rem;
+      margin: 0;
+    }
+
+    #adminHeader h2 i {
+      margin-right: 10px;
+    }
+
+    #adminScreenBackButton {
+      background: #A0522D;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      font-size: 0.85rem;
+      border-radius: 5px;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      transition: background-color 0.3s ease;
+      display: flex; /* Adicionado para alinhar ícone e texto */
+      align-items: center; /* Adicionado para alinhar ícone e texto */
+    }
+
+    #adminScreenBackButton:hover {
+      background: #8B4513;
+    }
+
+    #adminScreenBackButton i {
+      margin-right: 6px;
+    }
+
+    #adminContent {
+      padding: 25px;
+      max-width: 1200px;
+      margin: 0 auto; /* Centraliza */
+      /* padding-top: 80px;  Ajustado dinamicamente por JS ou após medição da altura do header */
+      /* O JavaScript já ajusta o margin-top do notes-container, para adminContent pode ser necessário algo similar ou um valor fixo alto */
+    }
+
+    /* Ajuste para adminContent considerar o adminHeader fixo */
+    /* É importante que o JS que calcula a altura do header para o notes-container seja revisto */
+    /* ou que uma altura fixa para o #adminHeader seja usada para calcular o padding-top do #adminContent. */
+    /* Exemplo com altura fixa (ajuste o valor 76px conforme necessário): */
+    #adminContent {
+        padding-top: 76px; /* Ex: 56px header + 20px espaço */
+    }
+
+    /* Estilos para a Seção de Estatísticas Globais */
+    #adminGlobalStats {
+        display: flex;
+        justify-content: space-around;
+        flex-wrap: wrap;
+        gap: 20px;
+        margin-bottom: 30px;
+        padding: 0; /* Remover padding do container geral se os itens tiverem o seu */
+        /* Removendo background-color, border, box-shadow para aplicar nos .stat-item */
+        background-color: transparent;
+        border: none;
+        box-shadow: none;
+    }
+
+    .stat-item { /* Aplicar a cada card de estatística */
+        background-color: #f9f6f0;
+        border: 1px solid #d2b48c;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        flex: 1 1 200px; /* Permite que cresçam mas tenham uma base de 200px */
+        text-align: center;
+        margin: 0; /* Gap do flex container lida com o espaçamento */
+    }
+
+    .stat-item h3 {
+        font-size: 0.9rem;
+        color: #8B4513; /* SaddleBrown */
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 10px;
+        font-weight: 700; /* Adicionado para dar mais peso ao título */
+    }
+
+    .stat-item h3 i {
+        font-size: 0.9em; /* Ajustado para ser relativo ao h3 */
+        margin-right: 8px;
+    }
+
+    .stat-item p {
+        font-size: 2.2rem;
+        font-weight: 700;
+        color: #2c2416;
+        margin: 0;
+    }
+
+    /* Estilos para a Seção de Gerenciamento de Usuários */
+    #adminUserManagementSection h2 {
+        font-size: 1.5rem;
+        color: #654321;
+        border-bottom: 2px solid #d2b48c;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+        /* font-family já herdado de #adminScreen */
+    }
+
+    .admin-filter-container {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+    .admin-filter-container label {
+        font-weight: 700;
+        color: #2c2416;
+        font-size: 0.9rem;
+        /* font-family já herdado */
+    }
+
+    input#adminUserEmailFilter {
+        padding: 10px 15px;
+        border: 1px solid #c5b7a3;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        background-color: #fff;
+        flex-grow: 1;
+        max-width: 400px;
+        /* font-family já herdado */
+    }
+
+    input#adminUserEmailFilter:focus {
+        outline: none;
+        border-color: #8b4513;
+        box-shadow: 0 0 0 2px rgba(139, 69, 19, 0.2);
+    }
+
+    #adminUserListContainer {
+        border: 1px solid #d2b48c;
+        border-radius: 8px;
+        background: #fdfaf3;
+        max-height: 60vh; /* Aumentada a altura máxima */
+        overflow-y: auto;
+    }
+
+    .admin-user-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 20px;
+        border-bottom: 1px solid #e7e0d3; /* Borda mais clara que a do container */
+        /* font-family já herdado */
+        font-size: 0.9rem;
+        transition: background-color 0.2s ease;
+    }
+
+    .admin-user-item:last-child {
+        border-bottom: none;
+    }
+
+    .admin-user-item:hover {
+        background-color: #f5f0e6; /* Cor de hover sutil */
+    }
+
+    /* Distribuindo espaço para os flex items dentro de .admin-user-item */
+    .admin-user-item > div:nth-child(1) { /* Informações do usuário (email, id, post-its, logins) */
+        flex-basis: 35%;
+        padding-right: 10px; /* Espaço para não colar com o próximo div */
+    }
+    .admin-user-item > div:nth-child(2) { /* Bônus */
+        flex-basis: 15%; /* Reduzido um pouco para dar mais espaço às ações */
+        text-align:center;
+        padding-right: 10px;
+    }
+    .admin-user-item > div:nth-child(3) { /* Ações */
+        flex-basis: 50%; /* Aumentado para acomodar melhor os botões e input */
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 8px;
+    }
+
+
+    .admin-user-item .user-email {
+        font-weight: bold;
+        color: #2c2416;
+        font-size: 0.95rem;
+        display: block; /* Para o title/ellipsis funcionar melhor */
+        word-wrap: break-word;
+        max-width: 100%; /* Para garantir que não estoure o flex-basis */
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    /* Estilo para os spans de detalhes (ID, Post-its, Logins, Bônus) */
+    .admin-user-item span[style*="font-size: 0.8em"], /* Pega os que têm estilo inline antigo */
+    .admin-user-item .user-detail-info { /* Adicionar esta classe aos spans se remover o style inline */
+        color: #54493b;
+        line-height: 1.5;
+        display: block; /* Para garantir que cada um ocupe sua linha se necessário */
+        font-size: 0.8em; /* Mantém o tamanho da fonte original */
+    }
+     /* Para o texto "Bônus:" que está dentro do segundo div */
+    .admin-user-item > div:nth-child(2) {
+        font-size: 0.85em; /* Mantém o tamanho original */
+        color: #54493b;
+    }
+
+
+    .admin-user-actions .bonus-amount-input {
+        padding: 6px 8px;
+        font-size: 0.8rem;
+        width: 60px; /* Aumentado um pouco */
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        /* font-family herdado */
+    }
+
+    .admin-user-actions button {
+        padding: 6px 10px;
+        font-size: 0.75rem;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        transition: opacity 0.2s ease;
+        /* font-family herdado */
+    }
+
+    .admin-user-actions button:hover {
+        opacity: 0.85;
+    }
+
+    .admin-user-actions .grant-bonus-btn {
+        background-color: #28a745;
+        color: white;
+    }
+
+    .admin-user-actions .user-status-toggle-btn {
+        min-width: 100px; /* Para manter o tamanho mínimo */
+        /* Cores são definidas por JS, mas garantir consistência de padding/font */
+    }
+
+    /* Estilos para a Seção de Gráficos */
+    #adminChartsSection h2 {
+        font-size: 1.5rem;
+        color: #654321;
+        border-bottom: 2px solid #d2b48c;
+        padding-bottom: 10px;
+        margin-bottom: 20px; /* Ajustado de 20px para consistência */
+    }
+
+    /* Wrapper dos chart-containers para aplicar gap */
+    #adminChartsSection > div[style*="display: flex"] { /* Seletor mais específico se necessário */
+        gap: 20px;
+        /* justify-content: space-around;  Já está inline, mas pode ser centralizado aqui se desejado */
+        /* flex-wrap: wrap; Já está inline */
+    }
+
+    .chart-container {
+        background-color: #f9f6f0;
+        border: 1px solid #d2b48c;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+        flex: 1 1 300px; /* Base de 300px, permitindo encolher/crescer */
+        min-height: 350px;
+        position: relative; /* Para Chart.js responsivo */
+        /* width e max-width são melhor definidos pelo flex-basis e pelo container pai */
+    }
+
+    .chart-container h3 {
+        font-size: 1rem;
+        color: #8B4513;
+        text-align: center;
+        margin-bottom: 20px;
+        font-weight: 700; /* Adicionado para dar mais peso ao título */
+    }
+
   </style>
 </head>
 <body>
@@ -1634,6 +1889,10 @@
     let currentThemeInfo = { id: null, type: null, name: null }; // Informações do tema atual
     let currentThemeType = null; // To store 'livro' ou 'curso' for the new modal
 
+    // Variáveis globais para instâncias dos gráficos
+    let userStatusChartInstance = null;
+    let topUsersByPostitsChartInstance = null;
+
     // Categorias com ícones
     const categorias = [
       ["pessoal", "🚨 Problemas"],
@@ -1819,14 +2078,21 @@
         }
     }
 
-    // --- Admin Panel Modal Functions ---
-    const adminPanelModalOverlay = document.getElementById('adminPanelModalOverlay');
+    // --- Funções para a Nova Tela de Admin ---
+    // A função loadAdminPanelData() foi efetivamente substituída por loadAdminGlobalStats() e loadAdminUserList().
+    // As funções grantBonusNotes() e toggleUserStatus() são mantidas e ajustadas abaixo para o novo contexto.
 
-    // Definição de grantBonusNotes PRIMEIRO
+    // Definição de grantBonusNotes (revisada para o novo contexto da lista de usuários)
     async function grantBonusNotes(userId, amount) {
         if (!Number.isInteger(amount) || amount <= 0) {
             console.error("grantBonusNotes: A quantidade deve ser um número inteiro positivo.", amount);
             alert("Erro: A quantidade de memórias a doar deve ser um número inteiro positivo.");
+            return;
+        }
+        if (currentUser && userId === currentUser.uid) { // Impede admin de doar para si mesmo
+            alert("Você não pode doar memórias bônus para si mesmo.");
+            const inputEl = document.getElementById('bonusInput_' + userId);
+            if(inputEl) inputEl.value = '';
             return;
         }
         try {
@@ -1835,196 +2101,305 @@
             });
             console.log(`Sucesso: ${amount} notas bônus concedidas para o usuário ${userId}.`);
             alert(`${amount} memórias bônus concedidas com sucesso!`);
-            loadAdminPanelData(); // Recarregar dados do painel
-            updateMemoryUsageDisplay(); // Atualizar exibição de uso se o admin for o usuário afetado
+            // Recarregar a lista de usuários para refletir a mudança, mantendo o filtro atual.
+            const currentFilterValue = document.getElementById('adminUserEmailFilter') ? document.getElementById('adminUserEmailFilter').value : '';
+            if (typeof loadAdminUserList === 'function') loadAdminUserList(currentFilterValue);
+            // Se o usuário afetado for o próprio admin (improvável devido à trava acima), e ele estiver vendo suas próprias notas,
+            // o updateMemoryUsageDisplay() seria chamado. Mas como a doação é para outros, não é necessário aqui.
         } catch (error) {
             console.error(`Erro ao conceder notas bônus para o usuário ${userId}:`, error);
             alert("Falha ao conceder memórias bônus. Verifique o console para mais detalhes.");
         }
     }
 
-    async function loadAdminPanelData() {
-        const freeUserCountSpan = document.getElementById('adminFreeUserCount');
-        const premiumUserCountSpan = document.getElementById('adminPremiumUserCount');
-        const userListDiv = document.getElementById('adminUserList');
-
-        if (!freeUserCountSpan || !premiumUserCountSpan || !userListDiv) {
-            console.error('Admin panel elements not found.');
+    // Definição de toggleUserStatus (revisada para o novo contexto da lista de usuários)
+    async function toggleUserStatus(userId, currentStatus) {
+        if (currentUser && userId === currentUser.uid) { // Impede admin de alterar seu próprio status
+            alert("Você não pode alterar seu próprio status de administrador por aqui.");
             return;
         }
-
-        userListDiv.innerHTML = '<p>Carregando usuários...</p>'; // Show loading state
-
-        try {
-            const usersSnapshot = await db.collection('users').orderBy('email', 'asc').get();
-            let freeCount = 0;
-            let premiumCount = 0;
-            
-            userListDiv.innerHTML = ''; // Clear loading message
-
-            if (usersSnapshot.empty) {
-                userListDiv.innerHTML = '<p>Nenhum usuário encontrado.</p>';
-            }
-
-            usersSnapshot.forEach(doc => {
-                const userData = doc.data();
-
-                if (userData.status === 'premium') {
-                    premiumCount++;
-                } else {
-                    freeCount++; // Default to free if status is missing or different
-                }
-
-                const userItem = document.createElement('div');
-                userItem.className = 'admin-user-item'; // display: flex, justify-content: space-between
-
-                const userInfoDiv = document.createElement('div'); // Agrupar email e bônus
-                userInfoDiv.style.display = 'flex';
-                userInfoDiv.style.flexDirection = 'column'; // E-mail acima, bônus abaixo
-                userInfoDiv.style.alignItems = 'flex-start'; // Alinhar à esquerda
-
-                const userEmailSpan = document.createElement('span');
-                userEmailSpan.className = 'user-email';
-                userEmailSpan.textContent = userData.email || userData.uid;
-                userEmailSpan.style.fontWeight = 'bold';
-                userInfoDiv.appendChild(userEmailSpan);
-
-                const userBonusSpan = document.createElement('span');
-                userBonusSpan.className = 'user-bonus-notes';
-                userBonusSpan.textContent = `Bônus: ${userData.bonusNotes !== undefined ? userData.bonusNotes : 0}`;
-                userBonusSpan.style.fontSize = '0.85em';
-                userBonusSpan.style.color = '#333';
-                userInfoDiv.appendChild(userBonusSpan);
-                
-                userItem.appendChild(userInfoDiv); // Adiciona o grupo de info
-
-                const userActionsDiv = document.createElement('div'); // Agrupar doação e toggle status
-                userActionsDiv.style.display = 'flex';
-                userActionsDiv.style.alignItems = 'center';
-                userActionsDiv.style.gap = '15px'; // Espaço entre doação e toggle status
-
-                const donationContainer = document.createElement('div');
-                donationContainer.style.display = 'flex';
-                donationContainer.style.alignItems = 'center';
-                donationContainer.style.gap = '5px';
-
-                const bonusAmountInput = document.createElement('input');
-                bonusAmountInput.type = 'number';
-                bonusAmountInput.min = '1';
-                bonusAmountInput.placeholder = 'Qtd.';
-                bonusAmountInput.className = 'bonus-amount-input'; 
-                bonusAmountInput.style.width = '50px';
-                bonusAmountInput.style.padding = '5px';
-                bonusAmountInput.style.border = '1px solid #ccc';
-                bonusAmountInput.style.borderRadius = '4px';
-
-                const grantBonusButton = document.createElement('button');
-                grantBonusButton.textContent = '+ Doar';
-                grantBonusButton.className = 'grant-bonus-btn'; 
-                grantBonusButton.style.padding = '5px 10px';
-                grantBonusButton.style.fontSize = '0.8rem';
-                grantBonusButton.style.backgroundColor = '#28a745'; 
-                grantBonusButton.style.color = 'white';
-                grantBonusButton.style.border = '1px solid #218838';
-                grantBonusButton.style.borderRadius = '4px';
-                grantBonusButton.style.cursor = 'pointer';
-
-                grantBonusButton.onclick = () => {
-                    const amountToDonate = parseInt(bonusAmountInput.value); // Renomeada para clareza
-                    if (Number.isInteger(amountToDonate) && amountToDonate > 0) {
-                        grantBonusNotes(doc.id, amountToDonate); // Chamar a função real implementada
-                        bonusAmountInput.value = ''; // Limpar input após a chamada
-                    } else {
-                        alert('Por favor, insira uma quantidade numérica positiva para doar.');
-                        bonusAmountInput.value = ''; // Limpar input também em caso de erro de validação
-                    }
-                };
-                donationContainer.appendChild(bonusAmountInput);
-                donationContainer.appendChild(grantBonusButton);
-                userActionsDiv.appendChild(donationContainer); 
-
-                const statusToggleButton = document.createElement('button');
-                statusToggleButton.className = 'user-status-toggle-btn';
-                statusToggleButton.textContent = userData.status === 'premium' ? 'Rebaixar para Free' : 'Promover para Premium';
-                statusToggleButton.style.padding = '5px 10px';
-                statusToggleButton.style.fontFamily = "'Courier Prime', monospace";
-                statusToggleButton.style.fontSize = '0.8rem';
-                statusToggleButton.style.cursor = 'pointer';
-                statusToggleButton.style.border = '1px solid #8b4513';
-                statusToggleButton.style.borderRadius = '4px';
-                if (userData.status === 'premium') {
-                    statusToggleButton.style.backgroundColor = '#d2b48c'; // Beige for "Rebaixar"
-                    statusToggleButton.style.color = '#2c2416';
-                } else {
-                    statusToggleButton.style.backgroundColor = '#633b06'; // Green for "Promover"
-                    statusToggleButton.style.color = 'white';
-                }
-
-                // Prevent changing admin's own status via this button for safety
-                if (userData.uid === currentUser.uid) { // currentUser should be admin here
-                    statusToggleButton.disabled = true;
-                    statusToggleButton.textContent = 'Admin (Você)';
-                    statusToggleButton.style.opacity = '0.7';
-                    statusToggleButton.style.cursor = 'not-allowed';
-                    grantBonusButton.disabled = true; 
-                    bonusAmountInput.disabled = true;
-                    grantBonusButton.style.opacity = '0.7';
-                    grantBonusButton.style.cursor = 'not-allowed';
-                } else {
-                    statusToggleButton.onclick = () => toggleUserStatus(doc.id, userData.status);
-                    // grantBonusButton.onclick is already defined above
-                }
-                
-                userActionsDiv.appendChild(statusToggleButton);
-                userItem.appendChild(userActionsDiv);
-                userListDiv.appendChild(userItem);
-            });
-
-            freeUserCountSpan.textContent = freeCount;
-            premiumUserCountSpan.textContent = premiumCount;
-
-        } catch (error) {
-            console.error('Error loading admin panel data:', error);
-            userListDiv.innerHTML = '<p>Erro ao carregar usuários.</p>';
-            freeUserCountSpan.textContent = 'Erro';
-            premiumUserCountSpan.textContent = 'Erro';
-        }
-    }
-
-    async function toggleUserStatus(userId, currentStatus) {
         const newStatus = currentStatus === 'premium' ? 'free' : 'premium';
         try {
             await db.collection('users').doc(userId).update({ status: newStatus });
             console.log(`User ${userId} status updated to ${newStatus}`);
-            loadAdminPanelData(); // Refresh the list and counts
+            // Recarregar a lista de usuários para refletir a mudança, mantendo o filtro atual.
+            const currentFilterValue = document.getElementById('adminUserEmailFilter') ? document.getElementById('adminUserEmailFilter').value : '';
+            if (typeof loadAdminUserList === 'function') loadAdminUserList(currentFilterValue);
         } catch (error) {
             console.error(`Error updating user ${userId} status:`, error);
             alert('Falha ao atualizar status do usuário.');
         }
     }
 
-    function openAdminModal() {
-      if (adminPanelModalOverlay) {
-        adminPanelModalOverlay.classList.add('active');
-        loadAdminPanelData(); 
-        console.log("Admin modal opened and data loading initiated.");
-      }
-    }
+    // loadAdminPanelData foi substituida por loadAdminGlobalStats e loadAdminUserList
+    // async function loadAdminPanelData() {
+    //     const freeUserCountSpan = document.getElementById('adminFreeUserCount');
+    //     const premiumUserCountSpan = document.getElementById('adminPremiumUserCount');
+    //     const userListDiv = document.getElementById('adminUserList'); // Este ID é do modal antigo
 
-    function closeAdminModal() {
-      if (adminPanelModalOverlay) {
-        adminPanelModalOverlay.classList.remove('active');
-        console.log("Admin modal closed.");
-      }
-    }
+    //     if (!freeUserCountSpan || !premiumUserCountSpan || !userListDiv) {
+    //         console.error('Admin panel elements (old modal) not found.');
+    //         return;
+    //     }
+    //     // ... resto da lógica do modal antigo ...
+    // }
 
-    if (adminPanelModalOverlay) {
-      adminPanelModalOverlay.addEventListener('click', function(event) {
-        if (event.target === adminPanelModalOverlay) {
-          closeAdminModal();
+
+    // openAdminModal foi ajustada para chamar as novas funções da tela de admin
+    async function openAdminModal() {
+        showScreen('adminScreen');
+        console.log("Transicionando para a tela de administração.");
+
+        let globalStatsData = null;
+        if (typeof loadAdminGlobalStats === 'function') {
+            globalStatsData = await loadAdminGlobalStats();
         }
-      });
+
+        let allUsersDataForCharts = null;
+        if (typeof loadAdminUserList === 'function') {
+            // A chamada abaixo irá popular a lista (filtrada, se houver filtro no input)
+            // e retornar TODOS os dados de usuários para os gráficos.
+            const emailFilterValue = document.getElementById('adminUserEmailFilter')?.value || '';
+            allUsersDataForCharts = await loadAdminUserList(emailFilterValue);
+        }
+
+        if (typeof renderAdminCharts === 'function') {
+            renderAdminCharts(allUsersDataForCharts, globalStatsData);
+        }
     }
+
+    // A função closeAdminModal() original foi removida/comentada pois o botão voltar já faz showScreen('appScreen')
+    // Event listener para o botão de voltar na tela de admin (já existia e está correto)
+    const adminScreenBackButton = document.getElementById('adminScreenBackButton');
+    if (adminScreenBackButton) {
+        adminScreenBackButton.addEventListener('click', () => {
+            showScreen('appScreen');
+        });
+    }
+
+    async function renderAdminCharts(allUsersData, globalStats) {
+        // Destruir gráficos existentes se houver
+        if (userStatusChartInstance) {
+            userStatusChartInstance.destroy();
+            userStatusChartInstance = null;
+        }
+        if (topUsersByPostitsChartInstance) {
+            topUsersByPostitsChartInstance.destroy();
+            topUsersByPostitsChartInstance = null;
+        }
+
+        // Gráfico de Distribuição de Usuários
+        const userStatusCtx = document.getElementById('userStatusChart')?.getContext('2d');
+        if (userStatusCtx && globalStats && globalStats.free !== undefined && globalStats.premium !== undefined) {
+            try {
+                userStatusChartInstance = new Chart(userStatusCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Free', 'Premium'],
+                        datasets: [{
+                            label: 'Distribuição de Usuários',
+                            data: [globalStats.free, globalStats.premium],
+                            backgroundColor: ['#A0522D', '#b08d57'], // Sienna e Dourado/Bronze
+                            hoverOffset: 4
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false }
+                });
+            } catch (e) { console.error("Erro ao renderizar gráfico de status de usuário:", e); }
+        } else {
+            console.warn("Contexto do canvas userStatusChart ou dados globais não encontrados/incompletos.");
+            const userStatusChartCanvas = document.getElementById('userStatusChart');
+            if (userStatusChartCanvas && !userStatusChartCanvas.dataset.rendered) { // Evitar múltiplas mensagens
+                userStatusChartCanvas.parentElement.innerHTML += '<p style="text-align:center; font-size:0.8rem; color: #8B4513;">Dados não disponíveis para o gráfico de status.</p>';
+                userStatusChartCanvas.dataset.rendered = "true";
+            }
+        }
+
+        // Gráfico Top Usuários por Post-its
+        const topUsersCtx = document.getElementById('topUsersByPostitsChart')?.getContext('2d');
+        if (topUsersCtx && allUsersData && allUsersData.length > 0) {
+            try {
+                const sortedUsers = [...allUsersData].sort((a, b) => b.postitCount - a.postitCount);
+                const top5Users = sortedUsers.slice(0, 5);
+                
+                const labels = top5Users.map(u => u.email ? u.email.substring(0, u.email.indexOf('@')) || u.email : 'Usuário Desconhecido');
+                const dataValues = top5Users.map(u => u.postitCount);
+
+                if (labels.length > 0 && dataValues.length > 0) {
+                    topUsersByPostitsChartInstance = new Chart(topUsersCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: 'Contagem de Post-its',
+                                data: dataValues,
+                                backgroundColor: '#654321', // Darker Sienna
+                                borderColor: '#8B4513', // SaddleBrown
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true, maintainAspectRatio: false,
+                            scales: { y: { beginAtZero: true, ticks: { stepSize: 1, precision: 0 } } }
+                        }
+                    });
+                } else {
+                     console.warn("Dados insuficientes para o gráfico Top Usuários após processamento.");
+                     const topUsersChartCanvas = document.getElementById('topUsersByPostitsChart');
+                     if (topUsersChartCanvas && !topUsersChartCanvas.dataset.rendered) {
+                         topUsersChartCanvas.parentElement.innerHTML += '<p style="text-align:center; font-size:0.8rem; color: #8B4513;">Dados não disponíveis para o gráfico de top usuários.</p>';
+                         topUsersChartCanvas.dataset.rendered = "true";
+                     }
+                }
+            } catch (e) { console.error("Erro ao renderizar gráfico de top usuários:", e); }
+        } else {
+            console.warn("Contexto do canvas topUsersByPostitsChart ou dados de todos os usuários não encontrados/vazios.");
+            const topUsersChartCanvas = document.getElementById('topUsersByPostitsChart');
+            if (topUsersChartCanvas && !topUsersChartCanvas.dataset.rendered) {
+                 topUsersChartCanvas.parentElement.innerHTML += '<p style="text-align:center; font-size:0.8rem; color: #8B4513;">Não há dados de usuários para exibir no gráfico.</p>';
+                 topUsersChartCanvas.dataset.rendered = "true";
+            }
+        }
+    }
+
+    async function loadAdminUserList(emailFilter = '') {
+        const userListContainer = document.getElementById('adminUserListContainer');
+        if (!userListContainer) {
+            console.error("Container da lista de usuários do admin não encontrado (#adminUserListContainer).");
+            return null;
+        }
+        userListContainer.innerHTML = '<p style="padding: 15px; text-align:center; font-family: \'Courier Prime\', monospace;">Carregando lista de usuários...</p>';
+
+        let allUsersDataForCharts = [];
+
+        try {
+            let usersQuery = db.collection('users').orderBy('email', 'asc');
+            const usersSnapshot = await usersQuery.get();
+
+            if (usersSnapshot.empty) {
+                userListContainer.innerHTML = '<p style="padding: 15px; text-align:center; font-family: \'Courier Prime\', monospace;">Nenhum usuário encontrado.</p>';
+                return [];
+            }
+
+            // Coletar dados de todos os usuários para os gráficos
+            for (const doc of usersSnapshot.docs) {
+                const userData = doc.data();
+                const userId = doc.id;
+                let postitCount = 0;
+                try {
+                    // Esta é uma operação N+1, mas para um painel de admin pode ser aceitável
+                    // para um número moderado de usuários. Para muitos usuários, otimizar.
+                    const postitsSnapshot = await db.collection('postits').where('uid', '==', userId).get();
+                    postitCount = postitsSnapshot.size;
+                } catch (postitError) {
+                    console.error(`Erro ao buscar post-its para usuário ${userId}:`, postitError);
+                    postitCount = 0;
+                }
+                
+                allUsersDataForCharts.push({
+                    id: userId, // Adicionado para uso nos botões
+                    email: userData.email,
+                    status: userData.status || 'free',
+                    bonusNotes: userData.bonusNotes !== undefined ? userData.bonusNotes : 0,
+                    totalLogins: userData.totalLogins !== undefined ? userData.totalLogins : 0,
+                    postitCount: postitCount
+                });
+            }
+
+            // Filtrar para exibição na lista HTML
+            const usersToDisplay = emailFilter
+                ? allUsersDataForCharts.filter(user => user.email && user.email.toLowerCase().includes(emailFilter.toLowerCase()))
+                : allUsersDataForCharts;
+
+            let userItemsHtml = '';
+            if (usersToDisplay.length === 0) {
+                userItemsHtml = '<p style="padding: 15px; text-align:center; font-family: \'Courier Prime\', monospace;">Nenhum usuário corresponde ao filtro.</p>';
+            } else {
+                usersToDisplay.forEach(uData => { // uData é um item de allUsersDataForCharts
+                    const isAdminCurrentUser = uData.id === currentUser.uid;
+                    const grantBonusDisabled = isAdminCurrentUser ? 'disabled' : '';
+                    const grantBonusOpacityStyle = isAdminCurrentUser ? 'opacity: 0.7; cursor: not-allowed;' : '';
+                    const toggleStatusDisabled = isAdminCurrentUser ? 'disabled' : '';
+                    const toggleStatusText = isAdminCurrentUser ? 'Admin (Você)' : (uData.status === 'premium' ? 'Rebaixar' : 'Promover');
+                    const toggleStatusBgColor = isAdminCurrentUser ? '#A9A9A9' : (uData.status === 'premium' ? '#d2b48c' : '#633b06');
+                    const toggleStatusColor = isAdminCurrentUser ? '#666666' : (uData.status === 'premium' ? '#2c2416' : 'white');
+                    const toggleStatusCursorStyle = isAdminCurrentUser ? 'cursor: not-allowed;' : 'cursor: pointer;';
+
+                    userItemsHtml += `
+                        <div class="admin-user-item" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; border-bottom: 1px solid #e0d8c8; font-family: 'Courier Prime', monospace; font-size: 0.9rem;">
+                            <div style="flex-basis: 35%;">
+                                <span class="user-email" style="font-weight: bold; color: #2c2416; display: block; word-wrap: break-word; max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${uData.email || uData.id}">${uData.email || uData.id}</span>
+                                <span style="font-size: 0.8em; color: #666;">ID: ${uData.id}</span><br>
+                                <span style="font-size: 0.8em; color: #666;">Post-its: ${uData.postitCount}</span><br>
+                                <span style="font-size: 0.8em; color: #666;">Total de Logins: ${uData.totalLogins}</span>
+                            </div>
+                            <div style="flex-basis: 15%; text-align:center; font-size: 0.85em;">
+                                 Bônus: ${uData.bonusNotes}
+                            </div>
+                            <div class="admin-user-actions" style="flex-basis: 35%; display: flex; align-items: center; justify-content: flex-end; gap: 8px;">
+                                <input type="number" min="1" placeholder="Qtd." class="bonus-amount-input" id="bonusInput_${uData.id}" style="width: 50px; padding: 5px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.8rem; ${grantBonusOpacityStyle}" ${grantBonusDisabled}>
+                                <button onclick="handleGrantBonus('${uData.id}')" class="grant-bonus-btn" style="padding: 5px 8px; font-size: 0.75rem; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; ${grantBonusOpacityStyle}" ${grantBonusDisabled}>+ Doar</button>
+                                <button onclick="toggleUserStatus('${uData.id}', '${uData.status}')" class="user-status-toggle-btn" style="padding: 5px 8px; font-size: 0.75rem; background-color: ${toggleStatusBgColor}; color: ${toggleStatusColor}; border: none; border-radius: 4px; ${toggleStatusCursorStyle} min-width: 100px;" ${toggleStatusDisabled}>
+                                    ${toggleStatusText}
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+                // Remover a última borda
+                if (userItemsHtml.includes('border-bottom: 1px solid #e0d8c8;')) {
+                    const lastBorderIndex = userItemsHtml.lastIndexOf('border-bottom: 1px solid #e0d8c8;');
+                    if (lastBorderIndex !== -1) {
+                        userItemsHtml = userItemsHtml.substring(0, lastBorderIndex) + userItemsHtml.substring(lastBorderIndex).replace('border-bottom: 1px solid #e0d8c8;', '/* Last border removed by JS */');
+                    }
+                }
+            }
+            userListContainer.innerHTML = userItemsHtml;
+            return allUsersDataForCharts; // Retornar todos os dados para os gráficos
+
+        } catch (error) {
+            console.error("Erro ao carregar lista de usuários do admin:", error);
+            userListContainer.innerHTML = '<p style="padding: 15px; text-align:center; color: red; font-family: \'Courier Prime\', monospace;">Erro ao carregar usuários.</p>';
+            return null; // Retornar null em caso de erro
+        }
+    }
+
+    function handleGrantBonus(userId) {
+        const inputEl = document.getElementById('bonusInput_' + userId);
+        if (inputEl) {
+            if (inputEl.disabled) {
+                alert("Você não pode doar memórias bônus para si mesmo.");
+                return;
+            }
+            const amount = parseInt(inputEl.value);
+            if (Number.isInteger(amount) && amount > 0) {
+                grantBonusNotes(userId, amount);
+                inputEl.value = '';
+            } else {
+                alert('Por favor, insira uma quantidade numérica positiva para doar.');
+            }
+        }
+    }
+
+    const adminUserEmailFilterInput = document.getElementById('adminUserEmailFilter');
+    if (adminUserEmailFilterInput) {
+        adminUserEmailFilterInput.addEventListener('keyup', function() {
+            if (typeof loadAdminUserList === 'function') loadAdminUserList(this.value);
+        });
+    } else {
+        console.warn("Elemento de filtro de email #adminUserEmailFilter não encontrado no momento do addEventListener.");
+    }
+
+    // --- Antigo loadAdminPanelData (referência, agora substituído) ---
+    /* async function loadAdminPanelData() {
+    // --- Antigo loadAdminPanelData (referência, agora substituído) ---
+    /* async function loadAdminPanelData() {
+        // Esta função continha a lógica para popular a lista de usuários no MODAL antigo.
+        // Seus pedaços relevantes foram movidos para `loadAdminUserList` e `loadAdminGlobalStats`.
+        // As funções `grantBonusNotes` e `toggleUserStatus` foram movidas para fora e adaptadas.
+    }*/
+
+    // --- Funções de Modal de Upgrade Premium ---
     
     // --- Premium Upgrade Modal Functions ---
     const premiumUpgradeModalOverlay = document.getElementById('premiumUpgradeModalOverlay');
@@ -2223,6 +2598,25 @@
       auth.signInWithEmailAndPassword(email, password)
         .then(userCredential => {
           console.log("Login realizado com sucesso");
+          const user = userCredential.user;
+          if (user) {
+            const userId = user.uid;
+            const userDocRef = db.collection('users').doc(userId);
+            userDocRef.update({
+                totalLogins: firebase.firestore.FieldValue.increment(1)
+            }).then(() => {
+                console.log(`Total de logins incrementado para usuário ${userId}`);
+            }).catch(error => {
+                console.warn("Falha ao incrementar totalLogins com update(). Tentando com set() {merge: true}.", error);
+                userDocRef.set({ totalLogins: firebase.firestore.FieldValue.increment(1) }, { merge: true })
+                .then(() => {
+                    console.log(`Total de logins definido/incrementado para usuário ${userId} usando set({merge:true})`);
+                })
+                .catch(err => {
+                    console.error("Erro ao definir/incrementar totalLogins com set({merge:true}):", err);
+                });
+            });
+          }
         })
         .catch(error => {
           console.error("Erro no login:", error);
@@ -2267,10 +2661,11 @@
                   uid: user.uid,
                   email: user.email,
                   status: 'free', 
-                    bonusNotes: 0, // Adicionar esta linha
-                  createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                  bonusNotes: 0,
+                  createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                  totalLogins: 1 // ADICIONADO: Contagem inicial de logins
               }).then(() => {
-                    console.log('User document created in Firestore with free status and bonusNotes.');
+                    console.log('User document created in Firestore with free status, bonusNotes, and totalLogins.');
               }).catch(error => {
                   console.error('Error creating user document in Firestore:', error);
               });
@@ -3111,6 +3506,76 @@ async function deleteThemeAndNotes(themeId, themeName, type) { // Tornar async s
     });
 
     console.log("Aplicação inicializada com sucesso!");
+
+<!--
+Função loadAdminGlobalStats corrigida para retornar dados para os gráficos.
+Substitua a função async function loadAdminGlobalStats() existente por esta:
+
+async function loadAdminGlobalStats() {
+    const totalUsersStatEl = document.getElementById('totalUsersStat');
+    const freeUsersStatEl = document.getElementById('freeUsersStat');
+    const premiumUsersStatEl = document.getElementById('premiumUsersStat');
+    const adminUsersStatEl = document.getElementById('adminUsersStat');
+
+    // Verifica se todos os elementos do DOM existem
+    if (!totalUsersStatEl || !freeUsersStatEl || !premiumUsersStatEl || !adminUsersStatEl) {
+        console.error("Um ou mais elementos de estatísticas globais não foram encontrados no DOM.");
+        // Se estiverem faltando, não adianta prosseguir com a atualização deles.
+        // Ainda podemos tentar buscar os dados para retornar, se a função for usada só para isso.
+        // Mas se a função também tem o propósito de atualizar o DOM, precisamos deles.
+        // Por ora, vamos retornar null como indicativo de problema.
+        return null;
+    }
+
+    totalUsersStatEl.textContent = '...';
+    freeUsersStatEl.textContent = '...';
+    premiumUsersStatEl.textContent = '...';
+    adminUsersStatEl.textContent = '...';
+
+    try {
+        const usersSnapshot = await db.collection('users').get();
+
+        let totalUsers = usersSnapshot.size;
+        let freeUsers = 0;
+        let premiumUsers = 0;
+        let adminUsers = 0;
+
+        usersSnapshot.forEach(doc => {
+            const userData = doc.data();
+            if (userData.status === 'premium') {
+                premiumUsers++;
+            } else {
+                freeUsers++;
+            }
+            // A lógica de admin deve ser consistente:
+            // Se o admin é identificado pelo email E também tem status 'premium',
+            // ele será contado em premiumUsers. Se ele também for contado em adminUsers,
+            // a soma de free + premium não será igual ao total de usuários se o admin for um deles.
+            // Para as estatísticas de "distribuição", geralmente se conta o status principal.
+            // A contagem de 'adminUsers' é uma estatística separada.
+            if (userData.email === 'flavio_cesar_oliveira@hotmail.com') {
+                adminUsers++;
+            }
+        });
+
+        totalUsersStatEl.textContent = totalUsers;
+        freeUsersStatEl.textContent = freeUsers;
+        premiumUsersStatEl.textContent = premiumUsers;
+        adminUsersStatEl.textContent = adminUsers;
+
+        // Retorna os dados para serem usados por outras funções (ex: gráficos)
+        return { free: freeUsers, premium: premiumUsers, total: totalUsers, admins: adminUsers };
+
+    } catch (error) {
+        console.error("Erro ao carregar estatísticas globais de usuários:", error);
+        totalUsersStatEl.textContent = 'Erro';
+        freeUsersStatEl.textContent = 'Erro';
+        premiumUsersStatEl.textContent = 'Erro';
+        adminUsersStatEl.textContent = 'Erro';
+        return null; // Retorna null em caso de erro
+    }
+}
+-->
   </script>
 
   <script>
@@ -3174,92 +3639,95 @@ async function deleteThemeAndNotes(themeId, themeName, type) { // Tornar async s
 
     function populateNewCategoryDropdown() {
         const mobileView = isMobileView();
-        // O .main-nav é o container onde os links de categoria/ação estarão no mobile.
-        // No desktop, ele contém o .category-dropdown.
         const mainNav = document.querySelector('.collapsible-menu .main-nav');
+        const userActions = document.querySelector('.collapsible-menu .user-actions'); // Para desktop
 
         if (!mainNav) {
             console.error("Container .main-nav não encontrado dentro de .collapsible-menu.");
             return;
         }
 
-        // Elementos específicos do dropdown de categorias desktop
-        let categoryDropdownDiv = mainNav.querySelector('.category-dropdown');
-        let categoryDropdownButton = categoryDropdownDiv ? categoryDropdownDiv.querySelector('.dropdown-btn') : null;
-        let dropdownContentTarget = categoryDropdownDiv ? categoryDropdownDiv.querySelector('.dropdown-content') : null;
+        mainNav.innerHTML = ''; // Limpar sempre o mainNav primeiro
 
         if (mobileView) {
-            mainNav.innerHTML = ''; // Limpar .main-nav para adicionar a lista plana
+            // Ocultar .user-actions se ele for um container separado no mobile e não parte da lista principal.
+            // No entanto, a estrutura CSS sugere que .user-actions também se torna parte da coluna.
+            // Por agora, vamos assumir que .main-nav é o único local para os itens de navegação no mobile.
+            // Os botões de Sair, Admin, Premium já estão em .user-actions e serão estilizados pelo CSS.
+
+            // Adicionar um título "Categorias" fixo no topo do menu mobile
+            const titleElement = document.createElement('div');
+            titleElement.textContent = 'Categorias';
+            titleElement.style.cssText = "padding: 15px 20px; font-family: 'Courier Prime', monospace; color: #2c2416; font-size: 1.1rem; font-weight: bold; border-bottom: 1px solid #d2b48c; margin-bottom: 5px;";
+            mainNav.appendChild(titleElement);
 
             // Adicionar "Pessoais"
             const pessoaisLink = document.createElement('a');
             pessoaisLink.href = '#';
             pessoaisLink.dataset.categoryType = 'pessoais';
-            pessoaisLink.innerHTML = '📝 Pessoais';
+            pessoaisLink.innerHTML = '📝 Pessoais'; // Ícone pode ser adicionado aqui ou via CSS se preferir
             mainNav.appendChild(pessoaisLink);
 
             // Adicionar links de THEME_TYPES_CONFIG
             THEME_TYPES_CONFIG.forEach(themeConfig => {
                 const themeLink = document.createElement('a');
                 themeLink.href = '#';
-                themeLink.dataset.categoryType = themeConfig.id;
-                themeLink.innerHTML = themeConfig.label; // Inclui ícone e texto
+                themeLink.dataset.categoryType = themeConfig.id; // Usar o ID do tema
+                themeLink.innerHTML = themeConfig.label; // label já contém ícone e texto
                 mainNav.appendChild(themeLink);
             });
 
             // Adicionar links de Contato e Configurações
             const contactLink = document.createElement('a');
-            contactLink.href = '#';
-            contactLink.className = 'contact-link-mobile';
+            contactLink.href = '#'; // Sem funcionalidade de clique por enquanto
+            contactLink.className = 'contact-link-mobile'; // Para estilização específica (ex: margem superior)
             contactLink.innerHTML = '<i class="fas fa-address-book"></i> Contatos';
             mainNav.appendChild(contactLink);
 
             const settingsLink = document.createElement('a');
-            settingsLink.href = '#';
+            settingsLink.href = '#'; // Sem funcionalidade de clique por enquanto
             settingsLink.className = 'settings-link-mobile';
             settingsLink.innerHTML = '<i class="fas fa-cog"></i> Configurações';
             mainNav.appendChild(settingsLink);
 
-            // Os botões de .user-actions (Sair, Admin, Premium) permanecem em seu próprio container
-            // e serão exibidos após o .main-nav no layout de coluna do .collapsible-menu.
-
         } else { // Desktop View
-            // Garantir que a estrutura do dropdown exista no mainNav
-            if (!categoryDropdownDiv) {
-                mainNav.innerHTML = ''; // Limpar mainNav caso tenha sido achatado
-                categoryDropdownDiv = document.createElement('div');
-                categoryDropdownDiv.className = 'category-dropdown';
-                mainNav.appendChild(categoryDropdownDiv);
-            }
-            if (!categoryDropdownButton) {
-                categoryDropdownButton = document.createElement('button');
-                categoryDropdownButton.className = 'dropdown-btn';
-                categoryDropdownDiv.appendChild(categoryDropdownButton); // Adicionar antes do content
-            }
-            if (!dropdownContentTarget) {
-                dropdownContentTarget = document.createElement('div');
-                dropdownContentTarget.className = 'dropdown-content';
-                categoryDropdownDiv.appendChild(dropdownContentTarget);
-            }
+            // Recriar a estrutura do dropdown de categorias dentro do .main-nav para desktop
+            const categoryDropdownDiv = document.createElement('div');
+            categoryDropdownDiv.className = 'category-dropdown';
 
-            // Restaurar/configurar botão e conteúdo do dropdown para desktop
+            const categoryDropdownButton = document.createElement('button');
+            categoryDropdownButton.className = 'dropdown-btn';
+            // O texto do botão será definido por handleNewCategorySelection ou estado atual
+            // Por padrão, ao recarregar em desktop, pode ser "Categorias" ou a última seleção.
+            // Vamos definir para "Categorias" inicialmente aqui.
             categoryDropdownButton.innerHTML = '<span class="btn-text">Categorias</span> <i class="fas fa-chevron-down"></i>';
-            categoryDropdownButton.style.display = ''; // Garantir visibilidade
-            dropdownContentTarget.innerHTML = ''; // Limpar conteúdo anterior
 
+            const dropdownContentTarget = document.createElement('div');
+            dropdownContentTarget.className = 'dropdown-content';
+
+            // Adicionar "Pessoais (Visao Geral)"
             const pessoaisOverviewLink = document.createElement('a');
             pessoaisOverviewLink.href = '#';
             pessoaisOverviewLink.dataset.categoryType = 'pessoais';
             pessoaisOverviewLink.innerHTML = 'Pessoais (Visao Geral)';
             dropdownContentTarget.appendChild(pessoaisOverviewLink);
 
+            // Adicionar links de visão geral de THEME_TYPES_CONFIG
             THEME_TYPES_CONFIG.forEach(themeConfig => {
                 const themeOverviewLink = document.createElement('a');
                 themeOverviewLink.href = '#';
-                themeOverviewLink.dataset.categoryType = themeConfig.id;
+                themeOverviewLink.dataset.categoryType = themeConfig.id; // ID do tipo de tema
                 themeOverviewLink.innerHTML = `${themeConfig.label} (Visao Geral)`;
                 dropdownContentTarget.appendChild(themeOverviewLink);
             });
+
+            categoryDropdownDiv.appendChild(categoryDropdownButton);
+            categoryDropdownDiv.appendChild(dropdownContentTarget);
+            mainNav.appendChild(categoryDropdownDiv);
+
+            // Garantir que o botão de dropdown no header (se houver um específico) também seja atualizado
+            // O dropdown que estamos populando aqui é o que está DENTRO do .collapsible-menu .main-nav
+            // A lógica em handleNewCategorySelection cuida do botão do dropdown principal no header.
         }
     }
 
@@ -3340,65 +3808,228 @@ async function deleteThemeAndNotes(themeId, themeName, type) { // Tornar async s
     }
 
 
-    function handleNewCategorySelection(type) {
-        console.log("New category selected:", type);
+    function handleNewCategorySelection(type, name = null, isThemeInstance = false) {
+        console.log("New category/theme selection:", { type, name, isThemeInstance });
         const dropdownBtnTextSpan = document.querySelector('.category-dropdown .dropdown-btn .btn-text');
         const mobileView = isMobileView();
+        // const appNameSpan = document.getElementById('appName'); //  "Minhas Memórias"
+
+        // O título principal da aplicação "Minhas Memórias" não deve mudar.
+        // appNameSpan.innerHTML = '<i class="fas fa-brain"></i> Minhas Memórias';
 
         if (type === "pessoais") {
-            navbarWrapper.style.display = "";
-            secondaryNavbarWrapper.style.display = "none";
+            navbarWrapper.style.display = ""; // Mostra navbar principal (Pessoal, Trabalho, etc.)
+            secondaryNavbarWrapper.style.display = "none"; // Esconde navbar de temas específicos
 
             const personalCategories = categorias.map(c => c[0]);
-            if (!currentTab || !personalCategories.includes(currentTab)) {
-                currentTab = "pessoal";
+            if (!currentTab || !personalCategories.includes(currentTab)) { // Se a aba atual não for pessoal válida
+                currentTab = "pessoal"; // Volta para "pessoal"
             }
             buildNavbar();
             changeTab(currentTab);
 
-            currentThemeInfo = { id: null, type: null, name: null };
+            currentThemeInfo = { id: null, type: null, name: null }; // Limpa informações de tema
             themeNoteCustomizationDiv.style.display = 'none';
 
-            if (dropdownBtnTextSpan && !mobileView) { // Só alterar texto no desktop
-                dropdownBtnTextSpan.textContent = 'Pessoais';
-            } else if (dropdownBtnTextSpan && mobileView) {
-                dropdownBtnTextSpan.textContent = 'Categorias'; // Manter "Categorias" no mobile
+            if (dropdownBtnTextSpan) {
+                if (mobileView && collapsibleMenu.classList.contains('active')) {
+                    // No mobile, se o menu hambúrguer estiver aberto, o "título" da lista é implicitamente "Categorias"
+                    // Não há um botão de dropdown principal dentro do menu hambúrguer para alterar.
+                    // O botão de dropdown no header (se visível) não deve ser alterado por seleção no menu mobile.
+                } else if (!mobileView) { // Desktop
+                    dropdownBtnTextSpan.textContent = 'Pessoais';
+                }
+                // Se estiver no mobile e o menu hambúrguer NÃO estiver ativo, não mexer no botão do header,
+                // pois a seleção veio de um local diferente (ex: #mobilePessoaisBtn)
             }
+        } else if (THEME_CONFIG_MAP[type] || (isThemeInstance && THEME_CONFIG_MAP[currentThemeInfo.type])) {
+            const themeConfig = isThemeInstance ? THEME_CONFIG_MAP[currentThemeInfo.type] : THEME_CONFIG_MAP[type];
 
-        } else if (THEME_CONFIG_MAP[type]) {
             navbarWrapper.style.display = "none";
             secondaryNavbarWrapper.style.display = "";
-            buildSecondaryNavbar(type);
 
-            if (dropdownBtnTextSpan && !mobileView) { // Só alterar texto no desktop
-                dropdownBtnTextSpan.textContent = THEME_CONFIG_MAP[type].singularName || THEME_CONFIG_MAP[type].label;
-            } else if (dropdownBtnTextSpan && mobileView) {
-                dropdownBtnTextSpan.textContent = 'Categorias'; // Manter "Categorias" no mobile
+            if (isThemeInstance && name) { // Selecionou uma instância de tema (ex: "O Hobbit")
+                // currentThemeInfo já foi definido por selectTheme
+                if (dropdownBtnTextSpan) {
+                    if (mobileView && collapsibleMenu.classList.contains('active')) {
+                        // Não alterar o botão do header
+                    } else if (!mobileView) {
+                        dropdownBtnTextSpan.textContent = name; // Nome da instância do tema
+                    }
+                }
+            } else { // Selecionou um tipo de tema (ex: "Livros (Visao Geral)")
+                buildSecondaryNavbar(type); // 'type' aqui é o themeType ('livro')
+                // currentThemeInfo é resetado dentro de buildSecondaryNavbar
+                if (dropdownBtnTextSpan) {
+                     if (mobileView && collapsibleMenu.classList.contains('active')) {
+                        // Não alterar o botão do header
+                    } else if (!mobileView) {
+                        dropdownBtnTextSpan.textContent = themeConfig.label; // Label do tipo de tema
+                    }
+                }
             }
         } else {
-            console.error("Unknown category type selected:", type);
-            if (dropdownBtnTextSpan && mobileView) { // Fallback para mobile
-                dropdownBtnTextSpan.textContent = 'Categorias';
+            console.error("Unknown category type selected or invalid state:", type, name, isThemeInstance, currentThemeInfo);
+            if (dropdownBtnTextSpan) {
+                if (mobileView && collapsibleMenu.classList.contains('active')) {
+                    // Não alterar
+                } else if (!mobileView) {
+                    dropdownBtnTextSpan.textContent = 'Categorias'; // Fallback para Desktop
+                }
             }
         }
     }
 
-    const mainDropdownContent = document.querySelector('.category-dropdown .dropdown-content');
+    function selectTheme(themeId, themeType, themeName) { // themeType é o ID do config (ex: 'livro'), themeName é o nome da instância (ex: "O Hobbit")
+        console.log(`Tema selecionado: ${themeName} (ID: ${themeId}, Tipo: ${themeType})`);
+        currentThemeInfo = { id: themeId, type: themeType, name: themeName };
+
+        document.querySelectorAll('#secondaryNavbar button').forEach(btn => btn.classList.remove('active-tab'));
+        const activeBtn = document.getElementById(`themebtn_${themeId}`);
+        if (activeBtn) activeBtn.classList.add('active-tab');
+
+        loadThemeNotes(themeId);
+
+        // Atualizar o texto do botão de dropdown no header (desktop) para o nome da instância do tema.
+        // No mobile, o menu hambúrguer não tem um botão de dropdown cujo texto precise mudar.
+        // O botão de dropdown do header (se visível no mobile, o que não é o caso) não deve ser alterado.
+        const dropdownBtnTextSpan = document.querySelector('.top-bar .category-dropdown .dropdown-btn .btn-text');
+        if (dropdownBtnTextSpan && !isMobileView()) { // Apenas para desktop
+            dropdownBtnTextSpan.textContent = themeName;
+        }
+        // Se for mobile, handleNewCategorySelection já cuida para não mudar o texto do botão do header.
+        // E populateNewCategoryDropdown cuida de como o menu mobile é exibido.
+    }
+
+    const mainDropdownContent = document.querySelector('.collapsible-menu .main-nav .category-dropdown .dropdown-content');
     if (mainDropdownContent) {
         mainDropdownContent.addEventListener('click', function(event) {
-            if (event.target.tagName === 'A' && event.target.dataset.categoryType) {
+            const targetLink = event.target.closest('a[data-category-type]');
+            if (targetLink && targetLink.dataset.categoryType) {
                 event.preventDefault();
-                const selectedType = event.target.dataset.categoryType;
-                handleNewCategorySelection(selectedType);
+                const selectedType = targetLink.dataset.categoryType; // Pode ser 'pessoais' ou um themeType como 'livro'
 
-                // Close mobile menu if it's active
+                // Quando um item é clicado no dropdown principal, ele é sempre um tipo de categoria/tema,
+                // não uma instância específica de tema.
+                handleNewCategorySelection(selectedType, null, false);
+
                 const mobileMenu = document.querySelector('.collapsible-menu');
-                if (mobileMenu && mobileMenu.classList.contains('active')) {
+                if (mobileMenu && mobileMenu.classList.contains('active') && isMobileView()) {
                     mobileMenu.classList.remove('active');
                 }
             }
         });
     }
+
+    // Ajuste no listener de clique do menu hambúrguer (collapsibleMenu)
+    if (collapsibleMenu) { // collapsibleMenu é definido no escopo global do script anterior
+        collapsibleMenu.addEventListener('click', function(event) {
+            const targetLink = event.target.closest('a[data-category-type]');
+            const isDropdownButton = event.target.matches('.dropdown-btn') || event.target.closest('.dropdown-btn');
+
+            if (targetLink && targetLink.dataset.categoryType) {
+                event.preventDefault();
+                const selectedType = targetLink.dataset.categoryType;
+                // No menu mobile (lista plana), a seleção é sempre de um tipo de categoria/tema.
+                handleNewCategorySelection(selectedType, null, false);
+
+                // Fechar o menu, já que um item de navegação foi clicado.
+                if (isMobileView()) { // Apenas fechar se estiver em mobile view.
+                   collapsibleMenu.classList.remove('active');
+                }
+            } else {
+                // Lógica original para fechar o menu para outros botões/links não relacionados a data-category-type
+                const isContactOrSettingsLink = event.target.matches('.contact-link-mobile, .settings-link-mobile') || event.target.closest('.contact-link-mobile, .settings-link-mobile');
+                if (isContactOrSettingsLink) {
+                    if (isMobileView()) collapsibleMenu.classList.remove('active');
+                } else if ((event.target.tagName === 'A' || event.target.closest('button')) && !isDropdownButton) {
+                    // Se for outro link/botão que não seja o dropdown (que não deveria estar na lista mobile de qualquer forma)
+                    if (isMobileView()) collapsibleMenu.classList.remove('active');
+                }
+            }
+        });
+    }
+
+    // Ajuste no listener do mobilePessoaisBtn
+    if (mobilePessoaisBtn) { // mobilePessoaisBtn é definido no escopo global
+        mobilePessoaisBtn.addEventListener('click', function() {
+            handleNewCategorySelection('pessoais', null, false);
+            if (collapsibleMenu && collapsibleMenu.classList.contains('active') && isMobileView()) {
+                collapsibleMenu.classList.remove('active');
+            }
+        });
+    }
+
+    // Ajuste no listener do headerPessoaisBtn (Desktop)
+    if (headerPessoaisBtn) { // headerPessoaisBtn é definido no escopo global
+        headerPessoaisBtn.addEventListener('click', function() {
+            handleNewCategorySelection('pessoais', null, false);
+        });
+    }
+
+    // Ajuste no populateMobileCategoryIcons
+    function populateMobileCategoryIcons() {
+        const container = document.getElementById('mobileCategoryIconsContainer');
+        if (!container) return;
+        container.innerHTML = '';
+
+        THEME_TYPES_CONFIG.forEach(themeConfig => {
+            const btn = document.createElement('button');
+            btn.className = 'mobile-category-icon-btn';
+            btn.innerHTML = `<i class="fas ${themeConfig.iconClass}"></i>`;
+            btn.title = themeConfig.label;
+            btn.dataset.categoryType = themeConfig.id; // O ID do tipo de tema ('livro')
+            btn.addEventListener('click', () => {
+                // Ao clicar num ícone de tipo de tema, não é uma instância específica.
+                handleNewCategorySelection(themeConfig.id, null, false);
+                // Opcional: Fechar a coluna de ícones se ela tiver um estado aberto/fechado
+                 if (collapsibleMenu && collapsibleMenu.classList.contains('active') && isMobileView()) {
+                    collapsibleMenu.classList.remove('active'); // Também fechar menu principal se aberto
+                }
+            });
+            container.appendChild(btn);
+        });
+    }
   </script>
 </body>
 </html>
+<!--
+  Bloco HTML para a Seção de Gerenciamento de Usuários na Tela de Administração.
+  Este bloco deve ser inserido dentro do <div id="adminContent">,
+  logo após a tag <hr class="admin-divider" style="border: none; border-top: 1px dashed #d2b48c; margin: 25px 0;">
+  (Nota: A tag <hr> acima é a que existe atualmente após a seção de estatísticas globais.
+   A tag <hr style="border: none; border-top: 1px dashed #d2b48c; margin-bottom: 30px;"> mencionada na tarefa original
+   pode ter sido uma versão anterior ou uma confusão, o importante é inserir após o <hr> existente.)
+
+<div id="adminUserManagementSection" style="margin-top: 20px; padding: 0 20px;">
+    <h2 style="font-size: 1.3rem; margin-bottom: 15px; color: #654321; border-bottom: 2px solid #e0d8c8; padding-bottom: 10px; font-family: 'Courier Prime', monospace;">Gerenciamento de Usuários</h2>
+
+    <div class="admin-filter-container" style="margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+        <label for="adminUserEmailFilter" style="font-weight: 700; color: #2c2416; font-family: 'Courier Prime', monospace;">Filtrar por E-mail:</label>
+        <input type="text" id="adminUserEmailFilter" placeholder="Digite o e-mail..." style="padding: 8px 12px; border: 1px solid #d2b48c; border-radius: 6px; font-size: 0.9rem; flex-grow: 1; max-width: 400px; font-family: 'Courier Prime', monospace;">
+    </div>
+
+    <div id="adminUserListContainer" style="max-height: 500px; overflow-y: auto; border: 1px solid #d2b48c; border-radius: 6px; background: #fdfaf3;">
+        <p style="padding: 15px; text-align:center; font-family: 'Courier Prime', monospace;">Carregando lista de usuários...</p>
+    </div>
+</div>
+
+    <hr style="border: none; border-top: 1px dashed #d2b48c; margin-top: 30px; margin-bottom: 30px;">
+    <div id="adminChartsSection" style="margin-top: 20px;">
+        <h2 style="font-size: 1.3rem; margin-bottom: 20px; color: #654321; border-bottom: 2px solid #e0d8c8; padding-bottom: 10px;">Visualização de Dados</h2>
+        <div style="display: flex; flex-wrap: wrap; justify-content: space-around; gap: 20px;">
+
+            <div class="chart-container" style="width: 100%; max-width: 400px; height: auto; padding: 15px; background-color: #f9f6f0; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border: 1px solid #d2b48c; position: relative;">
+                <h3 style="text-align:center; font-size: 1rem; margin-bottom:15px; color: #8B4513;">Distribuição de Usuários (Free vs. Premium)</h3>
+                <canvas id="userStatusChart"></canvas>
+            </div>
+
+            <div class="chart-container" style="width: 100%; max-width: 500px; height: auto; padding: 15px; background-color: #f9f6f0; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border: 1px solid #d2b48c; position: relative;">
+                <h3 style="text-align:center; font-size: 1rem; margin-bottom:15px; color: #8B4513;">Top 5 Usuários por Contagem de Post-its</h3>
+                <canvas id="topUsersByPostitsChart"></canvas>
+            </div>
+
+        </div>
+    </div>
+
+-->
