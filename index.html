@@ -228,6 +228,7 @@
     .logo-area {
       display: flex;
       align-items: center;
+      flex-grow: 1; /* Para empurrar os botões (Pessoais, Hamburger) para a direita */
     }
 
     #appName {
@@ -508,9 +509,48 @@
       align-self: center; /* Align well with appName in flex context */
     }
 
+    /* Estilo base para o novo botão (visível apenas em mobile) */
+    #mobilePessoaisBtn {
+        display: none; /* Oculto por padrão */
+        background: none;
+        border: none;
+        color: #f4f1e8; /* Mesma cor do hamburger-btn */
+        font-size: 1.4rem; /* Ajustar conforme o tamanho do hamburger-btn */
+        cursor: pointer;
+        padding: 5px; /* Ajustar padding */
+        margin-right: 10px; /* Espaçamento em relação ao hamburger-btn */
+        /* order: 2; Não é necessário se a ordem no HTML estiver correta */
+    }
+
     .notes-container {
         margin-top: 140px; /* Adjusted based on new header height; may need further tweaking */
     }
+
+    /* Estilos para a coluna de ação direita no mobile */
+    #mobileRightActionColumn {
+        /* Estilos iniciais são definidos inline no HTML, display: none; etc. */
+        /* No mobile, JS e CSS abaixo irão torná-lo visível e posicioná-lo */
+    }
+
+    .mobile-category-icon-btn {
+        background-color: #A0522D; /* Sienna */
+        color: white;
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        border: 1px solid #654321;
+        font-size: 1rem; /* Tamanho do ícone FontAwesome */
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        transition: background-color 0.3s ease;
+    }
+    .mobile-category-icon-btn:hover {
+        background-color: #8B4513; /* SaddleBrown */
+    }
+
 
     .modal-overlay {
       position: fixed;
@@ -780,21 +820,33 @@
       }
 
       .collapsible-menu {
-        display: none; /* Hidden by default on mobile */
+        /* display: none; Hidden by default on mobile - changed for transform */
+        visibility: hidden;
+        opacity: 0;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out, visibility 0s linear 0.3s;
         flex-direction: column;
         align-items: stretch;
-        position: absolute;
-        top: 100%; /* Position below the .top-bar */
+        position: fixed; /* Changed from absolute */
+        top: 56px; /* Altura estimada do .top-bar. Ajustar se necessário. */
         left: 0;
-        width: 100%;
-        background-color: #8B4513;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        z-index: 1002;
-        border-top: 1px solid #654321;
+        right: 0; /* Added for full width */
+        bottom: 0; /* Added for full height below top-bar */
+        /* width: 100%; */ /* Replaced by left:0, right:0 */
+        background-color: #f9f6f0; /* Changed to vintage paper */
+        box-shadow: 0 8px 16px rgba(0,0,0,0.2); /* Enhanced shadow */
+        z-index: 1005; /* Increased z-index */
+        /* border-top: 1px solid #654321; Removed, covered by shadow or new design */
+        overflow-y: auto; /* Added for scrollable content */
       }
 
       .collapsible-menu.active {
-        display: flex; /* Show when active */
+        /* display: flex; Show when active - flex is now default */
+        display: flex; /* Ensure display is flex when active */
+        visibility: visible;
+        opacity: 1;
+        transform: translateX(0);
+        transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
       }
 
       .collapsible-menu .main-nav,
@@ -806,46 +858,134 @@
       }
 
       .collapsible-menu .category-dropdown .dropdown-btn,
-      .collapsible-menu .user-actions button, /* Targets .header-logout-btn-new */
-      .collapsible-menu .user-actions .auth-button, /* For any other general buttons if added */
-      .collapsible-menu .user-actions #headerPremiumButton, /* JS-added */
-      .collapsible-menu .user-actions #adminPanelButton { /* JS-added */
+      .collapsible-menu .user-actions button,
+      .collapsible-menu .user-actions .auth-button,
+      .collapsible-menu .user-actions #headerPremiumButton,
+      .collapsible-menu .user-actions #adminPanelButton {
         width: 100%;
         text-align: left;
-        padding: 12px 15px;
+        padding: 15px 20px; /* Increased padding */
         border-radius: 0;
-        border-bottom: 1px solid #654321;
-        margin: 0; /* Reset any margins */
+        border-bottom: 1px solid #e0d8c8; /* Subtle border */
+        margin: 0;
+        font-family: 'Courier Prime', monospace; /* Retro font */
+        color: #2c2416; /* Retro text color */
+        background-color: transparent; /* Ensure no conflicting background */
+      }
+      /* Styling for category items specifically, if different from buttons */
+      .collapsible-menu .category-dropdown .dropdown-content a {
+        padding: 15px 20px; /* Increased padding */
+        font-family: 'Courier Prime', monospace; /* Retro font */
+        color: #2c2416; /* Retro text color */
+        border-bottom: 1px solid #e0d8c8; /* Subtle border */
+        /* border-radius, width, text-align, margin are inherited or covered by general rule */
       }
 
-      /* Remove bottom border from the last button in user-actions */
-      .collapsible-menu .user-actions > button:last-child,
-      .collapsible-menu .user-actions > .auth-button:last-child {
+      /* Remove bottom border from the very last item in the collapsible menu */
+      .collapsible-menu > div > *:last-child, /* For direct children like main-nav, user-actions */
+      .collapsible-menu .user-actions > button:last-of-type, /* For last button in user-actions */
+      .collapsible-menu .user-actions > .auth-button:last-of-type,
+      .collapsible-menu .category-dropdown .dropdown-content > a:last-of-type { /* For last category link */
         border-bottom: none;
       }
 
+      /* New styles for contact and settings links */
+      .collapsible-menu .contact-link-mobile,
+      .collapsible-menu .settings-link-mobile {
+        padding: 15px 20px;
+        font-family: 'Courier Prime', monospace;
+        color: #2c2416;
+        text-decoration: none;
+        display: block;
+        border-bottom: 1px solid #e0d8c8;
+      }
+      .collapsible-menu .contact-link-mobile {
+        margin-top: 20px; /* Separation from categories */
+        border-top: 1px solid #d2b48c; /* Stronger separator */
+      }
+      .collapsible-menu .settings-link-mobile:last-child { /* If settings is the absolute last, no border */
+          border-bottom: none;
+      }
+      /* Ensure icons in links are spaced correctly */
+      .collapsible-menu .contact-link-mobile i,
+      .collapsible-menu .settings-link-mobile i {
+        margin-right: 10px;
+      }
+
+      /* Ensure dropdown content itself doesn't have conflicting styles */
       .collapsible-menu .category-dropdown .dropdown-content {
-        position: static; /* No longer absolute */
+        position: static;
         width: 100%;
         box-shadow: none;
-        border: none; /* Remove main border */
-        border-top: 1px dashed #A0522D; /* Separator from dropdown button */
+        border: none;
+        /* border-top: 1px dashed #A0522D; /* Removed, items have their own top/bottom borders now */
         transform: none;
         margin-top: 0;
         border-radius: 0;
-        /* display: block; /* This is the line I want to add/ensure */
+        background-color: transparent; /* Make sure it's transparent */
       }
-       .collapsible-menu .category-dropdown .dropdown-content a {
-         padding-left: 30px; /* Indent sub-items */
+      /* Original indentation for sub-items, adjust if needed with new padding */
+       /* .collapsible-menu .category-dropdown .dropdown-content a {
+         padding-left: 30px;
          border-radius: 0;
-       }
-      #headerPessoaisBtn { /* Specific rule to hide Pessoais button on mobile */
-        display: none !important;
+       } */
+      #mobilePessoaisBtn {
+        display: block; /* Exibir o botão em telas mobile */
       }
+
+      #headerPessoaisBtn {
+        display: none !important; /* Reafirmar ou garantir esta regra */
+      }
+
+      /* A classe .mobile-premium-icon-source-hidden e sua regra CSS foram removidas,
+         pois mover o nó #headerPremiumButton é suficiente. */
+
+      #mobileRightActionColumn {
+          display: flex !important; /* Torna visível no mobile, usa !important para garantir prioridade se necessário */
+          bottom: 90px; /* Espaço acima do .floating-add-btn (ex: 60px btn + 30px margem) */
+          right: 25px;  /* Alinhar com o centro do .floating-add-btn */
+          /* Outros estilos como position, z-index, flex-direction já estão inline no HTML */
+      }
+
+      #headerPremiumButton.mobile-premium-icon {
+          display: flex !important; /* Garantir visibilidade e comportamento flex */
+          background: #b08d57 !important;
+          color: white !important;
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          padding: 0;
+          font-size: 1.2rem;
+          border: 2px solid #9a7947 !important;
+          margin-bottom: 10px;
+          align-items: center;
+          justify-content: center;
+          /* Ocultar texto - JS cuidará do innerHTML para remover o texto */
+      }
+       #headerPremiumButton.mobile-premium-icon .fa-star { /* Se o ícone já tem margens */
+          margin: 0;
+      }
+
+
       .notes-container {
-         margin-top: 125px; /* Adjusted for fixed top-bar + navbar + memory display */
+         margin-top: 125px;
       }
     }
+    /* Ensure the main category dropdown button (.dropdown-btn) within .collapsible-menu also gets vintage styling */
+    .collapsible-menu .category-dropdown .dropdown-btn {
+        background-color: transparent; /* Or a specific vintage background if desired */
+        color: #2c2416; /* Dark retro text color */
+        border-bottom: 1px solid #e0d8c8; /* Consistent separator */
+    }
+    .collapsible-menu .category-dropdown .dropdown-btn:hover {
+        background-color: #e0d8c8; /* Subtle hover for the button itself */
+    }
+    /* Ensure the .btn-text and icon inside .dropdown-btn are styled correctly */
+    .collapsible-menu .category-dropdown .dropdown-btn .btn-text,
+    .collapsible-menu .category-dropdown .dropdown-btn i {
+        color: #2c2416; /* Ensure text and icon match the desired retro color */
+    }
+
 
     @media (max-width: 480px) {
       body { font-size: 14px; }
@@ -1065,6 +1205,15 @@
           </div>
         </div>
 
+        <!-- Botão Pessoais Mobile Adicionado Aqui -->
+        <button id="mobilePessoaisBtn" class="mobile-action-btn" title="Acessar Pessoais">
+            <i class="fas fa-user"></i>
+        </button>
+
+        <button class="hamburger-btn">
+            <i class="fas fa-bars"></i>
+        </button>
+
         <div class="collapsible-menu">
             <nav class="main-nav">
               <div class="category-dropdown">
@@ -1089,9 +1238,9 @@
             </div>
         </div>
 
-        <button class="hamburger-btn">
+        <!-- <button class="hamburger-btn">
             <i class="fas fa-bars"></i>
-        </button>
+        </button> --> <!-- Botão hambúrguer duplicado removido -->
       </div>
 
       <div id="navbarWrapper" class="navbar-wrapper">
@@ -1115,6 +1264,14 @@
 
     <!-- Container dos post-its - AGORA SEM FORMULÁRIO -->
     <div class="notes-container" id="notes"></div>
+  </div>
+
+  <!-- Coluna de Ação Direita Mobile -->
+  <div id="mobileRightActionColumn" style="display: none; position: fixed; bottom: 100px; right: 20px; z-index: 999; flex-direction: column; align-items: center; gap: 10px;">
+      <!-- O botão Premium será movido para cá em mobile -->
+      <div id="mobileCategoryIconsContainer" style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+          <!-- Ícones de categoria serão adicionados aqui pelo JS -->
+      </div>
   </div>
 
   <!-- ========================================
@@ -1890,124 +2047,77 @@
     /**
      * Observador de estado de autenticação do Firebase
      */
-    auth.onAuthStateChanged(async user => { // Tornar async
+    auth.onAuthStateChanged(async user => {
         console.log("Estado de autenticação alterado");
 
-        // Limpa botões de admin e premium header antes de qualquer lógica
-        let existingAdminButton = document.getElementById('adminPanelButton');
-        if (existingAdminButton) existingAdminButton.remove();
-        let existingHeaderPremiumBtn = document.getElementById('headerPremiumButton');
-        if (existingHeaderPremiumBtn) existingHeaderPremiumBtn.remove();
+        // Limpar botões de admin e premium header antes de qualquer lógica de recriação
+        // Garantir que o botão premium, se existir, seja removido de onde estiver antes de ser potencialmente recriado/movido.
+        let currentPremiumBtn = document.getElementById('headerPremiumButton');
+        if (currentPremiumBtn && currentPremiumBtn.parentElement) {
+            currentPremiumBtn.parentElement.removeChild(currentPremiumBtn);
+        }
+        let currentAdminBtn = document.getElementById('adminPanelButton');
+        if (currentAdminBtn && currentAdminBtn.parentElement) {
+            currentAdminBtn.parentElement.removeChild(currentAdminBtn);
+        }
 
         if (user) {
             console.log("Usuário autenticado:", user.uid);
             currentUser = user;
 
-            // --- Verificação e Criação de Perfil de Usuário ---
             const userDocRef = db.collection('users').doc(user.uid);
             try {
-                const docSnapshot = await userDocRef.get(); // Usar await
+                const docSnapshot = await userDocRef.get();
                 if (!docSnapshot.exists) {
                     let initialStatus = 'free';
                     if (user.email === 'flavio_cesar_oliveira@hotmail.com') {
                         initialStatus = 'premium';
-                        console.log(`Usuário ${user.email} é administrador, definindo status inicial como premium.`);
                     }
-                    await userDocRef.set({ // Usar await
-                        uid: user.uid,
-                        email: user.email,
-                        status: initialStatus,
-                        bonusNotes: 0, // Adicionar esta linha
+                    await userDocRef.set({
+                        uid: user.uid, email: user.email, status: initialStatus, bonusNotes: 0,
                         createdAt: firebase.firestore.FieldValue.serverTimestamp()
                     });
-                    console.log(`Documento criado para ${user.uid} na coleção 'users' com status ${initialStatus} e bonusNotes 0.`);
-                } else {
-                    console.log(`Documento para ${user.uid} já existe. Status: ${docSnapshot.data().status}`);
                 }
             } catch (error) {
                 console.error("Erro ao verificar/criar documento do usuário:", error);
             }
-            // --- Fim da Verificação e Criação de Perfil ---
 
-            // Lógica do Botão Admin (verificar e-mail)
+            const userActionsDesktopContainer = document.querySelector('.top-bar .collapsible-menu .user-actions');
+            const logoutButtonDesktop = userActionsDesktopContainer ? userActionsDesktopContainer.querySelector('.header-logout-btn-new') : null;
+
+            // Lógica do Botão Admin
             if (user.email === 'flavio_cesar_oliveira@hotmail.com') {
-                let adminButton = document.getElementById('adminPanelButton'); 
-                if (!adminButton) {
-                    adminButton = document.createElement('button');
-                    adminButton.id = 'adminPanelButton';
-                    adminButton.innerHTML = '<i class="fas fa-user-shield"></i> Admin';
-                    adminButton.onclick = openAdminModal;
-                    
-                    // adminButton.style.position = 'absolute'; // Removed
-                    // adminButton.style.top = '15px'; // Removed
-                    // adminButton.style.right = '110px';  // Removed
-                    // adminButton.style.background = '#8b4513'; // Handled by CSS
-                    // adminButton.style.color = '#f4f1e8';      // Handled by CSS
-                    // adminButton.style.border = '2px solid #654321';  // Handled by CSS
-                    // adminButton.style.borderRadius = '6px'; // Handled by CSS
-                    // adminButton.style.padding = '6px 10px';  // Handled by CSS
-                    // adminButton.style.fontSize = '0.8rem'; // Handled by CSS
-                    // adminButton.style.fontWeight = '700'; // Handled by CSS
-                    // adminButton.style.cursor = 'pointer'; // Handled by CSS
-                    // adminButton.style.fontFamily = "'Courier Prime', monospace"; // Handled by CSS
-                    // adminButton.style.textTransform = 'uppercase'; // Handled by CSS
-                    // adminButton.style.letterSpacing = '0.5px'; // Handled by CSS
-                    // adminButton.style.zIndex = '1002'; // May not be needed or handled by .user-actions
-
-                    const userActionsContainer = document.querySelector('.top-bar .collapsible-menu .user-actions');
-                    if (userActionsContainer) {
-                        const logoutButton = userActionsContainer.querySelector('.header-logout-btn-new');
-                        if (logoutButton) {
-                            userActionsContainer.insertBefore(adminButton, logoutButton);
-                        } else {
-                            userActionsContainer.appendChild(adminButton);
-                        }
-                    }
+                const adminButton = document.createElement('button');
+                adminButton.id = 'adminPanelButton';
+                adminButton.innerHTML = '<i class="fas fa-user-shield"></i> Admin';
+                adminButton.onclick = openAdminModal;
+                if (userActionsDesktopContainer && logoutButtonDesktop) {
+                    userActionsDesktopContainer.insertBefore(adminButton, logoutButtonDesktop);
+                } else if (userActionsDesktopContainer) {
+                    userActionsDesktopContainer.appendChild(adminButton);
                 }
             }
 
-            // Lógica do Botão "Seja Premium" no Header
+            // Lógica do Botão "Seja Premium"
             try {
-                const userStatusDoc = await db.collection('users').doc(user.uid).get(); 
+                const userStatusDoc = await db.collection('users').doc(user.uid).get();
                 if (userStatusDoc.exists && userStatusDoc.data().status === 'premium') {
-                    console.log('Usuário é premium, botão Seja Premium do header não será exibido.');
+                    // Usuário é premium, não mostrar botão "Seja Premium"
                 } else {
-                    let headerPremiumButton = document.getElementById('headerPremiumButton');
-                    if (!headerPremiumButton) {
-                        headerPremiumButton = document.createElement('button');
-                        headerPremiumButton.id = 'headerPremiumButton';
-                        headerPremiumButton.innerHTML = '<i class="fas fa-star"></i> Seja Premium';
-                        headerPremiumButton.onclick = openPremiumUpgradeModal;
-                        
-                        // Remove old styling, rely on CSS
-                        // headerPremiumButton.style.position = 'absolute'; // Removed
-                        // headerPremiumButton.style.top = '15px'; // Removed
-                        // headerPremiumButton.style.right = rightPosition; // Removed
-                        // headerPremiumButton.style.background = '#b08d57';  // Handled by CSS
-                        // headerPremiumButton.style.color = 'white'; // Handled by CSS
-                        // headerPremiumButton.style.border = '2px solid #9a7947'; // Handled by CSS
-                        // headerPremiumButton.style.borderRadius = '6px'; // Handled by CSS
-                        // headerPremiumButton.style.padding = '6px 10px'; // Handled by CSS
-                        // headerPremiumButton.style.fontSize = '0.8rem'; // Handled by CSS
-                        // headerPremiumButton.style.fontWeight = '700'; // Handled by CSS
-                        // headerPremiumButton.style.cursor = 'pointer'; // Handled by CSS
-                        // headerPremiumButton.style.fontFamily = "'Courier Prime', monospace"; // Handled by CSS
-                        // headerPremiumButton.style.textTransform = 'uppercase'; // Handled by CSS
-                        // headerPremiumButton.style.zIndex = '1002'; // May not be needed
+                    const premiumButton = document.createElement('button');
+                    premiumButton.id = 'headerPremiumButton'; // ID é crucial para updateMobileActionColumnUI
+                    premiumButton.innerHTML = '<i class="fas fa-star"></i> Seja Premium';
+                    premiumButton.onclick = openPremiumUpgradeModal;
 
-                        const userActionsContainerForPremium = document.querySelector('.top-bar .collapsible-menu .user-actions');
-                        if (userActionsContainerForPremium) {
-                            const adminButtonRef = userActionsContainerForPremium.querySelector('#adminPanelButton');
-                            const logoutButtonRef = userActionsContainerForPremium.querySelector('.header-logout-btn-new');
-                            if (adminButtonRef) {
-                                userActionsContainerForPremium.insertBefore(headerPremiumButton, adminButtonRef);
-                            } else if (logoutButtonRef) {
-                                userActionsContainerForPremium.insertBefore(headerPremiumButton, logoutButtonRef);
-                            } else {
-                                userActionsContainerForPremium.appendChild(headerPremiumButton);
-                            }
+                    if (userActionsDesktopContainer) {
+                        const adminBtnRef = userActionsDesktopContainer.querySelector('#adminPanelButton');
+                        if (adminBtnRef) { // Inserir antes do admin se admin existir
+                            userActionsDesktopContainer.insertBefore(premiumButton, adminBtnRef);
+                        } else if (logoutButtonDesktop) { // Senão, inserir antes do logout
+                            userActionsDesktopContainer.insertBefore(premiumButton, logoutButtonDesktop);
+                        } else { // Senão, apenas adicionar
+                            userActionsDesktopContainer.appendChild(premiumButton);
                         }
-                        console.log('Usuário é free, botão Seja Premium do header exibido.');
                     }
                 }
             } catch (error) {
@@ -2015,28 +2125,19 @@
             }
 
             showScreen("appScreen");
-            // categorySelector.value = "pessoais"; // Old selector
-            // navbarWrapper.style.display = ""; // Handled by handleNewCategorySelection
-            // secondaryNavbarWrapper.style.display = "none"; // Handled by handleNewCategorySelection
-            // buildNavbar(); // Handled by handleNewCategorySelection
-            // const personalCategories = categorias.map(c => c[0]); // Logic now in handleNewCategorySelection
-            // if (!personalCategories.includes(currentTab)) {
-            //     currentTab = "pessoal";
-            // }
-            // changeTab(currentTab); // Handled by handleNewCategorySelection
-            // themeNoteCustomizationDiv.style.display = 'none'; // Handled by handleNewCategorySelection
-            handleNewCategorySelection('pessoais'); // New way to initialize category view
-            updateMemoryUsageDisplay(); // Chamar para exibir contagem no login
+            handleNewCategorySelection('pessoais');
+            updateMemoryUsageDisplay();
+            updateMobileActionColumnUI(); // Chamar após login e configuração dos botões
 
-        } else { 
+        } else {
             console.log("Usuário não autenticado");
             currentUser = null;
-            updateMemoryUsageDisplay(); // Chamará e ocultará o display pois currentUser é null
+            updateMemoryUsageDisplay();
             showScreen("loginScreen");
-            navbarContainer.innerHTML = '';
-            notesContainer.innerHTML = '';
-            noteTextInput.value = '';
-            // Os botões de admin e premium do header já foram removidos no início.
+            if(navbarContainer) navbarContainer.innerHTML = '';
+            if(notesContainer) notesContainer.innerHTML = '';
+            if(noteTextInput) noteTextInput.value = '';
+            updateMobileActionColumnUI(); // Chamar no logout para limpar a coluna de ação
         }
     });
 
@@ -2960,36 +3061,55 @@ async function deleteThemeAndNotes(themeId, themeName, type) { // Tornar async s
     if (hamburgerBtn && collapsibleMenu) {
         hamburgerBtn.addEventListener('click', function() {
             collapsibleMenu.classList.toggle('active');
+            // Quando o menu hambúrguer é aberto/fechado, repopular o dropdown
+            // para garantir que o conteúdo correto (mobile vs desktop) seja exibido
+            // e para garantir que o título "Categorias" esteja lá no mobile.
+            populateNewCategoryDropdown();
         });
 
-        // Close menu when a link or button inside it is clicked (but not the dropdown button itself)
+        // Close menu when a link or button inside it is clicked
         collapsibleMenu.addEventListener('click', function(event) {
-            // Check if the clicked target is an A tag or a BUTTON tag,
-            // and also ensure it's not the dropdown button or something inside it.
             const isDropdownButton = event.target.matches('.dropdown-btn') || event.target.closest('.dropdown-btn');
-            const isLinkOrButton = event.target.tagName === 'A' || event.target.closest('button');
+            const isCategoryLink = event.target.closest('.category-dropdown .dropdown-content a[data-category-type]');
+            const isContactOrSettingsLink = event.target.matches('.contact-link-mobile, .settings-link-mobile') || event.target.closest('.contact-link-mobile, .settings-link-mobile');
 
-            if (isLinkOrButton && !isDropdownButton) {
-                // For category selection from dropdown, specific handler will manage mobile menu close
-                if (!event.target.closest('.category-dropdown .dropdown-content a[data-category-type]')) {
-                    collapsibleMenu.classList.remove('active');
-                }
+            // Se for um link de categoria, contato ou configurações, fechar o menu.
+            if (isCategoryLink || isContactOrSettingsLink) {
+                collapsibleMenu.classList.remove('active');
+            }
+            // Se for qualquer outro botão ou link que NÃO seja o botão do dropdown principal, fechar também.
+            else if ((event.target.tagName === 'A' || event.target.closest('button')) && !isDropdownButton) {
+                 collapsibleMenu.classList.remove('active');
             }
         });
     }
 
-    // Event listener for the new Pessoais button in the header
+    const mobilePessoaisBtn = document.getElementById('mobilePessoaisBtn');
+    if (mobilePessoaisBtn) {
+        mobilePessoaisBtn.addEventListener('click', function() {
+            // Navegar para a categoria 'pessoais'
+            handleNewCategorySelection('pessoais');
+
+            // Fechar o menu hambúrguer se estiver aberto
+            // A variável collapsibleMenu já está definida no escopo externo deste script.
+            if (collapsibleMenu && collapsibleMenu.classList.contains('active')) {
+                collapsibleMenu.classList.remove('active');
+            }
+        });
+    }
+
+    // Event listener for the new Pessoais button in the header (Desktop)
     const headerPessoaisBtn = document.getElementById('headerPessoaisBtn');
     if (headerPessoaisBtn) {
         headerPessoaisBtn.addEventListener('click', function() {
             handleNewCategorySelection('pessoais');
-
-            // Safeguard: Close mobile menu if it's active (though button should be hidden on mobile)
-            const mobileMenu = document.querySelector('.collapsible-menu');
-            if (mobileMenu && mobileMenu.classList.contains('active')) {
-                mobileMenu.classList.remove('active');
-            }
+            // Este botão é para desktop, então não precisa se preocupar em fechar o menu mobile.
         });
+    }
+
+    function isMobileView() {
+        // O botão hambúrguer só é visível no mobile.
+        return hamburgerBtn && getComputedStyle(hamburgerBtn).display !== 'none';
     }
 
     function populateNewCategoryDropdown() {
@@ -2998,61 +3118,178 @@ async function deleteThemeAndNotes(themeId, themeName, type) { // Tornar async s
             console.error("New category dropdown content area not found.");
             return;
         }
-        dropdownContent.innerHTML = ''; // Clear any placeholders (like the initial HTML ones)
+        dropdownContent.innerHTML = ''; // Limpar conteúdo
 
-        const pessoaisLink = document.createElement('a');
-        pessoaisLink.href = '#';
-        pessoaisLink.dataset.categoryType = 'pessoais';
-        pessoaisLink.innerHTML = '📝 Pessoais'; // Keeping emoji for dropdown list display
-        dropdownContent.appendChild(pessoaisLink);
+        const mobileView = isMobileView();
+
+        if (mobileView) {
+            // Mobile: "Pessoais", depois THEME_TYPES_CONFIG, depois Contato e Configurações
+            const pessoaisLink = document.createElement('a');
+            pessoaisLink.href = '#';
+            pessoaisLink.dataset.categoryType = 'pessoais';
+            pessoaisLink.innerHTML = '📝 Pessoais';
+            dropdownContent.appendChild(pessoaisLink);
+
+            THEME_TYPES_CONFIG.forEach(themeConfig => {
+                const themeLink = document.createElement('a');
+                themeLink.href = '#';
+                themeLink.dataset.categoryType = themeConfig.id;
+                themeLink.innerHTML = themeConfig.label;
+                dropdownContent.appendChild(themeLink);
+            });
+
+            // Adicionar links de Contato e Configurações
+            const contactLink = document.createElement('a');
+            contactLink.href = '#'; // Sem funcionalidade de clique por enquanto
+            contactLink.className = 'contact-link-mobile';
+            contactLink.innerHTML = '<i class="fas fa-address-book"></i> Contatos';
+            dropdownContent.appendChild(contactLink);
+
+            const settingsLink = document.createElement('a');
+            settingsLink.href = '#'; // Sem funcionalidade de clique por enquanto
+            settingsLink.className = 'settings-link-mobile';
+            settingsLink.innerHTML = '<i class="fas fa-cog"></i> Configurações';
+            dropdownContent.appendChild(settingsLink);
+
+        } else {
+            // Desktop: "Pessoais (Visao Geral)", "Livros (Visao Geral)", etc.
+            // Esta é a lógica que estava implicitamente no HTML antes, adaptada.
+            const pessoaisOverviewLink = document.createElement('a');
+            pessoaisOverviewLink.href = '#';
+            pessoaisOverviewLink.dataset.categoryType = 'pessoais';
+            pessoaisOverviewLink.innerHTML = 'Pessoais (Visao Geral)';
+            dropdownContent.appendChild(pessoaisOverviewLink);
+
+            THEME_TYPES_CONFIG.forEach(themeConfig => {
+                const themeOverviewLink = document.createElement('a');
+                themeOverviewLink.href = '#';
+                // No desktop, ao clicar em "Livros (Visao Geral)", o handleNewCategorySelection
+                // espera o ID do TIPO de tema (ex: 'livro') para mostrar a barra secundária.
+                themeOverviewLink.dataset.categoryType = themeConfig.id;
+                themeOverviewLink.innerHTML = `${themeConfig.label} (Visao Geral)`;
+                dropdownContent.appendChild(themeOverviewLink);
+            });
+        }
+        // console.log("New category dropdown populated for", mobileView ? "mobile" : "desktop");
+    }
+
+    // Chamar populateNewCategoryDropdown no carregamento inicial para configurar o dropdown desktop
+    // ou mobile, dependendo do estado inicial da tela.
+    // A chamada também foi adicionada ao evento de clique do hamburgerBtn para re-populá-lo.
+    populateNewCategoryDropdown();
+    // Adicionar um listener para resize para o caso de o usuário redimensionar a janela
+    // e mudar entre visualização mobile e desktop.
+    window.addEventListener('resize', populateNewCategoryDropdown);
+    window.addEventListener('resize', updateMobileActionColumnUI); // Chamar no resize também
+
+
+    function populateMobileCategoryIcons() {
+        const container = document.getElementById('mobileCategoryIconsContainer');
+        if (!container) return;
+        container.innerHTML = ''; // Limpar
 
         THEME_TYPES_CONFIG.forEach(themeConfig => {
-            const themeLink = document.createElement('a');
-            themeLink.href = '#';
-            themeLink.dataset.categoryType = themeConfig.id;
-            themeLink.innerHTML = themeConfig.label; // Use full label with emoji for dropdown list
-            dropdownContent.appendChild(themeLink);
+            const btn = document.createElement('button');
+            btn.className = 'mobile-category-icon-btn';
+            btn.innerHTML = `<i class="fas ${themeConfig.iconClass}"></i>`;
+            btn.title = themeConfig.label;
+            btn.dataset.categoryType = themeConfig.id;
+            btn.addEventListener('click', () => {
+                handleNewCategorySelection(themeConfig.id);
+                // Opcional: Fechar a coluna de ícones se ela tiver um estado aberto/fechado
+            });
+            container.appendChild(btn);
         });
-        console.log("New category dropdown populated.");
     }
-    populateNewCategoryDropdown(); // Call it once on script load
+
+    function updateMobileActionColumnUI() {
+        const actionColumn = document.getElementById('mobileRightActionColumn');
+        const premiumBtn = document.getElementById('headerPremiumButton'); // Botão original
+        const userActionsDesktopContainer = document.querySelector('.top-bar .collapsible-menu .user-actions');
+        const logoutButtonDesktop = userActionsDesktopContainer ? userActionsDesktopContainer.querySelector('.header-logout-btn-new') : null;
+
+
+        if (isMobileView()) {
+            actionColumn.style.display = 'flex'; // Mostrar coluna
+            populateMobileCategoryIcons();
+
+            if (premiumBtn && premiumBtn.parentElement !== actionColumn) {
+                // Se o botão premium existe e não está na coluna de ação (ou seja, está no header desktop)
+                // e o usuário não é premium (botão "Seja Premium" está visível)
+                if (getComputedStyle(premiumBtn).display !== 'none') { // Verifica se o botão está visível
+                    premiumBtn.classList.add('mobile-premium-icon');
+                    premiumBtn.innerHTML = '<i class="fas fa-star"></i>'; // Manter apenas ícone
+                    actionColumn.insertBefore(premiumBtn, actionColumn.firstChild); // Mover para o topo da coluna
+                } else if (premiumBtn && getComputedStyle(premiumBtn).display === 'none' && premiumBtn.parentElement !== actionColumn) {
+                    // Se o botão premium existe mas está oculto (ex: usuário tornou-se premium enquanto em mobile)
+                    // e ele não está na actionColumn, garantir que a actionColumn não tente mostrá-lo.
+                }
+            }
+        } else { // Desktop view
+            actionColumn.style.display = 'none'; // Esconder coluna
+            if (document.getElementById('mobileCategoryIconsContainer')) {
+              document.getElementById('mobileCategoryIconsContainer').innerHTML = ''; // Limpar ícones
+            }
+
+            if (premiumBtn && premiumBtn.parentElement === actionColumn) {
+                // Se o botão premium está na coluna de ação, mova-o de volta para o desktop
+                premiumBtn.classList.remove('mobile-premium-icon');
+                premiumBtn.innerHTML = '<i class="fas fa-star"></i> Seja Premium'; // Restaurar texto
+
+                // Reinserir no local desktop original
+                const adminBtnRefDesktop = userActionsDesktopContainer ? userActionsDesktopContainer.querySelector('#adminPanelButton') : null;
+                if (userActionsDesktopContainer && adminBtnRefDesktop) { // Antes do Admin
+                    userActionsDesktopContainer.insertBefore(premiumBtn, adminBtnRefDesktop);
+                } else if (userActionsDesktopContainer && logoutButtonDesktop) { // Antes do Logout
+                    userActionsDesktopContainer.insertBefore(premiumBtn, logoutButtonDesktop);
+                } else if (userActionsDesktopContainer) { // Fallback
+                    userActionsDesktopContainer.appendChild(premiumBtn);
+                }
+            }
+        }
+    }
+
 
     function handleNewCategorySelection(type) {
-        console.log("New category selected via new dropdown:", type);
+        console.log("New category selected:", type);
         const dropdownBtnTextSpan = document.querySelector('.category-dropdown .dropdown-btn .btn-text');
+        const mobileView = isMobileView();
 
         if (type === "pessoais") {
             navbarWrapper.style.display = "";
             secondaryNavbarWrapper.style.display = "none";
 
             const personalCategories = categorias.map(c => c[0]);
-            // Ensure currentTab is valid for personal notes, default to 'pessoal' if not or if undefined
             if (!currentTab || !personalCategories.includes(currentTab)) {
                 currentTab = "pessoal";
             }
-            buildNavbar(); // Rebuilds the personal categories navbar
-            changeTab(currentTab); // Sets the active tab and loads notes for it
+            buildNavbar();
+            changeTab(currentTab);
 
             currentThemeInfo = { id: null, type: null, name: null };
-            themeNoteCustomizationDiv.style.display = 'none'; // Hide theme customization area
-            if (dropdownBtnTextSpan) dropdownBtnTextSpan.textContent = 'Pessoais';
+            themeNoteCustomizationDiv.style.display = 'none';
 
-        } else if (THEME_CONFIG_MAP[type]) { // Check if it is a known theme type ID
-            navbarWrapper.style.display = "none"; // Hide personal categories navbar
-            secondaryNavbarWrapper.style.display = ""; // Show theme instances navbar (e.g., list of books)
+            if (dropdownBtnTextSpan && !mobileView) { // Só alterar texto no desktop
+                dropdownBtnTextSpan.textContent = 'Pessoais';
+            } else if (dropdownBtnTextSpan && mobileView) {
+                dropdownBtnTextSpan.textContent = 'Categorias'; // Manter "Categorias" no mobile
+            }
 
-            // buildSecondaryNavbar will set currentThemeInfo.type to 'type' and currentThemeInfo.id/name to null
-            // It will also clear notesContainer or show placeholder for selecting a specific theme instance
+        } else if (THEME_CONFIG_MAP[type]) {
+            navbarWrapper.style.display = "none";
+            secondaryNavbarWrapper.style.display = "";
             buildSecondaryNavbar(type);
 
-            if (dropdownBtnTextSpan) {
-                // Use singularName for the button, fallback to full label if singularName is not defined
+            if (dropdownBtnTextSpan && !mobileView) { // Só alterar texto no desktop
                 dropdownBtnTextSpan.textContent = THEME_CONFIG_MAP[type].singularName || THEME_CONFIG_MAP[type].label;
+            } else if (dropdownBtnTextSpan && mobileView) {
+                dropdownBtnTextSpan.textContent = 'Categorias'; // Manter "Categorias" no mobile
             }
-            // Important: currentThemeInfo.id is null here. Notes should only be loaded when a specific theme instance is clicked in secondaryNavbar.
-            // buildSecondaryNavbar already handles setting notesContainer to a placeholder.
         } else {
-            console.error("Unknown category type selected from new dropdown:", type);
+            console.error("Unknown category type selected:", type);
+            if (dropdownBtnTextSpan && mobileView) { // Fallback para mobile
+                dropdownBtnTextSpan.textContent = 'Categorias';
+            }
         }
     }
 
