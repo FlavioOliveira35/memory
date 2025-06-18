@@ -792,7 +792,7 @@
       overflow-y: hidden; /* Hide scrollbar initially, adjust with JS if content overflows */
     }
 
-    @media (max-width: 768px) {
+    @media (max-width: 1024px) { /* Ajustado de 768px para 1024px */
       .auth-container { margin: 5vh 20px; padding: 30px 20px; }
       /* header { font-size: 1.4rem; padding: 12px 15px 8px 15px; } */ /* Old header padding */
       .navbar { padding: 8px 10px; gap: 6px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
@@ -969,6 +969,111 @@
 
       .notes-container {
          margin-top: 125px;
+      }
+
+      /* Ajustes para o menu hambúrguer achatado */
+      .collapsible-menu.active .main-nav .category-dropdown .dropdown-btn {
+          display: none !important;
+      }
+      .collapsible-menu.active .main-nav {
+          display: flex;
+          flex-direction: column;
+          width: 100%;
+      }
+      /* Estilo unificado para todos os links/botões que servem como itens de menu diretamente dentro do .main-nav */
+      .collapsible-menu.active .main-nav > a { /* Aplica a todos os links 'a' diretos */
+        padding: 15px 20px;
+        border-bottom: 1px solid #e0d8c8;
+        font-family: 'Courier Prime', monospace;
+        color: #2c2416;
+        text-decoration: none;
+        display: block;
+        background-color: transparent;
+        text-align: left;
+        margin:0;
+        border-radius: 0;
+        width: 100%;
+        border-left: none;
+        border-right: none;
+        border-top: none;
+      }
+      /* Remove a borda inferior do último link 'a' direto no .main-nav (que seria o settings-link-mobile) */
+      .collapsible-menu.active .main-nav > a:last-child {
+          border-bottom: none;
+      }
+
+      /* Se a estrutura .category-dropdown > .dropdown-content ainda existir DENTRO do .main-nav
+         (a lógica JS atual em populateNewCategoryDropdown para mobile limpa o mainNav,
+         então esta estrutura .category-dropdown não deveria estar lá no mobile.
+         Estas regras são mais um fallback ou para o caso da lógica JS mudar) */
+      .collapsible-menu.active .main-nav .category-dropdown {
+          width: 100%;
+          margin:0;
+          padding:0;
+          border:0;
+      }
+      .collapsible-menu.active .main-nav .category-dropdown .dropdown-content {
+          display: block; /* Se os links estiverem aqui, eles precisam ser mostrados */
+          position: static;
+          box-shadow: none;
+          border: none;
+          margin-top: 0;
+          background-color: transparent;
+          width: 100%;
+          padding: 0;
+      }
+      /* Os botões em .user-actions já são estilizados pelas regras existentes para .collapsible-menu .user-actions button */
+
+      /* Ajustes para o menu hambúrguer achatado */
+      .collapsible-menu.active .main-nav .category-dropdown .dropdown-btn {
+          display: none !important;
+      }
+      .collapsible-menu.active .main-nav {
+          display: flex;
+          flex-direction: column;
+          width: 100%;
+      }
+      /* Estilo unificado para todos os links <a> diretos no .main-nav */
+      .collapsible-menu.active .main-nav > a {
+        padding: 15px 20px;
+        border-bottom: 1px solid #e0d8c8;
+        font-family: 'Courier Prime', monospace;
+        color: #2c2416;
+        text-decoration: none;
+        display: block;
+        background-color: transparent;
+        text-align: left;
+        margin:0;
+        border-radius: 0;
+        width: 100%;
+        border-left: none;
+        border-right: none;
+        border-top: none;
+      }
+      /* Remove a borda inferior do último link <a> direto no .main-nav */
+      .collapsible-menu.active .main-nav > a:last-of-type { /* Ajustado para :last-of-type para ser mais robusto */
+          border-bottom: none;
+      }
+
+      /* Estrutura de fallback/limpeza se .category-dropdown e .dropdown-content ainda estiverem no DOM dentro de .main-nav
+         (A lógica JS atual limpa o .main-nav no mobile, então estas podem não ser estritamente necessárias, mas são boas como fallback) */
+      .collapsible-menu.active .main-nav .category-dropdown {
+          width: 100%;
+          margin:0;
+          padding:0;
+          border:0;
+          box-shadow: none; /* Adicionado para garantir limpeza */
+          background: transparent; /* Adicionado para garantir limpeza */
+      }
+      .collapsible-menu.active .main-nav .category-dropdown .dropdown-content {
+          display: block;
+          position: static;
+          box-shadow: none;
+          border: none;
+          margin-top: 0;
+          background-color: transparent;
+          width: 100%;
+          padding: 0;
       }
     }
     /* Ensure the main category dropdown button (.dropdown-btn) within .collapsible-menu also gets vintage styling */
@@ -3108,69 +3213,99 @@ async function deleteThemeAndNotes(themeId, themeName, type) { // Tornar async s
     }
 
     function isMobileView() {
-        // O botão hambúrguer só é visível no mobile.
-        return hamburgerBtn && getComputedStyle(hamburgerBtn).display !== 'none';
+        // Ajustado para considerar tablet como parte da "mobile view" até 1024px
+        return window.innerWidth <= 1024;
     }
 
     function populateNewCategoryDropdown() {
-        const dropdownContent = document.querySelector('.category-dropdown .dropdown-content');
-        if (!dropdownContent) {
-            console.error("New category dropdown content area not found.");
+        const mobileView = isMobileView();
+        // O .main-nav é o container onde os links de categoria/ação estarão no mobile.
+        // No desktop, ele contém o .category-dropdown.
+        const mainNav = document.querySelector('.collapsible-menu .main-nav');
+
+        if (!mainNav) {
+            console.error("Container .main-nav não encontrado dentro de .collapsible-menu.");
             return;
         }
-        dropdownContent.innerHTML = ''; // Limpar conteúdo
 
-        const mobileView = isMobileView();
+        // Elementos específicos do dropdown de categorias desktop
+        let categoryDropdownDiv = mainNav.querySelector('.category-dropdown');
+        let categoryDropdownButton = categoryDropdownDiv ? categoryDropdownDiv.querySelector('.dropdown-btn') : null;
+        let dropdownContentTarget = categoryDropdownDiv ? categoryDropdownDiv.querySelector('.dropdown-content') : null;
 
         if (mobileView) {
-            // Mobile: "Pessoais", depois THEME_TYPES_CONFIG, depois Contato e Configurações
+            mainNav.innerHTML = ''; // Limpar .main-nav para adicionar a lista plana
+
+            // Adicionar "Pessoais"
             const pessoaisLink = document.createElement('a');
             pessoaisLink.href = '#';
             pessoaisLink.dataset.categoryType = 'pessoais';
             pessoaisLink.innerHTML = '📝 Pessoais';
-            dropdownContent.appendChild(pessoaisLink);
+            mainNav.appendChild(pessoaisLink);
 
+            // Adicionar links de THEME_TYPES_CONFIG
             THEME_TYPES_CONFIG.forEach(themeConfig => {
                 const themeLink = document.createElement('a');
                 themeLink.href = '#';
                 themeLink.dataset.categoryType = themeConfig.id;
-                themeLink.innerHTML = themeConfig.label;
-                dropdownContent.appendChild(themeLink);
+                themeLink.innerHTML = themeConfig.label; // Inclui ícone e texto
+                mainNav.appendChild(themeLink);
             });
 
             // Adicionar links de Contato e Configurações
             const contactLink = document.createElement('a');
-            contactLink.href = '#'; // Sem funcionalidade de clique por enquanto
+            contactLink.href = '#';
             contactLink.className = 'contact-link-mobile';
             contactLink.innerHTML = '<i class="fas fa-address-book"></i> Contatos';
-            dropdownContent.appendChild(contactLink);
+            mainNav.appendChild(contactLink);
 
             const settingsLink = document.createElement('a');
-            settingsLink.href = '#'; // Sem funcionalidade de clique por enquanto
+            settingsLink.href = '#';
             settingsLink.className = 'settings-link-mobile';
             settingsLink.innerHTML = '<i class="fas fa-cog"></i> Configurações';
-            dropdownContent.appendChild(settingsLink);
+            mainNav.appendChild(settingsLink);
 
-        } else {
-            // Desktop: "Pessoais (Visao Geral)", "Livros (Visao Geral)", etc.
-            // Esta é a lógica que estava implicitamente no HTML antes, adaptada.
+            // Os botões de .user-actions (Sair, Admin, Premium) permanecem em seu próprio container
+            // e serão exibidos após o .main-nav no layout de coluna do .collapsible-menu.
+
+        } else { // Desktop View
+            // Garantir que a estrutura do dropdown exista no mainNav
+            if (!categoryDropdownDiv) {
+                mainNav.innerHTML = ''; // Limpar mainNav caso tenha sido achatado
+                categoryDropdownDiv = document.createElement('div');
+                categoryDropdownDiv.className = 'category-dropdown';
+                mainNav.appendChild(categoryDropdownDiv);
+            }
+            if (!categoryDropdownButton) {
+                categoryDropdownButton = document.createElement('button');
+                categoryDropdownButton.className = 'dropdown-btn';
+                categoryDropdownDiv.appendChild(categoryDropdownButton); // Adicionar antes do content
+            }
+            if (!dropdownContentTarget) {
+                dropdownContentTarget = document.createElement('div');
+                dropdownContentTarget.className = 'dropdown-content';
+                categoryDropdownDiv.appendChild(dropdownContentTarget);
+            }
+
+            // Restaurar/configurar botão e conteúdo do dropdown para desktop
+            categoryDropdownButton.innerHTML = '<span class="btn-text">Categorias</span> <i class="fas fa-chevron-down"></i>';
+            categoryDropdownButton.style.display = ''; // Garantir visibilidade
+            dropdownContentTarget.innerHTML = ''; // Limpar conteúdo anterior
+
             const pessoaisOverviewLink = document.createElement('a');
             pessoaisOverviewLink.href = '#';
             pessoaisOverviewLink.dataset.categoryType = 'pessoais';
             pessoaisOverviewLink.innerHTML = 'Pessoais (Visao Geral)';
-            dropdownContent.appendChild(pessoaisOverviewLink);
+            dropdownContentTarget.appendChild(pessoaisOverviewLink);
 
             THEME_TYPES_CONFIG.forEach(themeConfig => {
                 const themeOverviewLink = document.createElement('a');
                 themeOverviewLink.href = '#';
-                // No desktop, ao clicar em "Livros (Visao Geral)", o handleNewCategorySelection
-                // espera o ID do TIPO de tema (ex: 'livro') para mostrar a barra secundária.
                 themeOverviewLink.dataset.categoryType = themeConfig.id;
                 themeOverviewLink.innerHTML = `${themeConfig.label} (Visao Geral)`;
-                dropdownContent.appendChild(themeOverviewLink);
+                dropdownContentTarget.appendChild(themeOverviewLink);
             });
         }
-        // console.log("New category dropdown populated for", mobileView ? "mobile" : "desktop");
     }
 
     // Chamar populateNewCategoryDropdown no carregamento inicial para configurar o dropdown desktop
